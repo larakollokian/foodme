@@ -4,9 +4,12 @@ import org.springframework.stereotype.Repository;
 
 import ca.mcgill.ecse428.foodme.model.*;
 
+
+import java.util.List;
+
+
 @Repository
 public class Service {
-
 
 	public Restaurant restaurant;
 	public User user;
@@ -32,23 +35,12 @@ public class Service {
 		return liked;
 	}
 
-	/**
-	 * Method that allows user to update their password
-	 * 
-	 * @param aUser
-	 * @param newPassword
-	 */
-
 	public void changePassword(User aUser, String newPassword) {
 		aUser.setPassword(newPassword);
 		return;
 		
 	}
-
-	/**
-	 * Method that allows users to delete their existing account.
-	 * @param aUser
-	 */
+	
 	public void deleteAccount(User aUser) {
 		aUser.setCity(null);
 		aUser.setEmail(null);
@@ -56,16 +48,11 @@ public class Service {
 		aUser.setPassword(null);
 	}
 	
-
-	/**
-	 * Method that checks to see if a restaurant is open at the current time
-	 * @param aRestaurant
-	 * @return
-	 */
 	public boolean isRestaurantOpen(Restaurant aRestaurant) {
 	
 		
 		return true;
 	}
 }
+
 
