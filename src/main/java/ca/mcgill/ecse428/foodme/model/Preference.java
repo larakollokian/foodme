@@ -3,160 +3,168 @@
 
 package ca.mcgill.ecse428.foodme.model;
 
-// line 13 "../../../../../../../ump/tmp570555/model.ump"
-// line 46 "../../../../../../../ump/tmp570555/model.ump"
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="preference")
 public class Preference
 {
+	//------------------------
+	// MEMBER VARIABLES
+	//------------------------
 
-  //------------------------
-  // MEMBER VARIABLES
-  //------------------------
+	//Preference Attributes
+	private DistanceRange distance;
+	private Cuisine cuisine;
+	private PriceRange price;
+	private Rating rating;
+	private String pID;
 
-  //Preference Attributes
-  private String range;
-  private String distance;
-  private String cuisine;
-  private boolean open;
-  private int rating;
+	//Preference Associations
+	private AppUser appUser;
 
-  //Preference Associations
-  private User user;
+	//------------------------
+	// CONSTRUCTOR (SHOULD BE DEFAULT)
+	//------------------------
 
-  //------------------------
-  // CONSTRUCTOR
-  //------------------------
+	//  public Preference(DistanceRange aDistance, Cuisine aCuisine, PriceRange aPrice, Rating aRating, String aPID, User aUser)
+	//  {
+	//    distance = aDistance;
+	//    cuisine = aCuisine;
+	//    price = aPrice;
+	//    rating = aRating;
+	//    pID = aPID;
+	//    boolean didAddUser = setUser(aUser);
+	//    if (!didAddUser)
+	//    {
+	//      throw new RuntimeException("Unable to create preference due to user");
+	//    }
+	//  }
 
-  public Preference(String aRange, String aDistance, String aCuisine, boolean aOpen, int aRating, User aUser)
-  {
-    range = aRange;
-    distance = aDistance;
-    cuisine = aCuisine;
-    open = aOpen;
-    rating = aRating;
-    boolean didAddUser = setUser(aUser);
-    if (!didAddUser)
-    {
-      throw new RuntimeException("Unable to create preference due to user");
-    }
-  }
+	//------------------------
+	// INTERFACE
+	//------------------------
 
-  //------------------------
-  // INTERFACE
-  //------------------------
+	public boolean setDistance(DistanceRange aDistance)
+	{
+		boolean wasSet = false;
+		this.distance = aDistance;
+		wasSet = true;
+		return wasSet;
+	}
 
-  public boolean setRange(String aRange)
-  {
-    boolean wasSet = false;
-    range = aRange;
-    wasSet = true;
-    return wasSet;
-  }
+	public boolean setCuisine(Cuisine aCuisine)
+	{
+		boolean wasSet = false;
+		this.cuisine = aCuisine;
+		wasSet = true;
+		return wasSet;
+	}
 
-  public boolean setDistance(String aDistance)
-  {
-    boolean wasSet = false;
-    distance = aDistance;
-    wasSet = true;
-    return wasSet;
-  }
+	public boolean setPrice(PriceRange aPrice)
+	{
+		boolean wasSet = false;
+		this.price = aPrice;
+		wasSet = true;
+		return wasSet;
+	}
 
-  public boolean setCuisine(String aCuisine)
-  {
-    boolean wasSet = false;
-    cuisine = aCuisine;
-    wasSet = true;
-    return wasSet;
-  }
+	public boolean setRating(Rating aRating)
+	{
+		boolean wasSet = false;
+		this.rating = aRating;
+		wasSet = true;
+		return wasSet;
+	}
 
-  public boolean setOpen(boolean aOpen)
-  {
-    boolean wasSet = false;
-    open = aOpen;
-    wasSet = true;
-    return wasSet;
-  }
+	public boolean setPID(String aPID)
+	{
+		boolean wasSet = false;
+		this.pID = aPID;
+		wasSet = true;
+		return wasSet;
+	}
 
-  public boolean setRating(int aRating)
-  {
-    boolean wasSet = false;
-    rating = aRating;
-    wasSet = true;
-    return wasSet;
-  }
+	public DistanceRange getDistance()
+	{
+		if(this.distance == null)
+		{
+			this.distance = DistanceRange.None;
+		}
+		return this.distance;
+	}
 
-  public String getRange()
-  {
-    return range;
-  }
+	public Cuisine getCuisine()
+	{
+		if(this.cuisine == null)
+		{
+			this.cuisine = Cuisine.None;
+		}
+		return this.cuisine;
+	}
 
-  public String getDistance()
-  {
-    return distance;
-  }
+	public PriceRange getPrice()
+	{
+		if(this.price == null)
+		{
+			this.price = PriceRange.None;
+		}
+		return this.price;
+	}
 
-  public String getCuisine()
-  {
-    return cuisine;
-  }
+	public Rating getRating()
+	{
+		if(this.rating == null)
+		{
+			this.rating = Rating.None;
+		}
+		return this.rating;
+	}
 
-  public boolean getOpen()
-  {
-    return open;
-  }
+	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE)
+	public String getPID()
+	{
+		return this.pID;
+	}
+	/* Code from template association_GetOne */
+	@ManyToOne
+	@JoinColumn //(name = "app_user")
+	public AppUser getUser()
+	{
+		return this.appUser;
+	}
+	/* Code from template association_SetOneToMany */
+	public void setUser(AppUser aUser)
+	{
+		this.appUser = aUser;
+	}
 
-  public int getRating()
-  {
-    return rating;
-  }
-  /* Code from template attribute_IsBoolean */
-  public boolean isOpen()
-  {
-    return open;
-  }
-  /* Code from template association_GetOne */
-  public User getUser()
-  {
-    return user;
-  }
-  /* Code from template association_SetOneToMany */
-  public boolean setUser(User aUser)
-  {
-    boolean wasSet = false;
-    if (aUser == null)
-    {
-      return wasSet;
-    }
-
-    User existingUser = user;
-    user = aUser;
-    if (existingUser != null && !existingUser.equals(aUser))
-    {
-      existingUser.removePreference(this);
-    }
-    user.addPreference(this);
-    wasSet = true;
-    return wasSet;
-  }
-
-  public void delete()
-  {
-    User placeholderUser = user;
-    this.user = null;
-    if(placeholderUser != null)
-    {
-      placeholderUser.removePreference(this);
-    }
-  }
+	public void delete()
+	{
+		AppUser placeholderUser = appUser;
+		this.appUser = null;
+		if(placeholderUser != null)
+		{
+			placeholderUser.removePreference(this);
+		}
+	}
 
 
-  public String toString()
-  {
-    return super.toString() + "["+
-            "range" + ":" + getRange()+ "," +
-            "distance" + ":" + getDistance()+ "," +
-            "cuisine" + ":" + getCuisine()+ "," +
-            "open" + ":" + getOpen()+ "," +
-            "rating" + ":" + getRating()+ "]" + System.getProperties().getProperty("line.separator") +
-            "  " + "user = "+(getUser()!=null?Integer.toHexString(System.identityHashCode(getUser())):"null");
-  }
+	public String toString()
+	{
+		return super.toString() + "["+
+				"pID" + ":" + getPID()+ "]" + System.getProperties().getProperty("line.separator") +
+				"  " + "distance" + "=" + (getDistance() != null ? !getDistance().equals(this)  ? getDistance().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+				"  " + "cuisine" + "=" + (getCuisine() != null ? !getCuisine().equals(this)  ? getCuisine().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+				"  " + "price" + "=" + (getPrice() != null ? !getPrice().equals(this)  ? getPrice().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+				"  " + "rating" + "=" + (getRating() != null ? !getRating().equals(this)  ? getRating().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+				"  " + "user = "+(getUser()!=null?Integer.toHexString(System.identityHashCode(getUser())):"null");
+	}
 }
