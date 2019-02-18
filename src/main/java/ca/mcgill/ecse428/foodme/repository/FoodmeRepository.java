@@ -10,6 +10,7 @@ import ca.mcgill.ecse428.foodme.model.*;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Repository
 public class FoodmeRepository {
@@ -30,6 +31,41 @@ public class FoodmeRepository {
 		u.setDislikes(new ArrayList<String>());
 		entityManager.persist(u);
 		return u;
+	}
+
+	@Transactional
+	public Preference createPreference(String username, String priceRange, String distanceRange, String cuisine, String rating){
+		Preference preference = new Preference();
+		// TODO return exception if enum don't exist, probably will never happen if we have dropdown menus though
+		preference.setPrice(PriceRange.valueOf(priceRange));
+		preference.setDistance(DistanceRange.valueOf(distanceRange));
+		preference.setCuisine(Cuisine.valueOf(cuisine));
+		preference.setRating(Rating.valueOf(rating));
+		//preference.setUser();
+		entityManager.persist(preference);
+		return preference;
+	}
+
+	@Transactional
+	public void addPreferenceToUser(AppUser user, Preference preference) {
+		user.addPreference(preference);
+		entityManager.persist(user);
+	}
+
+	@Transactional
+	public Preference editPreference(Preference editPreference, PriceRange priceRange, DistanceRange distanceRange, Cuisine cuisine, Rating rating) {
+		editPreference.setPrice(priceRange);
+		editPreference.setDistance(distanceRange);
+		editPreference.setCuisine(cuisine);
+		editPreference.setRating(rating);
+		entityManager.persist(editPreference);
+		return editPreference;
+	}
+
+	@Transactional
+	public void updatePreferenceToUser(AppUser user, int index, Preference editPreference) {
+		user.getPreferences().set(index, editPreference);
+		entityManager.persist(user);
 	}
 
 //	public Restaurant restaurant;

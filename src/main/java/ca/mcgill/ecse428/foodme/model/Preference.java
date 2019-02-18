@@ -24,7 +24,7 @@ public class Preference
 	private Cuisine cuisine;
 	private PriceRange price;
 	private Rating rating;
-	private String pID;
+	private int pID;
 
 	//Preference Associations
 	private AppUser appUser;
@@ -83,7 +83,7 @@ public class Preference
 		return wasSet;
 	}
 
-	public boolean setPID(String aPID)
+	public boolean setPID(int aPID)
 	{
 		boolean wasSet = false;
 		this.pID = aPID;
@@ -129,7 +129,7 @@ public class Preference
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	public String getPID()
+	public int getPID()
 	{
 		return this.pID;
 	}
