@@ -3,7 +3,8 @@ package ca.mcgill.ecse428.foodme.service;
 import org.springframework.stereotype.Repository;
 import ca.mcgill.ecse428.foodme.model.*;
 import java.util.*;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 @Repository
 public class Service {
@@ -48,7 +49,7 @@ public class Service {
 	 * Method that allows users to delete their account
 	 * @param aUser
 	 */
-	public void deleteAccount(User aUser) {
+	public void deleteAccount(AppUser aUser) {
 		aUser.setCity(null);
 		aUser.setEmail(null);
 		aUser.setName(null);
