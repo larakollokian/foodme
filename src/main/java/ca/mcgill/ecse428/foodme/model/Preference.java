@@ -3,13 +3,10 @@
 
 package ca.mcgill.ecse428.foodme.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name="preference")
@@ -24,7 +21,8 @@ public class Preference
 	private Cuisine cuisine;
 	private PriceRange price;
 	private Rating rating;
-	private String pID;
+
+	private int pID;
 
 	//Preference Associations
 	private AppUser appUser;
@@ -83,7 +81,7 @@ public class Preference
 		return wasSet;
 	}
 
-	public boolean setPID(String aPID)
+	public boolean setPID(int aPID)
 	{
 		boolean wasSet = false;
 		this.pID = aPID;
@@ -129,13 +127,15 @@ public class Preference
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	public String getPID()
+
+	public int getPID()
 	{
 		return this.pID;
 	}
 	/* Code from template association_GetOne */
 	@ManyToOne
-	@JoinColumn //(name = "app_user")
+	//@JoinColumn(name = "app_user")
+	@JsonIgnore
 	public AppUser getUser()
 	{
 		return this.appUser;
