@@ -99,9 +99,20 @@ public class Controller
 	@GetMapping("/search/price/")
 	public ResponseEntity<String> searchByPriceRange (
 	        @RequestParam("location") String location,
-            @RequestParam("price") String price) {
+            @RequestParam("longitude") String longitude,
+            @RequestParam("latitude") String latitude,
+            @RequestParam("price") String price) throws Exception{
 
-	    String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
+		String url = null;
+		if (location == null && (longitude != null && latitude != null)) {
+			url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
+		} else if (location != null && (longitude == null || latitude == null)) {
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
+		} else if (location != null && latitude != null && longitude != null) {
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&longitude" + longitude + "&latitude=" + latitude + "&price=" + price;
+		} else {
+			throw new Exception("You are missing either location or longitude and latitude to make a query!");
+		}
 
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Authorization", "Bearer " + APIKey);
