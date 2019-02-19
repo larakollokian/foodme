@@ -10,7 +10,6 @@ import ca.mcgill.ecse428.foodme.model.*;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Repository
 public class FoodmeRepository {
@@ -36,42 +35,40 @@ public class FoodmeRepository {
 	@Transactional
 	public Preference createPreference(AppUser user, String priceRange, String distanceRange, String cuisine, String rating){
 		Preference preference = new Preference();
-		// TODO return exception if enum don't exist, probably will never happen if we have dropdown menus though
 		preference.setPrice(PriceRange.valueOf(priceRange));
 		preference.setDistance(DistanceRange.valueOf(distanceRange));
 		preference.setCuisine(Cuisine.valueOf(cuisine));
 		preference.setRating(Rating.valueOf(rating));
 		preference.setUser(user);
+		user.addPreference(preference);
 		entityManager.persist(preference);
+		entityManager.merge(user);
 		return preference;
 	}
 
 	@Transactional
-	public void addPreferenceToUser(AppUser user, Preference preference) {
-		user.addPreference(preference);
-		entityManager.persist(user);
-	}
-
-	@Transactional
-	public Preference editPreference(Preference editPreference, PriceRange priceRange, DistanceRange distanceRange, Cuisine cuisine, Rating rating) {
-		editPreference.setPrice(priceRange);
-		editPreference.setDistance(distanceRange);
-		editPreference.setCuisine(cuisine);
-		editPreference.setRating(rating);
-		entityManager.persist(editPreference);
-		return editPreference;
-	}
-
-	@Transactional
-	public void updatePreferenceToUser(AppUser user, int index, Preference editPreference) {
+	public Preference editPreference(AppUser user, Preference editPreference, String priceRange, String distanceRange,
+									 String cuisine, String rating, int index) {
+		editPreference.setPrice(PriceRange.valueOf(priceRange));
+		editPreference.setDistance(DistanceRange.valueOf(distanceRange));
+		editPreference.setCuisine(Cuisine.valueOf(cuisine));
+		editPreference.setRating(Rating.valueOf(rating));
 		user.getPreferences().set(index, editPreference);
-		entityManager.persist(user);
+		entityManager.merge(editPreference);
+		entityManager.merge(user);
+		return editPreference;
 	}
 
 	@Transactional
 	public AppUser getAppUser(String username){
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		return appUser;
+	}
+
+	@Transactional
+	public Preference getPreference(int pID){
+		Preference preference = entityManager.find(Preference.class, pID);
+		return preference;
 	}
 
 //	public Restaurant restaurant;

@@ -3,13 +3,9 @@
 
 package ca.mcgill.ecse428.foodme.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name="preference")
@@ -135,7 +131,8 @@ public class Preference
 	}
 	/* Code from template association_GetOne */
 	@ManyToOne
-	@JoinColumn //(name = "app_user")
+	//@JoinColumn(name = "app_user")
+	@JsonIgnore
 	public AppUser getUser()
 	{
 		return this.appUser;

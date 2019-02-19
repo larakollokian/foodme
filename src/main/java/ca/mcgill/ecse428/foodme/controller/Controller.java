@@ -69,34 +69,20 @@ public class Controller
 
 		AppUser appUser = repository.getAppUser(username);
 		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
-		repository.addPreferenceToUser(appUser, preference);
 		return preference;
 	}
 
 	@PostMapping("/users/{user}/preferences/{pID}/")
 	public Preference editPreference(
-			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam PriceRange priceRange,
-			@RequestParam DistanceRange distanceRange, @RequestParam Cuisine cuisine, @RequestParam Rating rating){
+			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
+			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
 		AppUser appUser = repository.getAppUser(username);
 		List<Preference> preferenceList = appUser.getPreferences();
-		Preference editPreference = null;
-		int index = 0;
+		Preference editPreference = repository.getPreference(pID);
+		int index = preferenceList.indexOf(editPreference);
 
-		for (Preference preference: preferenceList) {	// Find preference to be updated
-			if (preference.getPID() == pID) {
-				editPreference = preference;
-				index = preferenceList.indexOf(preference);
-				break;
-			}
-		}
-
-		if(editPreference == null)	//Don't try if the preference does not exist
-			return null;
-
-		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
-		repository.updatePreferenceToUser(appUser, index, editPreference);
-
+		editPreference = repository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, index);
 		return editPreference;
 	}
 }
