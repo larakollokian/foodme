@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
+import ca.mcgill.ecse428.foodme.service.AuthenticationException;
+import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 
 import java.util.List;
 

@@ -28,6 +28,7 @@ public class AuthenticationService {
 	 * gets an AppUser by session 
 	 * @param sessionGuid
 	 * @return AppUser 
+	 * @throws Exception 
 	 */
 	public AppUser getUserBySession(String sessionGuid) throws InvalidSessionException {
 		String name = userBySession.get(sessionGuid);
@@ -41,6 +42,7 @@ public class AuthenticationService {
 	 * gets an AppUser in the repository using the username
 	 * @param username
 	 * @return AppUser
+	 * @throws Exception 
 	 */
 	private AppUser findUserByUsername(String username) throws InvalidSessionException  {
 
@@ -56,15 +58,18 @@ public class AuthenticationService {
 	 * @param username
 	 * @param password
 	 * @return sessionGuid
+	 * @throws AuthenticationException 
+
 	 */
-	public String login(String username, String password) throws AuthenticationException,InvalidSessionException {
+	public String login(String username, String password) throws AuthenticationException{
 		AppUser user;	
 		try{
 			user = findUserByUsername(username);
 			Password.check(password, user.getPassword());
 		}
+		
 		catch(Exception e){
-			throw new AuthenticationException("Invalid login information!!!");
+			throw new AuthenticationException("Invalid login information!!!",e);
 		}
 			
 		if (sessionByUser.containsKey(user.getUsername())) {
