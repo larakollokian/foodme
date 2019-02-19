@@ -1,6 +1,7 @@
 package ca.mcgill.ecse428.foodme.controller;
 
 import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Preference;
 import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
 import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @RestController
 public class Controller 
@@ -118,5 +121,27 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	@PostMapping("/users/{user}/preferences/")
+	public Preference addPreference(
+			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
+			@RequestParam String cuisine, @RequestParam String rating) {
 
+		AppUser appUser = repository.getAppUser(username);
+		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+		return preference;
+	}
+
+	@PostMapping("/users/{user}/preferences/{pID}/")
+	public Preference editPreference(
+			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
+			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
+
+		AppUser appUser = repository.getAppUser(username);
+		List<Preference> preferenceList = appUser.getPreferences();
+		Preference editPreference = repository.getPreference(pID);
+		int index = preferenceList.indexOf(editPreference);
+
+		editPreference = repository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, index);
+		return editPreference;
+	}
 }

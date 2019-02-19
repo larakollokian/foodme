@@ -41,4 +41,68 @@ public class FoodmeRepository {
 
 		return u;
 	}
+
+	@Transactional
+	public Preference createPreference(AppUser user, String priceRange, String distanceRange, String cuisine, String rating){
+		Preference preference = new Preference();
+		preference.setPrice(PriceRange.valueOf(priceRange));
+		preference.setDistance(DistanceRange.valueOf(distanceRange));
+		preference.setCuisine(Cuisine.valueOf(cuisine));
+		preference.setRating(Rating.valueOf(rating));
+		preference.setUser(user);
+		user.addPreference(preference);
+		entityManager.persist(preference);
+		entityManager.merge(user);
+		return preference;
+	}
+
+	@Transactional
+	public Preference editPreference(AppUser user, Preference editPreference, String priceRange, String distanceRange,
+									 String cuisine, String rating, int index) {
+		editPreference.setPrice(PriceRange.valueOf(priceRange));
+		editPreference.setDistance(DistanceRange.valueOf(distanceRange));
+		editPreference.setCuisine(Cuisine.valueOf(cuisine));
+		editPreference.setRating(Rating.valueOf(rating));
+		user.getPreferences().set(index, editPreference);
+		entityManager.merge(editPreference);
+		entityManager.merge(user);
+		return editPreference;
+	}
+
+	@Transactional
+	public AppUser getAppUser(String username){
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		return appUser;
+	}
+
+	@Transactional
+	public Preference getPreference(int pID){
+		Preference preference = entityManager.find(Preference.class, pID);
+		return preference;
+	}
+
+//	public Restaurant restaurant;
+//	public User user;
+//	private List<Restaurant> liked;
+//	
+//	/**
+//	 * Method to like a restaurant so its in the user list of liked restaurant
+//	 * @param restaurant The restaurant a user likes
+//	 * @return void The method returns nothing, this change will be saved in the database
+//	 */
+//	public void isLiked(Restaurant restaurant) {
+//		liked=user.getLiked();
+//		liked.add(restaurant);
+//		user.setLiked(liked);
+//	}
+//	
+//	/**
+//	 * Method to list all the liked restaurants of a user
+//	 * @return The list of all the liked restaurants
+//	 */
+//	public List<Restaurant> listAllLiked() {
+//		List<Restaurant> liked = user.getLiked();
+//		return liked;
+//	}
+	
 }
