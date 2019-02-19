@@ -17,9 +17,18 @@ public class FoodmeRepository {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	/**
+	 * Method to create an new account
+	 * @param username The user's chosen username
+	 * @param firstName The user's first name
+	 * @param lastName The user's last name
+	 * @param email The user's email address
+	 * @param password The user's password
+	 * @return User entity that was created
+	 */
 	@Transactional
-	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password) 
-	{
+	public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws InvalidInputException {
+
 		AppUser u = new AppUser();
 		u.setUsername(username);
 		u.setFirstName(firstName);
@@ -29,31 +38,7 @@ public class FoodmeRepository {
 		u.setLikes(new ArrayList<String>());
 		u.setDislikes(new ArrayList<String>());
 		entityManager.persist(u);
+
 		return u;
 	}
-
-//	public Restaurant restaurant;
-//	public User user;
-//	private List<Restaurant> liked;
-//	
-//	/**
-//	 * Method to like a restaurant so its in the user list of liked restaurant
-//	 * @param restaurant The restaurant a user likes
-//	 * @return void The method returns nothing, this change will be saved in the database
-//	 */
-//	public void isLiked(Restaurant restaurant) {
-//		liked=user.getLiked();
-//		liked.add(restaurant);
-//		user.setLiked(liked);
-//	}
-//	
-//	/**
-//	 * Method to list all the liked restaurants of a user
-//	 * @return The list of all the liked restaurants
-//	 */
-//	public List<Restaurant> listAllLiked() {
-//		List<Restaurant> liked = user.getLiked();
-//		return liked;
-//	}
-	
 }
