@@ -77,13 +77,18 @@ public class FoodmeRepository {
 	 * Method that allows users to delete their account
 	 * @param aUser
 	 */
-	public void deleteAccount(AppUser aUser) {
-		aUser.setLikes(null);
-		aUser.setDislikes(null);
-		aUser.setEmail(null);
-		aUser.setFirstName(null);
-		aUser.setLastName(null);
-		aUser.setPassword(null);
+	@Transactional
+	public void deleteUser(String username) throws ParseException {
+		AppUser u = entityManager.find(AppUser.class, username);
+		entityManager.remove(u);
+		
+		// aUser.setUsername(null);
+		// aUser.setLikes(null);
+		// aUser.setDislikes(null);
+		// aUser.setEmail(null);
+		// aUser.setFirstName(null);
+		// aUser.setLastName(null);
+		// aUser.setPassword(null);
 	}
 
 
@@ -92,22 +97,22 @@ public class FoodmeRepository {
 	 * @param aRestaurant
 	 * @return
 	 */
-	public boolean isRestaurantOpen(Restaurant aRestaurant) {
+	// public boolean isRestaurantOpen(Restaurant aRestaurant) {
 
-		Date date = new Date();
-		Date time = new Date();
+	// 	Date date = new Date();
+	// 	Date time = new Date();
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		Date dateInput = sdf.parse(departureDate);
-		String date1 = sdf.format(dateInput);        
-		String date2 = sdf.format(date);
+	// 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+	// 	Date dateInput = sdf.parse(departureDate);
+	// 	String date1 = sdf.format(dateInput);        
+	// 	String date2 = sdf.format(date);
 
-		SimpleDateFormat sdf2 = new SimpleDateFormat("HHmm");
-		Date timeInput = sdf2.parse(departureTime);
-		String time1 = sdf2.format(timeInput);
-		String time2 = sdf2.format(time);
+	// 	SimpleDateFormat sdf2 = new SimpleDateFormat("HHmm");
+	// 	Date timeInput = sdf2.parse(departureTime);
+	// 	String time1 = sdf2.format(timeInput);
+	// 	String time2 = sdf2.format(time);
 		
-		return true;
-	}
+	// 	return true;
+	// }
 
 }

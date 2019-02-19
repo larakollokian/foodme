@@ -2,14 +2,21 @@ package ca.mcgill.ecse428.foodme.controller;
 	
 	
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
+import ca.mcgill.ecse428.foodme.repository.*;
+import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 
 @RestController
+@CrossOrigin
 public class Controller 
 {
 	@Autowired
@@ -56,7 +63,41 @@ public class Controller
 		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
 		return u;
 	}
-	
+
+
+	@PostMapping("/users/delete/{username}")
+	public void deleteUser(@PathVariable("username")String username)
+	{
+
+		try {
+			repository.deleteUser(username);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+
+		
+		// Response r = new Response();
+		// try {
+		// 	repository.deleteUser(username);
+		// 	r.setResponse(true);
+			
+		// } catch (NullPointerException e) {
+		// 	r.setResponse(false);
+		// 	r.setError("No such User exists");
+		// }
+		// return r;	
+	}
+
+	@PostMapping("/users/changePassword/{username}/new/{password}")
+	public void changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
+		// AppUser u = repository.getAppUser(username);
+
+		// aUser.setPassword(newPassword);
+		// return;
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                   PREFERENCE CONTROLLER                           /////////////////
