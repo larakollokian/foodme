@@ -8,12 +8,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.repository.*;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -103,5 +108,28 @@ public class Controller
 	/////////////////                   PREFERENCE CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+	@PostMapping("/users/{user}/preferences/")
+	public Preference addPreference(
+			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
+			@RequestParam String cuisine, @RequestParam String rating) {
+
+		AppUser appUser = repository.getAppUser(username);
+		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+		return preference;
+	}
+
+	@PostMapping("/users/{user}/preferences/{pID}/")
+	public Preference editPreference(
+			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
+			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
+
+		AppUser appUser = repository.getAppUser(username);
+		List<Preference> preferenceList = appUser.getPreferences();
+		Preference editPreference = repository.getPreference(pID);
+		int index = preferenceList.indexOf(editPreference);
+
+		editPreference = repository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, index);
+		return editPreference;
+	}
 }

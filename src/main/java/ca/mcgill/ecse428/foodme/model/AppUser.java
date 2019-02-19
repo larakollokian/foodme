@@ -1,13 +1,10 @@
 package ca.mcgill.ecse428.foodme.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.*;
 
 //import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
 @Table(name="app_user")
@@ -183,7 +180,7 @@ public class AppUser
 	}
 
 	@Transient
-	@OneToMany(mappedBy = "app_user"/*, cascade = CascadeType.ALL*/)
+	@OneToMany(mappedBy = "app_user")
 	public List<Preference> getPreferences()
 	{
 		if(this.preferences == null)
@@ -207,6 +204,10 @@ public class AppUser
 
 	public void addPreference(Preference aPreference)
 	{
+		if(this.preferences == null)
+		{
+			this.preferences = new ArrayList<Preference>();
+		}
 		this.preferences.add(aPreference);
 	}
 
