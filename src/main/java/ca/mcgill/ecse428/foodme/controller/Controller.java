@@ -57,7 +57,15 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  	@PostMapping("/users/create/{username}/")
+	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
+	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
+								  @PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
+	{
+		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
+		return u;
+	}
+
+	@PostMapping("/users/create/{username}/")
 	public AppUser createAccount(
 			@PathVariable("username") String username,
 			@RequestParam("firstName")String firstName,

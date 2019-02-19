@@ -17,6 +17,21 @@ public class FoodmeRepository {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	@Transactional
+	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password)
+	{
+		AppUser u = new AppUser();
+		u.setUsername(username);
+		u.setFirstName(firstName);
+		u.setLastName(lastName);
+		u.setEmail(email);
+		u.setPassword(password);
+		u.setLikes(new ArrayList<String>());
+		u.setDislikes(new ArrayList<String>());
+		entityManager.persist(u);
+		return u;
+	}
+
 	/**
 	 * Method to create an new account
 	 * @param username The user's chosen username
