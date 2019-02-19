@@ -34,14 +34,14 @@ public class FoodmeRepository {
 	}
 
 	@Transactional
-	public Preference createPreference(String username, String priceRange, String distanceRange, String cuisine, String rating){
+	public Preference createPreference(AppUser user, String priceRange, String distanceRange, String cuisine, String rating){
 		Preference preference = new Preference();
 		// TODO return exception if enum don't exist, probably will never happen if we have dropdown menus though
 		preference.setPrice(PriceRange.valueOf(priceRange));
 		preference.setDistance(DistanceRange.valueOf(distanceRange));
 		preference.setCuisine(Cuisine.valueOf(cuisine));
 		preference.setRating(Rating.valueOf(rating));
-		//preference.setUser();
+		preference.setUser(user);
 		entityManager.persist(preference);
 		return preference;
 	}
@@ -66,6 +66,12 @@ public class FoodmeRepository {
 	public void updatePreferenceToUser(AppUser user, int index, Preference editPreference) {
 		user.getPreferences().set(index, editPreference);
 		entityManager.persist(user);
+	}
+
+	@Transactional
+	public AppUser getAppUser(String username){
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		return appUser;
 	}
 
 //	public Restaurant restaurant;

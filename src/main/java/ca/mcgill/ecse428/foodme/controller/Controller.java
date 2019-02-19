@@ -67,8 +67,9 @@ public class Controller
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
 
-		Preference preference =  repository.createPreference(username, priceRange, distanceRange, cuisine, rating);
-		//repository.addPreferenceToUser(user, preference);
+		AppUser appUser = repository.getAppUser(username);
+		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+		repository.addPreferenceToUser(appUser, preference);
 		return preference;
 	}
 
@@ -77,12 +78,13 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam PriceRange priceRange,
 			@RequestParam DistanceRange distanceRange, @RequestParam Cuisine cuisine, @RequestParam Rating rating){
 
-
-		/*List<Preference> preferenceList = user.getPreferences();
+		AppUser appUser = repository.getAppUser(username);
+		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = null;
 		int index = 0;
+
 		for (Preference preference: preferenceList) {	// Find preference to be updated
-			if (preference.getPID() == (pID)) {
+			if (preference.getPID() == pID) {
 				editPreference = preference;
 				index = preferenceList.indexOf(preference);
 				break;
@@ -93,9 +95,8 @@ public class Controller
 			return null;
 
 		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
-		repository.updatePreferenceToUser(user, index, editPreference);
+		repository.updatePreferenceToUser(appUser, index, editPreference);
 
-		return editPreference;*/
-		return null;
+		return editPreference;
 	}
 }
