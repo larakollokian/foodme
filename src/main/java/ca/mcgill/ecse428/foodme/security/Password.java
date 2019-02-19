@@ -3,6 +3,9 @@ package ca.mcgill.ecse428.foodme.security;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+
+import ca.mcgill.ecse428.foodme.service.AuthenticationException;
+
 import java.security.SecureRandom;
 
 import java.util.Base64;
@@ -18,13 +21,23 @@ public class Password {
     private static final Encoder base64Encoder = Base64.getEncoder();
     private static final Decoder base64Decoder = Base64.getDecoder();
 
-    /*Generate a salt hash */
+    /**
+	 * get salted hash given a password
+	 * @param password
+	 * @return salt hash password
+	 */
+
     public static String getSaltedHash(String password) throws Exception {
         byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
         // store the salt with the password
         return base64Encoder.encodeToString(salt) + "$" + hash(password, salt);
     }
-
+    /**
+	 * hash given a password
+	 * @param password
+	 * @param finish
+	 * @return hashed password
+	 */
     //Hashing password using PBKDF2
     private static String hash(String password, byte[] salt) throws Exception {
         if (password == null || password.length() == 0)
@@ -35,14 +48,22 @@ public class Password {
         );
         return base64Encoder.encodeToString(key.getEncoded());
     }
-
-    //Check if password entered by user corresponds to the salt hash
-    public static boolean check(String password, String storedHash) throws Exception {
+    /**
+     * checks if password entered by user corresponds to the salt hash 
+	 * @param password
+	 * @param storedHash
+	 * @throws IllegalStateException when the stored password hash is formatted incorrectly
+     * @throws Exception when the password is not equal to the storedHash
+	 */
+    public static void check(String password, String storedHash) throws Exception {
         String[] saltAndPass = storedHash.split("\\$");
         if (saltAndPass.length != 2) {
             throw new IllegalStateException("The stored password hash is formatted incorrectly.");
         }
         String hashOfInput = hash(password, base64Decoder.decode(saltAndPass[0]));
-        return hashOfInput.equals(saltAndPass[1]);
+        boolean isEqual = hashOfInput.equals(saltAndPass[1]);
+        if(!isEqual){
+            throw new Exception("Wrong password");
+        }
     }
 }

@@ -1,0 +1,60 @@
+class Preference
+{
+  DistanceRange distance;
+  Cuisine cuisine;
+  PriceRange price;
+  Rating rating;
+  pID;
+}
+
+class User
+{
+  username;
+  firstName;
+  lastName;
+  email;
+  password;
+  List<String> likes;
+  List<String> dislikes;
+  1 --* Preference;
+}
+
+enum Cuisine 
+{
+  Mexican, Italian
+}
+
+enum PriceRange
+{
+   $,$$,$$$,$$$$,$$$$$
+}
+
+enum DistanceRange
+{
+   250m,500m,750m,1km,2km+
+}
+
+enum Rating
+{
+   0, 0.5,1,1.5,2,2.5,3,3.5,4,4.5,5
+}
+
+
+
+//$?[End_of_model]$?
+
+class Preference
+{
+  position 49 52 189 124;
+}
+
+class User
+{
+  position 429 16 141 158;
+  position.association Preference__User 0,10 189,1;
+}
+
+class Preference
+{
+  position 49 52 189 124;
+}
