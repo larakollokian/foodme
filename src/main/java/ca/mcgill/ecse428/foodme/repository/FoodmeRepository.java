@@ -11,6 +11,7 @@ import ca.mcgill.ecse428.foodme.model.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@SuppressWarnings("Duplicates")
 @Repository
 public class FoodmeRepository {
 	
@@ -80,7 +81,7 @@ public class FoodmeRepository {
 		editPreference.setRating(Rating.valueOf(rating));
 		user.getPreferences().set(index, editPreference);
 		entityManager.merge(editPreference);
-		entityManager.merge(user);
+		entityManager.persist(user);
 		return editPreference;
 	}
 
@@ -94,6 +95,18 @@ public class FoodmeRepository {
 	public Preference getPreference(int pID){
 		Preference preference = entityManager.find(Preference.class, pID);
 		return preference;
+	}
+
+	@Transactional
+	public void addDislike (AppUser user, String restaurant) {
+		// dummy for test
+		// do nothing
+	}
+
+	@Transactional
+	public boolean removeDislike (AppUser user, String restaurant) {
+		// dummy for test
+		return true;
 	}
 
 //	public Restaurant restaurant;
