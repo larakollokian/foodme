@@ -105,8 +105,10 @@ public class FoodmeRepository {
 	 * @param aUser
 	 * @param newPassword
 	 */
-	public void changePassword(AppUser aUser, String newPassword) {
-		aUser.setPassword(newPassword);
+	public void changePassword(String username, String newPassword) {
+		AppUser u = entityManager.find(AppUser.class, username);
+		u.setPassword(newPassword);
+		entityManager.merge(u);
 		return;
 		
 	}
