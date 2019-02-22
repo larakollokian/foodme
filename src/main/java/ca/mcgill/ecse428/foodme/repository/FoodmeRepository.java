@@ -1,10 +1,9 @@
 package ca.mcgill.ecse428.foodme.repository;
 
 
-import java.util.ArrayList;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import ca.mcgill.ecse428.foodme.model.*;
 
@@ -44,22 +43,20 @@ public class FoodmeRepository {
 		preference.setCuisine(Cuisine.valueOf(cuisine));
 		preference.setRating(Rating.valueOf(rating));
 		preference.setUser(user);
-		user.addPreference(preference);
 		entityManager.persist(preference);
+		user.addPreference(preference);
 		entityManager.merge(user);
 		return preference;
 	}
 
 	@Transactional
-	public Preference editPreference(AppUser user, Preference editPreference, String priceRange, String distanceRange,
-									 String cuisine, String rating, int index) {
+	public Preference editPreference(Preference editPreference, String priceRange, String distanceRange,
+									 String cuisine, String rating) {
 		editPreference.setPrice(PriceRange.valueOf(priceRange));
 		editPreference.setDistance(DistanceRange.valueOf(distanceRange));
 		editPreference.setCuisine(Cuisine.valueOf(cuisine));
 		editPreference.setRating(Rating.valueOf(rating));
-		user.getPreferences().set(index, editPreference);
 		entityManager.merge(editPreference);
-		entityManager.merge(user);
 		return editPreference;
 	}
 
@@ -67,6 +64,19 @@ public class FoodmeRepository {
 	public AppUser getAppUser(String username){
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		return appUser;
+	}
+	
+	/**
+	 * gets all users in database using native SQL query statements
+	 * @return list of AppUsers
+	 */
+	@Transactional
+	public List<AppUser> getAllUsers() 
+	{
+		Query q = entityManager.createNativeQuery("SELECT * FROM app_user");
+		@SuppressWarnings("unchecked")
+		List<AppUser> users = q.getResultList();
+		return users;
 	}
 
 	@Transactional
@@ -105,11 +115,12 @@ public class FoodmeRepository {
 	 * @param aUser
 	 * @param newPassword
 	 */
-	public void changePassword(String username, String newPassword) {
+	@Transactional
+	public AppUser changePassword(String username, String newPassword) {
 		AppUser u = entityManager.find(AppUser.class, username);
 		u.setPassword(newPassword);
 		entityManager.merge(u);
-		return;
+		return u;
 		
 	}
 	
@@ -122,6 +133,7 @@ public class FoodmeRepository {
 	public void deleteUser(String username) throws ParseException {
 		AppUser u = entityManager.find(AppUser.class, username);
 		entityManager.remove(u);
+		entityManager.detach(u);
 		
 		// aUser.setUsername(null);
 		// aUser.setLikes(null);
@@ -132,6 +144,33 @@ public class FoodmeRepository {
 		// aUser.setPassword(null);
 	}
 
+	/**
+	 * gets all preferences in database regardless of user
+	 * @return
+	 */
+	@Transactional
+	public List<Preference> getAllPreferences() 
+	{
+		Query q = entityManager.createNativeQuery("SELECT * FROM preference");
+		@SuppressWarnings("unchecked")
+		List<Preference> preferences = q.getResultList();
+		return preferences;
+	}
+
+	/**
+	 * getting the paramaters for a specific user
+	 * @param username
+	 * @return list of parameters
+	 */
+	@Transactional
+	public List<Preference> getPreferencesForUser(String username) 
+	{
+		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
+		q.setParameter("user", username);
+		@SuppressWarnings("unchecked")
+		List<Preference> preferences = q.getResultList();
+		return preferences;
+	}
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time 
