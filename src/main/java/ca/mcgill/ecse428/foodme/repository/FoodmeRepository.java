@@ -95,12 +95,12 @@ public class FoodmeRepository {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		
 		//TODO change the query to what is in the db
-		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
-		@SuppressWarnings("unchecked")
-		List<String> liked = q.getResultList();
+//		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
+//		@SuppressWarnings("unchecked")
+//		List<String> liked = q.getResultList();
 		
-		return liked;
-		//return appUser.getLikes();
+		//return liked;
+		return appUser.getLikes();
 	}
 	
 
