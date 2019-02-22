@@ -95,11 +95,17 @@ public class Controller
 	}
 
 	@PostMapping("/users/changePassword/{username}/new/{password}")
-	public void changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
+	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
+
+
 		AppUser u = repository.getAppUser(username);
-		
 		u.setPassword(password);
-		return;
+		return u;
+		
+		// AppUser u = repository.getAppUser(username);
+		
+		// u.setPassword(password);
+		// return;
 	}
 
 	@GetMapping("/users/get/{username}")
