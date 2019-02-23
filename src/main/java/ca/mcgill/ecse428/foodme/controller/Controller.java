@@ -5,6 +5,14 @@ import ca.mcgill.ecse428.foodme.model.Preference;
 import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
 import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -14,6 +22,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+
+import ca.mcgill.ecse428.foodme.model.*;
+import ca.mcgill.ecse428.foodme.service.AuthenticationException;
+import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import ca.mcgill.ecse428.foodme.repository.*;
+import java.util.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +39,10 @@ public class Controller
 	@Autowired
 	FoodmeRepository repository;
 	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
+
+	@Autowired 
+	AuthenticationService authentication;
+
 
 	/**
 	 * Greeting on home page of the website
@@ -69,6 +87,15 @@ public class Controller
 	}
 
 
+	/* Attempts to login and returns the session if successful
+	 * @param username
+	 * @return sessionGuid
+	 * @throws AuthenticationException
+	 */
+	@PostMapping(value = { "/login" })
+	public String login(@RequestParam String username, @RequestParam String password) throws AuthenticationException {
+		return authentication.login(username, password);
+	}
 	/**
 	 * Method that creates a new account for a user. Username must be unique.
 	 * @param username
@@ -153,7 +180,19 @@ public class Controller
 
         return response;
 	}
-		
+
+	/**
+	 * Gets all users in the database. If there are none, returns an empty list
+	 * @return list of users
+	 */
+	@GetMapping("/users/get/all")
+	public List<AppUser> getAllUsers()
+	{
+		List<AppUser> allUsers = repository.getAllUsers();
+		return allUsers;
+	}
+
+
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
@@ -206,27 +245,26 @@ public class Controller
 	}
 
 	
-	/**
-	 * Gets all users in the database. If there are none, returns an empty list
-	 * @return list of users
-	 */
-	@GetMapping("/users/get/all")
-	public List<AppUser> getAllUsers() {
-		
-		List<String> users = repository.getAllUsers();
-		List<AppUser> fullUser = new ArrayList<AppUser>();
-		
-		for(String u: users) {
-			fullUser.add(repository.getAppUser(u));
-		}
-		if(fullUser.isEmpty())
-		{
-			System.out.println("There are no users in the database");
-			return null;
-		}
-		return fullUser;
 
-	}
+	
+//	@GetMapping("/users/get/all")
+//	public List<AppUser> getAllUsers() {
+//
+//		List<String> users = repository.getAllUsers();
+//		List<AppUser> fullUser = new ArrayList<AppUser>();
+//
+//		for(String u: users) {
+//			fullUser.add(repository.getAppUser(u));
+//		}
+//		if(fullUser.isEmpty())
+//		{
+//			System.out.println("There are no users in the database");
+//			return null;
+//		}
+//		return fullUser;
+//
+//	}
+
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,6 +273,22 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+	@GetMapping("/preferences/get/all")
+	public List<Preference> getAllPreferences()
+	{
+		
+		List<Preference> allPs = repository.getAllPreferences();
+		return allPs;
+	}
+	
+	@GetMapping("/preferences/user/{username}")
+	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
+	{
+		List<Preference> prefForUser = repository.getPreferencesForUser(username);
+		return prefForUser;
+	}
+	
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,

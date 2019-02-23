@@ -10,6 +10,7 @@ import ca.mcgill.ecse428.foodme.model.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -62,6 +63,7 @@ public class FoodmeRepository {
 	}
 
 	@Transactional
+
 	public Preference createPreference(AppUser user, String priceRange, String distanceRange, String cuisine, String rating){
 		Preference preference = new Preference();
 		preference.setPrice(PriceRange.valueOf(priceRange));
@@ -98,19 +100,20 @@ public class FoodmeRepository {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * gets all users in database using native SQL query statements
 	 * @return list of AppUsers
 	 */
 	@Transactional
-	public List<String> getAllUsers() 
+	public List<AppUser> getAllUsers()
 	{
-		Query q = entityManager.createNativeQuery("SELECT username FROM app_user");
+		Query q = entityManager.createNativeQuery("SELECT * FROM app_user");
 		@SuppressWarnings("unchecked")
-		List<String> users = q.getResultList();
+		List<AppUser> users = q.getResultList();
 		return users;
 	}
+
 
 	@Transactional
 	public Preference getPreference(int pID){

@@ -2,10 +2,12 @@ package ca.mcgill.ecse428.foodme;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+
 
 @SpringBootApplication
 public class FoodmeApplication {
@@ -15,6 +17,7 @@ public class FoodmeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(FoodmeApplication.class, args);
 	}
+
 
 }
 
