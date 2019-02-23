@@ -165,7 +165,7 @@ public class Controller
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
 		Preference editPreference = repository.getPreference(pID);
-		if(editPreference.getUser().getUsername() == username)
+		if(editPreference.getUser().getUsername().equals(username))
 		{
 			editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
 		}
