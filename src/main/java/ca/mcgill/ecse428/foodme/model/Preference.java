@@ -133,7 +133,7 @@ public class Preference
 		return this.pID;
 	}
 
-g
+
 	@ManyToOne
 	//@JoinColumn(name = "app_user")
 	@JsonIgnore
