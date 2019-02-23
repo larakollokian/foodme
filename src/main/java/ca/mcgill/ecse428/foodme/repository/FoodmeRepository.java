@@ -115,7 +115,7 @@ public class FoodmeRepository {
 
 /**
 	 * Method that allows users to update their account's password
-	 * @param aUser
+	 * @param username
 	 * @param newPassword
 	 */
 	@Transactional
@@ -130,7 +130,7 @@ public class FoodmeRepository {
 
 	/**
 	 * Method that allows users to delete their account
-	 * @param aUser
+	 * @param username
 	 */
 	@Transactional
 	public void deleteUser(String username) throws ParseException {

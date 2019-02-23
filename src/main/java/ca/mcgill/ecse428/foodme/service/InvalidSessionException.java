@@ -4,7 +4,7 @@ public class InvalidSessionException extends Exception {
 
 	private static final long serialVersionUID = -8864842408601238959L;
 
-	public InvalidSessionException() {
-		super("Session has expired or is invalid.");
+	public InvalidSessionException(String errorMessage) {
+		super(errorMessage);
 	}
 }

@@ -34,7 +34,7 @@ public class AuthenticationService {
 	public AppUser getUserBySession(String sessionGuid) throws InvalidSessionException {
 		String name = userBySession.get(sessionGuid);
 		if (name == null) {
-			throw new InvalidSessionException();
+			throw new InvalidSessionException("Session has expired or is invalid.");
 		}
 		AppUser user = findUserByUsername(name);
 		return user;
@@ -50,7 +50,7 @@ public class AuthenticationService {
 		AppUser user = repository.getAppUser(username);
 		if (user == null){
 			//User no longer/do not exist
-			throw new InvalidSessionException();
+			throw new InvalidSessionException("User does not exist");
 		}
 		return user;
 	}
@@ -68,7 +68,6 @@ public class AuthenticationService {
 			user = findUserByUsername(username);
 			Password.check(password, user.getPassword());
 		}
-		
 		catch(Exception e){
 			throw new AuthenticationException("Invalid login information!!!",e);
 		}
