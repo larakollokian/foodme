@@ -93,7 +93,7 @@ public class Controller
 	 * @throws AuthenticationException
 	 */
 	@PostMapping(value = { "/login" })
-	public String login(@RequestParam String username, @RequestParam String password) throws AuthenticationException {
+	public String login(@RequestParam String username, @RequestParam String password) throws Exception {
 		return authentication.login(username, password);
 	}
 	/**
