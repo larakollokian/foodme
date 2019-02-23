@@ -156,7 +156,7 @@ public class Controller
         HttpEntity<Void> entity = new HttpEntity<>(headers);
         entity.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        // Response 
+        // Response
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 

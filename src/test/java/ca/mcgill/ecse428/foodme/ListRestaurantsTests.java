@@ -23,20 +23,20 @@ public class ListRestaurantsTests {
     @Autowired
     private FoodmeRepository foodmeRepository;
 
-    @Test
-    public void testListAllRestaurantsExceptDisliked() {
-        if(foodmeRepository.getAppUser("Tester123") == null)
-            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = foodmeRepository.getAppUser("Tester123");
-
-    }
-
-    @Test
-    public void testListAllRestaurantsExceptDislikedEmpty() {
-        if(foodmeRepository.getAppUser("Tester123") == null)
-            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = foodmeRepository.getAppUser("Tester123");
-    }
+//    @Test
+//    public void testListAllRestaurantsExceptDisliked() {
+//        if(foodmeRepository.getAppUser("Tester123") == null)
+//            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
+//        else
+//            appUser = foodmeRepository.getAppUser("Tester123");
+//
+//    }
+//
+//    @Test
+//    public void testListAllRestaurantsExceptDislikedEmpty() {
+//        if(foodmeRepository.getAppUser("Tester123") == null)
+//            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
+//        else
+//            appUser = foodmeRepository.getAppUser("Tester123");
+//    }
 }

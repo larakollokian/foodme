@@ -25,17 +25,17 @@ public class DislikeRestaurantTests {
     @Autowired
     private FoodmeRepository foodmeRepository;
 
-    @Test
-    public void testCreateAccountEmptyDislikedRestaurants() {
-
+//    @Test
+//    public void testCreateAccountEmptyDislikedRestaurants() {
+//
 //        appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
 //        assertEquals(appUser.getDislikes().size(), 0);
-
-    }
-
-    @Test
-    public void testAddDislikedRestaurant() {
-
+//
+//    }
+//
+//    @Test
+//    public void testAddDislikedRestaurant() {
+//
 //        if(foodmeRepository.getAppUser("Tester123") == null)
 //            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
 //        else
@@ -43,11 +43,11 @@ public class DislikeRestaurantTests {
 //
 //        foodmeRepository.addDislike(appUser, "Restaurant");
 //        assertEquals(appUser.getDislikes().size(), 1);
-    }
-
-    @Test
-    public void testRemoveDislikedRestaurantThatExists() {
-
+//    }
+//
+//    @Test
+//    public void testRemoveDislikedRestaurantThatExists() {
+//
 //        if(foodmeRepository.getAppUser("Tester123") == null)
 //            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
 //        else
@@ -56,11 +56,11 @@ public class DislikeRestaurantTests {
 //        foodmeRepository.addDislike(appUser, "Restaurant");
 //        foodmeRepository.removeDislike(appUser, "Restaurant");
 //        assertEquals(appUser.getDislikes().size(), 0);
-    }
-
-    @Test
-    public void testRemoveDislikedRestaurantThatDoesNotExist() {
-
+//    }
+//
+//    @Test
+//    public void testRemoveDislikedRestaurantThatDoesNotExist() {
+//
 //       if(foodmeRepository.getAppUser("Tester123") == null)
 //           appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
 //       else
@@ -70,5 +70,5 @@ public class DislikeRestaurantTests {
 //       foodmeRepository.removeDislike(appUser, "Restaurant");
 //       foodmeRepository.removeDislike(appUser, "Restaurant2");
 //       assertEquals(appUser.getDislikes().size(), 0);
-    }
+//    }
 }
