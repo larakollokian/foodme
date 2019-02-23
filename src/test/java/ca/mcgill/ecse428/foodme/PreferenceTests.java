@@ -52,4 +52,5 @@ public class PreferenceTests {
 //        foodmeRepository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, 0);
 //        assertEquals(appUser.getPreferences().get(0).getPrice(), PriceRange.$);
 //    }
+
 }
