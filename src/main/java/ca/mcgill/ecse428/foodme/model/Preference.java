@@ -133,7 +133,7 @@ public class Preference
 		return this.pID;
 	}
 
-	/* Code from template association_GetOne */
+g
 	@ManyToOne
 	//@JoinColumn(name = "app_user")
 	@JsonIgnore
@@ -141,7 +141,7 @@ public class Preference
 	{
 		return this.appUser;
 	}
-	/* Code from template association_SetOneToMany */
+
 	public void setUser(AppUser aUser)
 	{
 		this.appUser = aUser;

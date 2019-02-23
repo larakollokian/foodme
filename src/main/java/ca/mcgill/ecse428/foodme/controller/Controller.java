@@ -1,17 +1,30 @@
 package ca.mcgill.ecse428.foodme.controller;
-
+	
+	
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+
 import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import ca.mcgill.ecse428.foodme.repository.*;
+import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class Controller 
 {
 	@Autowired
@@ -55,6 +68,17 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * creates a new user with chosen parameters. Username must be unique. This is a test method that 
+	 * doesn't include any parameter validation.
+	 * 
+	 * @param username
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @param password
+	 * @return the created user
+	 */
 	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
 	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName, 
 			@PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
@@ -73,6 +97,54 @@ public class Controller
 		return authentication.login(username, password);
 	}
 	
+	/**
+	 * Gets all users in the database. If there are none, returns an empty list
+	 * @return list of users
+	 */
+	@GetMapping("/users/get/all")
+	public List<AppUser> getAllUsers()
+	{
+		List<AppUser> allUsers = repository.getAllUsers();
+		return allUsers;
+	}
+
+	@PostMapping("/users/delete/{username}")
+	public void deleteUser(@PathVariable("username")String username)
+	{
+		try {
+			repository.deleteUser(username);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}	
+	}
+
+	/**
+	 * changes password for username
+	 * 
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	@PostMapping("/users/changePassword/{username}/{password}")
+	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
+		AppUser u = repository.changePassword(username,password);
+		return u;
+	}
+
+	/**
+	 * get user with username from database
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@GetMapping("/users/get/{username}")
+	public AppUser getAppUser(@PathVariable("username")String username) 
+	{
+		AppUser u = repository.getAppUser(username);
+		return u;
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                   PREFERENCE CONTROLLER                           /////////////////
@@ -80,8 +152,23 @@ public class Controller
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+	@GetMapping("/preferences/get/all")
+	public List<Preference> getAllPreferences()
+	{
+		
+		List<Preference> allPs = repository.getAllPreferences();
+		return allPs;
+	}
+	
+	@GetMapping("/preferences/user/{username}")
+	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
+	{
+		List<Preference> prefForUser = repository.getPreferencesForUser(username);
+		return prefForUser;
+	}
+	
 	@PostMapping("/users/{user}/preferences/")
-	public Preference addPreference(
+	public Preference createPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
 
@@ -95,12 +182,15 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
-		AppUser appUser = repository.getAppUser(username);
-		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
-		int index = preferenceList.indexOf(editPreference);
-
-		editPreference = repository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, index);
+		if(editPreference.getUser().getUsername() == username)
+		{
+			editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+		}
+		else
+		{
+			System.out.println("The preference ID provided is not associated to this user");
+		}
 		return editPreference;
 	}
 }
