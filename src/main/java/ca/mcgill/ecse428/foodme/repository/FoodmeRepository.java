@@ -111,18 +111,6 @@ public class FoodmeRepository {
 		return preference;
 	}
 
-//	@Transactional
-//	public void addDislike (AppUser user, String restaurant) {
-//		// dummy for test
-//		// do nothing
-//	}
-//
-//	@Transactional
-//	public boolean removeDislike (AppUser user, String restaurant) {
-//		// dummy for test
-//		return true;
-//	}
-
 //	public Restaurant restaurant;
 //	public User user;
 //	private List<Restaurant> liked;
