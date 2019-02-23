@@ -1,4 +1,5 @@
 package ca.mcgill.ecse428.foodme.model;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.*;
@@ -169,7 +170,7 @@ public class AppUser
 		this.dislikes.add(dislike);
 	}
 	
-	public boolean removeDisike(String dislike)
+	public boolean removeDislike(String dislike)
 	{
 		if(this.dislikes.contains(dislike))
 		{
@@ -180,6 +181,7 @@ public class AppUser
 	}
 
 	@Transient
+
 	@OneToMany(mappedBy = "app_user")
 	public List<Preference> getPreferences()
 	{
@@ -204,6 +206,7 @@ public class AppUser
 
 	public void addPreference(Preference aPreference)
 	{
+
 		if(this.preferences == null)
 		{
 			this.preferences = new ArrayList<Preference>();

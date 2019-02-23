@@ -3,6 +3,7 @@
 
 package ca.mcgill.ecse428.foodme.model;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ public class Preference
 	private Cuisine cuisine;
 	private PriceRange price;
 	private Rating rating;
+
 	private int pID;
 
 	//Preference Associations
@@ -125,10 +127,12 @@ public class Preference
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
+
 	public int getPID()
 	{
 		return this.pID;
 	}
+
 
 	@ManyToOne
 	@JoinColumn(name = "app_user")
