@@ -39,7 +39,7 @@ public class AppUserTests {
             appUser = foodmeRepository.getAppUser("Tester123");
             String username = appUser.getUsername();
 
-            appUser = foodmeRepository.deleteUser(username);
+        //    appUser = foodmeRepository.deleteUser(username);
             assertEquals(1, appUser);
 
 
