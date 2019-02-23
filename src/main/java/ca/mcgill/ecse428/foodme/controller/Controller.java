@@ -101,9 +101,8 @@ public class Controller
 		AppUser u = repository.getAppUser(username);
 		u.setPassword(password);
 		return u;
-		
+
 		// AppUser u = repository.getAppUser(username);
-		
 		// u.setPassword(password);
 		// return;
 	}
