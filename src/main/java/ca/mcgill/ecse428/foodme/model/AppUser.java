@@ -169,7 +169,7 @@ public class AppUser
 		this.dislikes.add(dislike);
 	}
 	
-	public boolean removeDisike(String dislike)
+	public boolean removeDislike(String dislike)
 	{
 		if(this.dislikes.contains(dislike))
 		{
