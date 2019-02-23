@@ -29,6 +29,7 @@ import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.repository.*;
 import java.util.*;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -191,6 +192,7 @@ public class Controller
 		return allUsers;
 	}
 
+
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
@@ -243,6 +245,7 @@ public class Controller
 	}
 
 	
+
 	
 //	@GetMapping("/users/get/all")
 //	public List<AppUser> getAllUsers() {
@@ -261,6 +264,7 @@ public class Controller
 //		return fullUser;
 //
 //	}
+
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
