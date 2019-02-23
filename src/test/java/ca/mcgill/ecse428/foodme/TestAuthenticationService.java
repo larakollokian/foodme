@@ -48,6 +48,7 @@ public class TestAuthenticationService {
             Mockito.when(foodRepo.getNumberUsers()).thenReturn(1);
             Mockito.when(foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
             Mockito.when(foodRepo.getAppUser(USERNAME)).thenReturn(user);
+            Mockito.when(foodRepo.getAppUser("none")).thenReturn(null);
         }
 	    catch(Exception e){
 	        e.printStackTrace();
@@ -62,7 +63,7 @@ public class TestAuthenticationService {
             user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
         }
 	    catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid password.");
+            throw new InvalidInputException("Invalid input format.");
         }
 
 	    assertEquals(1, foodRepo.getNumberUsers());
@@ -94,9 +95,42 @@ public class TestAuthenticationService {
             fail("User session invalid: "  + e.getMessage());
             return;
         }
+	    catch (Exception e){
+            fail(e.getMessage());
+            return;
+        }
 
     }
+    @Test
+    public void testLoginWithUnExistingUsername() throws InvalidInputException{
+        String error ="";
+        AppUser user;
+        try {
+            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
 
+        assertEquals(1, foodRepo.getNumberUsers());
+
+        String password = "none";
+        String username ="none";
+
+        try{
+            authentication.login(username,password);
+        }
+        //Expected
+        catch(InvalidSessionException e){
+           error += e.getMessage();
+        }
+        catch(Exception e){
+            fail(e.getMessage());
+            return;
+        }
+
+        assertEquals("User does not exist",error);
+    }
     @Test
     public void testLoginWithWrongPassword() throws InvalidInputException{
 	    String error ="";
@@ -105,7 +139,7 @@ public class TestAuthenticationService {
             user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
         }
         catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid password.");
+            throw new InvalidInputException("Invalid input format.");
         }
 
         assertEquals(1, foodRepo.getNumberUsers());
@@ -116,11 +150,16 @@ public class TestAuthenticationService {
         try{
             authentication.login(user.getUsername(),password);
         }
+        //Expected
         catch(AuthenticationException e){
             error += e.getMessage();
         }
+        catch(Exception e){
+            fail(e.getMessage());
+            return;
+        }
 
-        assertEquals("Invalid login information!!!",error);
+        assertEquals("Invalid login password!!!",error);
     }
 
     @Test
@@ -130,14 +169,14 @@ public class TestAuthenticationService {
             user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
         }
         catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid password.");
+            throw new InvalidInputException("Invalid input format.");
         }
 
         assertEquals(1, foodRepo.getNumberUsers());
 
         try {
             // First login to get the session
-            String session = authentication.login(user.getUsername(), "HelloWorld123");
+            authentication.login(user.getUsername(), "HelloWorld123");
 
             // Then logout to invalidate the session
             authentication.logout(user.getUsername());
@@ -150,6 +189,14 @@ public class TestAuthenticationService {
                 // Expected
             }
         } catch (AuthenticationException e) {
+            fail(e.getMessage());
+            return;
+        }
+        catch (InvalidSessionException e) {
+            fail(e.getMessage());
+            return;
+        }
+        catch (Exception e){
             fail(e.getMessage());
             return;
         }
