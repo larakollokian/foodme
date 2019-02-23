@@ -1,5 +1,4 @@
 package ca.mcgill.ecse428.foodme.model;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.*;
 
@@ -26,26 +25,6 @@ public class AppUser
 
 	//User Associations
 	private List<Preference> preferences;
-
-	//------------------------
-	// CONSTRUCTOR (SHOULD BE DEFAULT)
-	//------------------------
-
-	//  public User(String aUsername, String aFirstName, String aLastName, String aEmail, String aPassword, List<String> aLikes, List<String> aDislikes)
-	//  {
-	//    username = aUsername;
-	//    firstName = aFirstName;
-	//    lastName = aLastName;
-	//    email = aEmail;
-	//    password = aPassword;
-	//    likes = aLikes;
-	//    dislikes = aDislikes;
-	//    preferences = new ArrayList<Preference>();
-	//  }
-
-	//------------------------
-	// INTERFACE
-	//------------------------
 
 	public boolean setUsername(String aUsername)
 	{

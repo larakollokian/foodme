@@ -1,6 +1,5 @@
 package ca.mcgill.ecse428.foodme.controller;
-	
-	
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.repository.*;
-import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -54,13 +52,13 @@ public class Controller
 			return "Hello, " + name + "!";
 		}
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                     APP USER CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * creates a new user with chosen parameters. Username must be unique. This is a test method that 
 	 * doesn't include any parameter validation.
@@ -81,6 +79,19 @@ public class Controller
 	}
 	
 	/**
+	 * get user with username from database
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@GetMapping("/users/get/{username}")
+	public AppUser getAppUser(@PathVariable("username")String username) 
+	{
+		AppUser u = repository.getAppUser(username);
+		return u;
+	}
+
+	/**
 	 * Gets all users in the database. If there are none, returns an empty list
 	 * @return list of users
 	 */
@@ -91,6 +102,11 @@ public class Controller
 		return allUsers;
 	}
 
+	/**
+	 * delete user with username from database
+	 * 
+	 * @param username
+	 */
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
@@ -114,19 +130,6 @@ public class Controller
 		return u;
 	}
 
-	/**
-	 * get user with username from database
-	 * 
-	 * @param username
-	 * @return
-	 */
-	@GetMapping("/users/get/{username}")
-	public AppUser getAppUser(@PathVariable("username")String username) 
-	{
-		AppUser u = repository.getAppUser(username);
-		return u;
-	}
-
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
@@ -137,18 +140,18 @@ public class Controller
 	@GetMapping("/preferences/get/all")
 	public List<Preference> getAllPreferences()
 	{
-		
+
 		List<Preference> allPs = repository.getAllPreferences();
 		return allPs;
 	}
-	
+
 	@GetMapping("/preferences/user/{username}")
 	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
 	{
 		List<Preference> prefForUser = repository.getPreferencesForUser(username);
 		return prefForUser;
 	}
-	
+
 	@PostMapping("/users/{user}/preferences/")
 	public Preference createPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
