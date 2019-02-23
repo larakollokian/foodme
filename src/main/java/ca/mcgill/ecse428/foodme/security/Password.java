@@ -33,12 +33,11 @@ public class Password {
         return base64Encoder.encodeToString(salt) + "$" + hash(password, salt);
     }
     /**
-	 * hash given a password
+	 * Hashing password using PBKDF2
 	 * @param password
-	 * @param finish
+	 * @param salt
 	 * @return hashed password
 	 */
-    //Hashing password using PBKDF2
     private static String hash(String password, byte[] salt) throws Exception {
         if (password == null || password.length() == 0)
             throw new IllegalArgumentException("Empty passwords are not supported.");
@@ -52,7 +51,6 @@ public class Password {
      * checks if password entered by user corresponds to the salt hash 
 	 * @param password
 	 * @param storedHash
-	 * @throws IllegalStateException when the stored password hash is formatted incorrectly
      * @throws Exception when the password is not equal to the storedHash
 	 */
     public static void check(String password, String storedHash) throws Exception {

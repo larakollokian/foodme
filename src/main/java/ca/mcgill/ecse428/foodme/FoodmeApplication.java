@@ -3,8 +3,7 @@ package ca.mcgill.ecse428.foodme;
 import org.springframework.boot.SpringApplication;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import ca.mcgill.ecse428.foodme.service.*;
+
 
 @SpringBootApplication
 public class FoodmeApplication {
@@ -15,9 +14,6 @@ String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvy
 		SpringApplication.run(FoodmeApplication.class, args);
 	}
 
-	@Bean
-	public AuthenticationService authService() {
-		return new AuthenticationService();
-	}
+
 }
 

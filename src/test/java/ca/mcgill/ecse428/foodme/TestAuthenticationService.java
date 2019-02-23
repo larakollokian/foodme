@@ -24,7 +24,7 @@ public class TestAuthenticationService {
     private AuthenticationService authService;
 
 	private AppUser user;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		

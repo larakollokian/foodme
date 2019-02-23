@@ -182,7 +182,11 @@ public class AppUser
 
 	@Transient
 
-	@OneToMany(mappedBy = "app_user")
+	@OneToMany(
+			mappedBy = "app_user",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true
+	)
 	public List<Preference> getPreferences()
 	{
 		if(this.preferences == null)

@@ -19,6 +19,7 @@ public class AuthenticationService {
 
 	private static final HashMap<String, String> userBySession = new HashMap<>();
 	private static final HashMap<String, String> sessionByUser = new HashMap<>();
+
 	/**
 	 * Constructor
 	 */

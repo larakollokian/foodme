@@ -132,6 +132,7 @@ public class Preference
 	{
 		return this.pID;
 	}
+
 	/* Code from template association_GetOne */
 	@ManyToOne
 	//@JoinColumn(name = "app_user")
