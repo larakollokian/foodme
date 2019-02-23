@@ -1,6 +1,7 @@
 package ca.mcgill.ecse428.foodme;
 
 import ca.mcgill.ecse428.foodme.repository.*;
+import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.*;
 import ca.mcgill.ecse428.foodme.model.*;
 import static org.junit.Assert.assertEquals;
@@ -8,26 +9,17 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.Before;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.util.*;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FoodmeApplication.class)
 public class TestAuthenticationService {
-
-//    @TestConfiguration
-//    static class AuthenticationTestConfiguration {
-//
-//        @Bean
-//        public AuthenticationService authService() {
-//            return new AuthenticationService();
-//        }
-//    }
 
     @Autowired
     private AuthenticationService authentication;
@@ -36,9 +28,7 @@ public class TestAuthenticationService {
     private FoodmeRepository foodRepo;
 
 
-	private AppUser user;
-
-	private static final String USERNAME = "testUsername";
+	private static final String USERNAME = "test";
 	private static final String FIRSTNAME = "John";
 	private static final String LASTNAME="Doe";
 	private static String EMAIL="johnDoe@hotmail.ca";
@@ -48,16 +38,34 @@ public class TestAuthenticationService {
 	@Before
 	public void setMockOutput() throws InvalidInputException {
 	    try {
-            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            AppUser user = new AppUser();
+            user.setUsername(USERNAME);
+            user.setLastName(LASTNAME);
+            user.setFirstName(FIRSTNAME);
+            user.setPassword(Password.getSaltedHash(PASSWORD));
+            user.setEmail(EMAIL);
+
+            Mockito.when(foodRepo.getNumberUsers()).thenReturn(1);
+            Mockito.when(foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
+            Mockito.when(foodRepo.getAppUser(USERNAME)).thenReturn(user);
         }
 	    catch(Exception e){
-	        throw new InvalidInputException("User not created.");
+	        e.printStackTrace();
         }
 	}
 
     @Test
-    public void testLoginWithValidPassword(){
-        assertEquals(1, foodRepo.getAllUsers().size());
+    public void testLoginWithValidPassword() throws InvalidInputException{
+
+	    AppUser user;
+	    try {
+            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+	    catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid password.");
+        }
+
+	    assertEquals(1, foodRepo.getNumberUsers());
 
 	    String password = "HelloWorld123";
 	    try{
@@ -90,9 +98,18 @@ public class TestAuthenticationService {
     }
 
     @Test
-    public void testLoginWithWrongPassword(){
+    public void testLoginWithWrongPassword() throws InvalidInputException{
 	    String error ="";
-        assertEquals(1, foodRepo.getAllUsers().size());
+        AppUser user;
+        try {
+            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid password.");
+        }
+
+        assertEquals(1, foodRepo.getNumberUsers());
+
 
         String password = "Hello";
 
@@ -100,26 +117,34 @@ public class TestAuthenticationService {
             authentication.login(user.getUsername(),password);
         }
         catch(AuthenticationException e){
-            error += e;
+            error += e.getMessage();
         }
 
         assertEquals("Invalid login information!!!",error);
     }
 
     @Test
-    public void testLogout() {
-        assertEquals(1, foodRepo.getAllUsers().size());
+    public void testLogout()throws InvalidInputException {
+        AppUser user;
+        try {
+            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid password.");
+        }
+
+        assertEquals(1, foodRepo.getNumberUsers());
 
         try {
             // First login to get the session
-            String bobSession = authentication.login(user.getUsername(), "HelloWorld123");
+            String session = authentication.login(user.getUsername(), "HelloWorld123");
 
             // Then logout to invalidate the session
-            authentication.logout(bobSession);
+            authentication.logout(user.getUsername());
 
             // Usage of the invalidated session should fail
             try {
-                authentication.getUserBySession(bobSession);
+                authentication.getUserBySession(user.getUsername());
                 fail("Invalidated session, no exception thrown");
             } catch (InvalidSessionException e) {
                 // Expected

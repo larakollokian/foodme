@@ -56,17 +56,17 @@ public class FoodmeRepository {
 		u.setLastName(lastName);
 		u.setEmail(email);
 
-		String passwordHash;
+		String passwordHash="";
+
 		try {
 			passwordHash = Password.getSaltedHash(password);
 		} catch (Exception e) {
-			throw new InvalidInputException("Invalid password.");
+			e.printStackTrace();
 		}
 		u.setPassword(passwordHash);
 		u.setLikes(new ArrayList<String>());
 		u.setDislikes(new ArrayList<String>());
 		entityManager.persist(u);
-
 		return u;
 	}
 
@@ -121,7 +121,14 @@ public class FoodmeRepository {
 		List<AppUser> users = q.getResultList();
 		return users;
 	}
-
+	/**
+	 *gets number of users
+	 * @return number of users
+	 */
+	@Transactional
+	public int getNumberUsers(){
+		return getAllUsers().size();
+	}
 
 	@Transactional
 	public Preference getPreference(int pID){
