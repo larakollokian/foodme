@@ -59,17 +59,6 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	/**
-	 * creates a new user with chosen parameters. Username must be unique. This is a test method that 
-	 * doesn't include any parameter validation.
-	 * 
-	 * @param username
-	 * @param firstName
-	 * @param lastName
-	 * @param email
-	 * @param password
-	 * @return the created user
-	 */
 	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
 	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
 								  @PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
@@ -77,6 +66,7 @@ public class Controller
 		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
 		return u;
 	}
+
 
 	/**
 	 * Method that creates a new account for a user. Username must be unique.
@@ -177,37 +167,72 @@ public class Controller
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
+
 		try {
 			repository.deleteUser(username);
 		} catch (ParseException e) {
 			e.printStackTrace();
-		}	
+		}
+
+
+		
+		// Response r = new Response();
+		// try {
+		// 	repository.deleteUser(username);
+		// 	r.setResponse(true);
+			
+		// } catch (NullPointerException e) {
+		// 	r.setResponse(false);
+		// 	r.setError("No such User exists");
+		// }
+		// return r;	
 	}
 
-	/**
-	 * changes password for username
-	 * 
-	 * @param username
-	 * @param password
-	 * @return
-	 */
-	@PostMapping("/users/changePassword/{username}/{password}")
-	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
-		AppUser u = repository.changePassword(username,password);
+	@PostMapping("/users/changePassword/{username}/old/{oPassword}/new/{nPassword}")
+	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("oPassword")String oPassword, @PathVariable("nPassword")String nPassword) {
+
+
+		AppUser u = repository.getAppUser(username);
+		
+		// if(u.getPassword() == oPassword) {
+		// 	System.out.println("Error: New password cannot be the same as old password");
+		// } 
+		// else {
+		u.setPassword(nPassword);
 		return u;
-	}
+		}
 
-	/**
-	 * get user with username from database
-	 * 
-	 * @param username
-	 * @return
-	 */
+		// AppUser u = repository.getAppUser(username);
+		// u.setPassword(password);
+		// return;
+	
+	
+	//}
+
 	@GetMapping("/users/get/{username}")
-	public AppUser getAppUser(@PathVariable("username")String username) 
-	{
+	public AppUser getAppUser(@PathVariable("username")String username) {
 		AppUser u = repository.getAppUser(username);
 		return u;
+	}
+
+	
+	
+	@GetMapping("/users/get/all")
+	public List<AppUser> getAllUsers() {
+		
+		List<String> users = repository.getAllUsers();
+		List<AppUser> fullUser = new ArrayList<AppUser>();
+		
+		for(String u: users) {
+			fullUser.add(repository.getAppUser(u));
+		}
+		if(fullUser.isEmpty())
+		{
+			System.out.println("There are no users in the database");
+			return null;
+		}
+		return fullUser;
+
 	}
 
 
@@ -217,23 +242,8 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/preferences/get/all")
-	public List<Preference> getAllPreferences()
-	{
-		
-		List<Preference> allPs = repository.getAllPreferences();
-		return allPs;
-	}
-	
-	@GetMapping("/preferences/user/{username}")
-	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
-	{
-		List<Preference> prefForUser = repository.getPreferencesForUser(username);
-		return prefForUser;
-	}
-	
 	@PostMapping("/users/{user}/preferences/")
-	public Preference createPreference(
+	public Preference addPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
 
@@ -247,15 +257,12 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
+		AppUser appUser = repository.getAppUser(username);
+		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
-		if(editPreference.getUser().getUsername() == username)
-		{
-			editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
-		}
-		else
-		{
-			System.out.println("The preference ID provided is not associated to this user");
-		}
+		int index = preferenceList.indexOf(editPreference);
+
+		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
 		return editPreference;
 	}
 }
