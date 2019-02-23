@@ -120,30 +120,33 @@ public class FoodmeRepository {
 		Preference preference = entityManager.find(Preference.class, pID);
 		return preference;
 	}
-
-//	public Restaurant restaurant;
-//	public User user;
-//	private List<Restaurant> liked;
-//	
-//	/**
-//	 * Method to like a restaurant so its in the user list of liked restaurant
-//	 * @param restaurant The restaurant a user likes
-//	 * @return void The method returns nothing, this change will be saved in the database
-//	 */
-//	public void isLiked(Restaurant restaurant) {
-//		liked=user.getLiked();
-//		liked.add(restaurant);
-//		user.setLiked(liked);
-//	}
-//	
-//	/**
-//	 * Method to list all the liked restaurants of a user
-//	 * @return The list of all the liked restaurants
-//	 */
-//	public List<Restaurant> listAllLiked() {
-//		List<Restaurant> liked = user.getLiked();
-//		return liked;
-//	}
+	
+	/**
+	 * Method to like a restaurant so its in the user list of liked restaurant
+	 * @param restaurant The restaurant a user likes
+	 * @return void The method returns nothing, this change will be saved in the database
+	 */
+	@Transactional
+	public void isLiked(String username, String restaurant) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		appUser.addLike(restaurant);
+	}
+	
+	/**
+	 * Method to list all the liked restaurants of a user
+	 * @return The list of all the liked restaurants
+	 */
+	public List<String> listAllLiked(String username) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		
+		//TODO change the query to what is in the db
+//		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
+//		@SuppressWarnings("unchecked")
+//		List<String> liked = q.getResultList();
+		
+		//return liked;
+		return appUser.getLikes();
+	}
 	
 
 	/**
