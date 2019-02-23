@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - FoodmeApplication",
+            "request": "launch",
+            "mainClass": "ca.mcgill.ecse428.foodme.FoodmeApplication",
+            "projectName": "foodme"
+        }
+    ]
+}

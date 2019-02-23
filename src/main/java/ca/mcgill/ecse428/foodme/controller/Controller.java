@@ -14,9 +14,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 public class Controller 
 {
 	@Autowired
@@ -56,7 +58,18 @@ public class Controller
 	/////////////////                     APP USER CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	
+	/**
+	 * creates a new user with chosen parameters. Username must be unique. This is a test method that 
+	 * doesn't include any parameter validation.
+	 * 
+	 * @param username
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @param password
+	 * @return the created user
+	 */
 	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
 	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
 								  @PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
@@ -65,6 +78,16 @@ public class Controller
 		return u;
 	}
 
+	/**
+	 * Method that creates a new account for a user. Username must be unique.
+	 * @param username
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @param password
+	 * @return The new user
+	 * @throws InvalidInputException
+	 */
 	@PostMapping("/users/create/{username}/")
 	public AppUser createAccount(
 			@PathVariable("username") String username,
@@ -80,6 +103,7 @@ public class Controller
 				try {
 					if (password.length() >= 6) {
 						try {
+							// TODO Check if username already exists in the database (i.e. check username uniqueness)
 							if (username.length() >= 1) {
 								u = repository.createAccount(username, firstName, lastName, email, password);
 							} else {
@@ -104,44 +128,112 @@ public class Controller
 		return u;
 	}
 
+	/**
+	 * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
+	 * @param location
+	 * @param price
+	 * @return
+	 * @throws Exception
+	 */
+	// TODO This method does not work at the moment
 	@GetMapping("/search/price/")
 	public ResponseEntity<String> searchByPriceRange (
 	        @RequestParam("location") String location,
-            @RequestParam("longitude") String longitude,
-            @RequestParam("latitude") String latitude,
             @RequestParam("price") String price) throws Exception{
 
+		// Set up url
 		String url = null;
-		if (location == null && (longitude != null && latitude != null)) {
-			url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
-		} else if (location != null && (longitude == null || latitude == null)) {
+		if (location != null) {
 			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
-		} else if (location != null && latitude != null && longitude != null) {
-			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&longitude" + longitude + "&latitude=" + latitude + "&price=" + price;
 		} else {
-			throw new Exception("You are missing either location or longitude and latitude to make a query!");
+			throw new Exception("You are missing a location to make a query!");
 		}
 
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Authorization", "Bearer " + APIKey);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
         entity.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
+        // Response 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         return response;
 	}
 	
+	/**
+	 * Gets all users in the database. If there are none, returns an empty list
+	 * @return list of users
+	 */
+	@GetMapping("/users/get/all")
+	public List<AppUser> getAllUsers()
+	{
+		List<AppUser> allUsers = repository.getAllUsers();
+		return allUsers;
+	}
+
+	@PostMapping("/users/delete/{username}")
+	public void deleteUser(@PathVariable("username")String username)
+	{
+		try {
+			repository.deleteUser(username);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}	
+	}
+
+	/**
+	 * changes password for username
+	 * 
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	@PostMapping("/users/changePassword/{username}/{password}")
+	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
+		AppUser u = repository.changePassword(username,password);
+		return u;
+	}
+
+	/**
+	 * get user with username from database
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@GetMapping("/users/get/{username}")
+	public AppUser getAppUser(@PathVariable("username")String username) 
+	{
+		AppUser u = repository.getAppUser(username);
+		return u;
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                   PREFERENCE CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	@GetMapping("/preferences/get/all")
+	public List<Preference> getAllPreferences()
+	{
+		
+		List<Preference> allPs = repository.getAllPreferences();
+		return allPs;
+	}
+	
+	@GetMapping("/preferences/user/{username}")
+	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
+	{
+		List<Preference> prefForUser = repository.getPreferencesForUser(username);
+		return prefForUser;
+	}
+	
 	@PostMapping("/users/{user}/preferences/")
-	public Preference addPreference(
+	public Preference createPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
 
@@ -155,12 +247,15 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
-		AppUser appUser = repository.getAppUser(username);
-		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
-		int index = preferenceList.indexOf(editPreference);
-
-		editPreference = repository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, index);
+		if(editPreference.getUser().getUsername() == username)
+		{
+			editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+		}
+		else
+		{
+			System.out.println("The preference ID provided is not associated to this user");
+		}
 		return editPreference;
 	}
 }

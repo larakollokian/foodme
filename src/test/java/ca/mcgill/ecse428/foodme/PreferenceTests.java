@@ -41,15 +41,15 @@ public class PreferenceTests {
         assertEquals(appUser.getPreferences().size(), 1);
     }
 
-    @Test
-    public void testEditPreference() {
-        Preference editPreference = appUser.getPreferences().get(0);
-        String distanceRange = "fivehundred";
-        String cuisine = "Mexican";
-        String priceRange = "$";
-        String rating = "four";
-
-        Preference p = foodmeRepository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, 0);
-        assertEquals(appUser.getPreferences().get(0).getPrice(), PriceRange.$);
-    }
+//    @Test
+//    public void testEditPreference() {
+//        Preference editPreference = appUser.getPreferences().get(0);
+//        String distanceRange = "fivehundred";
+//        String cuisine = "Mexican";
+//        String priceRange = "$";
+//        String rating = "four";
+//
+//        foodmeRepository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, 0);
+//        assertEquals(appUser.getPreferences().get(0).getPrice(), PriceRange.$);
+//    }
 }
