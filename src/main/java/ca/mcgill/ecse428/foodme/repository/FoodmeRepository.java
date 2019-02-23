@@ -62,8 +62,15 @@ public class FoodmeRepository {
 
 	@Transactional
 	public AppUser getAppUser(String username){
+
+		if(entityManager.find(AppUser.class, username) == null) {
+			System.out.println("Cannot delete a user that does not exist");
+		}
+		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		return appUser;
+		}
+		return null;
 	}
 	
 	/**
@@ -71,11 +78,11 @@ public class FoodmeRepository {
 	 * @return list of AppUsers
 	 */
 	@Transactional
-	public List<AppUser> getAllUsers() 
+	public List<String> getAllUsers() 
 	{
-		Query q = entityManager.createNativeQuery("SELECT * FROM app_user");
+		Query q = entityManager.createNativeQuery("SELECT username FROM app_user");
 		@SuppressWarnings("unchecked")
-		List<AppUser> users = q.getResultList();
+		List<String> users = q.getResultList();
 		return users;
 	}
 
@@ -133,17 +140,15 @@ public class FoodmeRepository {
 	 */
 	@Transactional
 	public void deleteUser(String username) throws ParseException {
+
+		if(entityManager.find(AppUser.class, username) == null) {
+			System.out.println("Cannot delete a user that does not exist");
+		}
+		else {
 		AppUser u = entityManager.find(AppUser.class, username);
 		entityManager.remove(u);
-		entityManager.detach(u);
-		
-		// aUser.setUsername(null);
-		// aUser.setLikes(null);
-		// aUser.setDislikes(null);
-		// aUser.setEmail(null);
-		// aUser.setFirstName(null);
-		// aUser.setLastName(null);
-		// aUser.setPassword(null);
+		//entityManager.detach(u);
+		}
 	}
 
 	/**

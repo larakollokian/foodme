@@ -94,23 +94,51 @@ public class Controller
 		// return r;	
 	}
 
-	@PostMapping("/users/changePassword/{username}/new/{password}")
-	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("password")String password) {
+	@PostMapping("/users/changePassword/{username}/old/{oPassword}/new/{nPassword}")
+	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("oPassword")String oPassword, @PathVariable("nPassword")String nPassword) {
 
 
 		AppUser u = repository.getAppUser(username);
-		u.setPassword(password);
+		
+		// if(u.getPassword() == oPassword) {
+		// 	System.out.println("Error: New password cannot be the same as old password");
+		// } 
+		// else {
+		u.setPassword(nPassword);
 		return u;
+		}
 
 		// AppUser u = repository.getAppUser(username);
 		// u.setPassword(password);
 		// return;
-	}
+	
+	
+	//}
 
 	@GetMapping("/users/get/{username}")
 	public AppUser getAppUser(@PathVariable("username")String username) {
 		AppUser u = repository.getAppUser(username);
 		return u;
+	}
+
+	
+	
+	@GetMapping("/users/get/all")
+	public List<AppUser> getAllUsers() {
+		
+		List<String> users = repository.getAllUsers();
+		List<AppUser> fullUser = new ArrayList<AppUser>();
+		
+		for(String u: users) {
+			fullUser.add(repository.getAppUser(u));
+		}
+		if(fullUser.isEmpty())
+		{
+			System.out.println("There are no users in the database");
+			return null;
+		}
+		return fullUser;
+
 	}
 
 
@@ -140,7 +168,7 @@ public class Controller
 		Preference editPreference = repository.getPreference(pID);
 		int index = preferenceList.indexOf(editPreference);
 
-		editPreference = repository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, index);
+		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
 		return editPreference;
 	}
 }
