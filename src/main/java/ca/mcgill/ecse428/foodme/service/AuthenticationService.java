@@ -89,5 +89,6 @@ public class AuthenticationService {
 	 */
 	public void logout(String username) {
 		userBySession.remove(sessionByUser.remove(username));
+
 	}
 }

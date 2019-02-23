@@ -4,6 +4,8 @@ import ca.mcgill.ecse428.foodme.model.AppUser;
 import ca.mcgill.ecse428.foodme.model.Preference;
 import ca.mcgill.ecse428.foodme.model.PriceRange;
 import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
+import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -26,12 +28,20 @@ public class PreferenceTests {
     @Autowired
     private FoodmeRepository foodmeRepository;
 
+    @Before
+    public void setMockOutput() throws InvalidInputException {
+        try {
+            appUser = foodmeRepository.createAccount("Tester123", "Test", "User", "student@mcgill.ca", "password");
+        }
+        catch(Exception e){
+            throw new InvalidInputException("User not created.");
+        }
+    }
     @Test
     public void testAddPreference() {
-        if(foodmeRepository.getAppUser("Tester123") == null)
-            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = foodmeRepository.getAppUser("Tester123");
+        assertEquals(1, foodmeRepository.getAllUsers().size());
+
+        appUser = foodmeRepository.getAppUser("Tester123");
         String distanceRange = "fivehundred";
         String cuisine = "Italian";
         String priceRange = "$$$";
