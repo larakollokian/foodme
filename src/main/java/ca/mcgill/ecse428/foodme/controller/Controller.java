@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -152,18 +153,7 @@ public class Controller
 
         return response;
 	}
-	
-	/**
-	 * Gets all users in the database. If there are none, returns an empty list
-	 * @return list of users
-	 */
-	@GetMapping("/users/get/all")
-	public List<AppUser> getAllUsers()
-	{
-		List<AppUser> allUsers = repository.getAllUsers();
-		return allUsers;
-	}
-
+		
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
@@ -216,7 +206,10 @@ public class Controller
 	}
 
 	
-	
+	/**
+	 * Gets all users in the database. If there are none, returns an empty list
+	 * @return list of users
+	 */
 	@GetMapping("/users/get/all")
 	public List<AppUser> getAllUsers() {
 		
