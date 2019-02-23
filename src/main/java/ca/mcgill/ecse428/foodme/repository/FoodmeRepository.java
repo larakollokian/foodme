@@ -177,7 +177,7 @@ public class FoodmeRepository {
 	 * @param username
 	 */
 	@Transactional
-	public void deleteUser(String username)  {
+	public void deleteUser(String username) throws ParseException {
 
 		if(entityManager.find(AppUser.class, username) == null) {
 			System.out.println("Cannot delete a user that does not exist");

@@ -18,6 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 
+import java.text.ParseException;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -51,10 +53,14 @@ public class AppUserTests {
 
         String username = appUser.getUsername();
         assertNotEquals(username, null);
-
-       foodmeRepository.deleteUser(username);
-
-       assertEquals(0, foodmeRepository.getAllUsers().size());
+        try {
+            foodmeRepository.deleteUser(username);
+        }
+        catch (ParseException e) {
+            //Not expected
+            e.printStackTrace();
+        }
+        assertEquals(0, foodmeRepository.getAllUsers().size());
 
 
     }
