@@ -248,7 +248,7 @@ public class Controller
 		// Set up url
 		String url = null;
 		if (location != null) {
-			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine;
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&categories=" + cuisine;
 		} else {
 			throw new Exception("You are missing a location to make a query!");
 		}
