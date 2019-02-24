@@ -104,7 +104,7 @@ public class FoodmeApplicationTests
 		u.setLastName(testLastName);
 		u.setEmail(testEmail);
 		u.setPassword(testPassword);
-		u.setPreferences(new ArrayList<Preference>());zs                                                                                      
+		u.setPreferences(new ArrayList<Preference>());                                                                                      
 		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 
 		when(repository.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword)).thenReturn(u);
