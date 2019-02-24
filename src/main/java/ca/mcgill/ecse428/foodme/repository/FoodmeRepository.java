@@ -101,12 +101,12 @@ public class FoodmeRepository {
 
 		if(entityManager.find(AppUser.class, username) == null) {
 			System.out.println("Cannot delete a user that does not exist");
+			return null;
 		}
 		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		return appUser;
 		}
-		return null;
 	}
 
 	/**
@@ -192,7 +192,6 @@ public class FoodmeRepository {
 		else {
 		AppUser u = entityManager.find(AppUser.class, username);
 		entityManager.remove(u);
-		//entityManager.detach(u);
 		}
 	}
 

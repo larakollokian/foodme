@@ -19,6 +19,8 @@ import javax.persistence.EntityManager;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FoodmeApplication.class)
 public class AppUserTests {
@@ -32,15 +34,15 @@ public class AppUserTests {
     private FoodmeRepository foodmeRepository;
 
     @Test
-    public void testDeleteUser() {
+    public void testDeleteUser() throws ParseException {
         if(foodmeRepository.getAppUser("Tester123") == null)
             appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
         else
             appUser = foodmeRepository.getAppUser("Tester123");
         String username = appUser.getUsername();
-
-        //    appUser = foodmeRepository.deleteUser(username);
-        assertEquals(1, appUser);
+        foodmeRepository.deleteUser(username);
+        //assertEquals(null, appUser);
+        assertEquals(null, foodmeRepository.getAppUser(username));
     }
 
 }
