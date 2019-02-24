@@ -135,7 +135,7 @@ public class Preference
 
 
 	@ManyToOne
-	//@JoinColumn(name = "user")
+	@JoinColumn(name = "app_user")
 	@JsonIgnore
 	public AppUser getUser()
 	{

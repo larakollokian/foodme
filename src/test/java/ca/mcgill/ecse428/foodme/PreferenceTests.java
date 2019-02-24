@@ -67,4 +67,5 @@ public class PreferenceTests {
         assertEquals(editPreference.getPrice(), PriceRange.$); // Check to see that the price range changed!
         assertEquals(editPreference.getPID(), pID); // Make sure PID didn't change
     }
+
 }
