@@ -144,8 +144,9 @@ public class FoodmeRepository {
 	public void addLiked(String username, String restaurantName) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
-		appUser.addLikesAnsDislike(restaurant);
 		restaurant.setLiked(true);
+		restaurant.setRestaurantName(restaurantName);
+		restaurant.setAppUser(appUser);
 		entityManager.merge(restaurant);
 		entityManager.merge(appUser);
 	}
@@ -158,14 +159,13 @@ public class FoodmeRepository {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		
 		//TODO change the query to what is in the db
-		Query q = entityManager.createNativeQuery("SELECT * FROM restaurant WHERE app_user= :user");
+		Query q = entityManager.createNativeQuery("SELECT FROM restaurant WHERE app_user= :user and liked=true");
 		q.setParameter("user", username);
 		@SuppressWarnings("unchecked")
 		List<Restaurant>likedAndDisliked = q.getResultList();
 		//filter through that list for only liked and not disliked either from db or here.
-		
 		if(likedAndDisliked.isEmpty()) {
-			return null;
+			return Collections.emptyList();
 		}
 		
 		List<Restaurant> liked = new ArrayList<Restaurant>();
@@ -175,10 +175,9 @@ public class FoodmeRepository {
 			}
 		}
 		if(liked.isEmpty()) {
-			return null;
+			return Collections.emptyList();
 		}
 
-		//return liked;
 		return liked;
 	}
 	

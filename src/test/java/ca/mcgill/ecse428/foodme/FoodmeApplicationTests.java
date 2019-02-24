@@ -2,6 +2,7 @@ package ca.mcgill.ecse428.foodme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
@@ -319,6 +320,12 @@ public class FoodmeApplicationTests
         }
     }
 
+    public Restaurant helperCreateRestaurant(String restaurantID, int id) {
+    	Restaurant restaurant = new Restaurant();
+    	restaurant.setRestaurantName(restaurantID);
+    	restaurant.setRestaurantID(id);
+    	return restaurant;
+    }
     /**
      * Test UT for adding a restaurant to the liked list
      * @throws InvalidInputException
@@ -326,9 +333,12 @@ public class FoodmeApplicationTests
     @Test
 	public void testAddLike () throws InvalidInputException {
 		AppUser user;
-    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
 	    user = repository.createAccount("Ali", "Baba", "baba", "baba@gmail.com", "22");
-	    assertEquals(0, user.getLikesAnsDislikes().size());
+
+    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+    	helperCreateRestaurant("nameRestaurant", 11223);
+
+    	//assertEquals(0, user.getLikesAnsDislikes().size());
 	    //repository.addLiked(USERNAME, id);
 	    //assertEquals(1, user.getLikesAnsDislikes().size());
 	}
@@ -339,20 +349,14 @@ public class FoodmeApplicationTests
      */
 	@Test
 	public void testListAll () throws InvalidInputException {
-		int count =0;
 		AppUser user;
+		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
-	    user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-	    
-	    for (Restaurant r: user.getLikesAnsDislikes()) {
-	    	if(user.getLikesAnsDislikes().isEmpty()) {
-	    		count=0;
-	    	}
-	    	else if(r.isLiked()) {
-	    		count++;
-	    	}
-	    }
-	    assertEquals(liked.size(), count);
+		assertTrue(liked.isEmpty());
+		repository.addLiked(USERNAME, "RestaurantA");
+		
+		repository.listAllLiked(USERNAME);
+		assertEquals(1, liked.size());
 	}
 }
 
