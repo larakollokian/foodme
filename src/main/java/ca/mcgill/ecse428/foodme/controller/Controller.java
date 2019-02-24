@@ -18,7 +18,6 @@ import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.repository.*;
-import ca.mcgill.ecse428.foodme.security.Password;
 import java.text.ParseException;
 import java.util.*;
 
@@ -174,7 +173,6 @@ public class Controller
 		return response;
 	}
 
-	
 	/**
 	 * Method that searches restaurant and sort them by best_match, rating, review_count or distance
 	 * If recommend param is set to 1, it will return random restaurant from the result
@@ -219,9 +217,6 @@ public class Controller
 		
 		return response;
 	}
-	
-	
-	
 	
 	/**
 	 * get user with username from database
@@ -289,13 +284,13 @@ public class Controller
 
 
 	//}
-
 	@GetMapping("/password/random/{n}")
 	public String getRandomPassword(@PathVariable("n")int length)
 	{
 		String randPassword = Password.generateRandomPassword(length);
 		return randPassword;
 	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
@@ -344,4 +339,69 @@ public class Controller
 		}
 		return editPreference;
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////                        LIKED CONTROLLER                           /////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Controller Method that takes a user and the ID of the restaurants they liked to add it in their liked restaurants
+	 * @param username of the user on the application
+	 * @param restaurant ID of the restaurant
+	 */
+	@PostMapping("/users/{user}/liked/{id}")
+	public void addLiked(@PathVariable("user") String username, @PathVariable("id") String id) {
+		repository.addLiked(username, id);
+	}
+	
+	/**
+	 * Controller Method that takes a user and list all its liked restaurants
+	 * @param username
+	 * @return
+	 */
+	@PostMapping("/users/{user}/allliked/")
+	public List<Restaurant> allLiked(@PathVariable("user") String username){
+		List<Restaurant> liked = repository.listAllLiked(username);
+		
+//		for(String like: liked) {
+//			ResponseEntity<String> likedRestaurant = lookUpRestaurantByID();
+//		}
+		return liked;
+		
+		
+	}
+	
+	/**
+	 * Controller method that calls the API to return a restaurant based on its id
+	 * @param id
+	 * @return Restaurant and all its information associated with it
+	 * @throws Exception
+	 */
+	@GetMapping("/businesses/{id}")
+	public ResponseEntity<String> lookUpRestaurantByID (@RequestParam("id") String id) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (id != null) {
+			url = "https://api.yelp.com/v3/businesses/" + id;
+		} else {
+			throw new Exception("You are missing the id to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // Response
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        return response;
+	}
+	
 }

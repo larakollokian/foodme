@@ -2,14 +2,18 @@ package ca.mcgill.ecse428.foodme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
+
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.mcgill.ecse428.foodme.controller.Controller;
@@ -357,5 +362,47 @@ public class FoodmeApplicationTests
     }
     
     
+    public Restaurant helperCreateRestaurant(String restaurantID, int id) {
+    	Restaurant restaurant = new Restaurant();
+    	restaurant.setRestaurantName(restaurantID);
+    	restaurant.setRestaurantID(id);
+    	return restaurant;
+    }
+    
+    //TODO currently merged in one with testListAll()
+//    /**
+//     * Test UT for adding a restaurant to the liked list
+//     * @throws InvalidInputException
+//     */
+//    @Test
+//	public void testAddLike () throws InvalidInputException {
+//		AppUser user;
+//	    user = repository.createAccount("Ali", "Baba", "baba", "baba@gmail.com", "22");
+//
+//    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+//    	helperCreateRestaurant("nameRestaurant", 11223);
+//
+//    	assertEquals(0, user.getLikesAnsDislikes().size());
+//	    repository.addLiked(USERNAME, id);
+//	    assertEquals(1, user.getLikesAnsDislikes().size());
+//	}
+    
+    /**
+     * Test UT for listing all the restaurants liked
+     * @throws InvalidInputException
+     */
+	@Ignore
+    //@Test
+	public void testListAll () throws InvalidInputException {
+		AppUser user;
+		String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
+		assertTrue(liked.isEmpty());
+		repository.addLiked(USERNAME, id);
+		
+		repository.listAllLiked(USERNAME);
+		assertEquals(1, liked.size());
+	}
 }
 
