@@ -133,14 +133,14 @@ public class FoodmeRepository {
 	}	
 
 	/**
-	 * Method to dislike a restaurant so its in the user list of disliked restaurant
-	 * @param restaurant The restaurant a user dislikes
+	 * Method to dislike a restaurant so it's in the user list of disliked restaurant
+	 * @param restaurant The ID for arestaurant a user dislikes
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void isDisliked(String username, String restaurant) {
+	public void addDisliked(String username, String id) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.addDislike(restaurant);
+		appUser.addDislike(id);
 	}
 	
 	/**
@@ -166,36 +166,32 @@ public class FoodmeRepository {
 	public List<String> listAllButDisliked(String username) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		
-		//TODO: change the query fit the database
-//		Query q = entityManager.createNativeQuery("SELECT restaurantName FROM 
-//		restaurants WHERE appreciation="liked" OR appreciation="");
-//		
-//		List<String> allButDisliked = q.getResultList();
-		
-		//return allbutDisliked;
-		return appUser.getDislikes();
+		List<String> dislikeList = appUser.getDislikes();
+		return dislikeList;
 	}
 
 	/**
-	 * Method to remove a like for  a restaurant so it dissapears from the liked list
-	 * @param restaurant The restaurant a user doesn't like anymore
+	 * Method to remove a like for a restaurant so it dissapears from the liked list
+	 * @param restaurant The id for the restaurant a user doesn't like anymore
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void removeLike(String username, String restaurant) {
+	public void removeLike(String username, String id) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.removeLike(restaurant);
+		appUser.removeLike(id);
+		entityManager.merge(appUser);
 	}
 
 	/**
-	 * Method to remove a dislike for  a restaurant so it dissapears from the disliked list
+	 * Method to remove a dislike for a restaurant so it dissapears from the disliked list
 	 * @param restaurant The restaurant a user doesn't dislike anymore
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void removeDislike(String username, String restaurant) {
+	public void removeDislike(String username, String id) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.removeDislike(restaurant);
+		appUser.removeDislike(id);
+		entityManager.merge(appUser);
 	}
 
 	/**

@@ -312,4 +312,27 @@ public class Controller
 		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
 		return editPreference;
 	}
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////                   DISLIKE CONTROLLER                           	/////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@PostMapping("users/{user}/disliked/{id}")
+	public void addDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
+		repository.addDisliked(username, id);
+	}
+
+	@PostMapping("users/{user}/removedisliked/{id}")
+	public void removeDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
+		repository.removeDislike(username, id);
+	}
+
+	@PostMapping("users/{user}/removeliked/{id}")
+	public void removeLiked(@PathVariable("user") String username, @PathVariable("id") String id) { 
+		repository.removeLike(username, id);
+	}
+
 }
