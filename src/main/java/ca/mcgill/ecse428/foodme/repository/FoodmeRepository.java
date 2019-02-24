@@ -7,13 +7,13 @@ import javax.persistence.Query;
 
 import ca.mcgill.ecse428.foodme.model.*;
 
+import ca.mcgill.ecse428.foodme.security.Password;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
 
 @SuppressWarnings("Duplicates")
 @Repository
@@ -163,11 +163,18 @@ public class FoodmeRepository {
 	 * Method to list all the restaurants except those disliked by a user
 	 * @return The list of all the restaurants but those disliked
 	 */
-	public List<String> listAllButDisliked(String username) {
+	public List<Restaurant> listAllButDisliked(String username) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		
-		List<String> dislikeList = appUser.getDislikes();
-		return dislikeList;
+		Query q = entityManager.createNativeQuery("SELECT * FROM restaurant WHERE app_user=:user and disliked=false");
+		q.setParameter("user", username);
+		List<Restaurant> notDisliked=q.getResultList();
+
+		if(notDisliked.isEmpty())
+			return Collections.emptyList();
+
+		return notDisliked;
+		
 	}
 
 	/**

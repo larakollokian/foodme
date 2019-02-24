@@ -321,8 +321,14 @@ public class Controller
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@PostMapping("users/{user}/disliked/{id}")
-	public void addDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
-		repository.addDisliked(username, id);
+	public Boolean addDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
+		try {
+			repository.addDisliked(username, id);
+		} catch (Exception e) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	@PostMapping("users/{user}/removedisliked/{id}")
@@ -330,6 +336,13 @@ public class Controller
 		repository.removeDislike(username, id);
 	}
 
+	@PostMapping("users/{user}/alldisliked/")
+	public List<Restaurant> allDisliked(@PathVariable("user") String username) {
+		List<Restaurant> disliked = repository.listAllDisliked(username);
+
+		return disliked;
+	}
+	
 	@PostMapping("users/{user}/removeliked/{id}")
 	public void removeLiked(@PathVariable("user") String username, @PathVariable("id") String id) { 
 		repository.removeLike(username, id);
