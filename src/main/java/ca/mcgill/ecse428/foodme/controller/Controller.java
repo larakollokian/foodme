@@ -1,11 +1,6 @@
 package ca.mcgill.ecse428.foodme.controller;
 
-import ca.mcgill.ecse428.foodme.model.AppUser;
-import ca.mcgill.ecse428.foodme.model.Preference;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
-import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +14,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.repository.*;
-import java.util.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +61,7 @@ public class Controller
 			return "Hello, " + name + "!";
 		}
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                     APP USER CONTROLLER                           /////////////////
@@ -93,6 +86,7 @@ public class Controller
 	public String login(@RequestParam String username, @RequestParam String password) throws Exception {
 		return authentication.login(username, password);
 	}
+
 	/**
 	 * Method that creates a new account for a user. Username must be unique.
 	 * @param username
@@ -181,6 +175,19 @@ public class Controller
 	}
 
 	/**
+	 * get user with username from database
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@GetMapping("/users/get/{username}")
+	public AppUser getAppUser(@PathVariable("username")String username) 
+	{
+		AppUser u = repository.getAppUser(username);
+		return u;
+	}
+
+	/**
 	 * Gets all users in the database. If there are none, returns an empty list
 	 * @return list of users
 	 */
@@ -191,7 +198,11 @@ public class Controller
 		return allUsers;
 	}
 
-
+	/**
+	 * delete user with username from database
+	 * 
+	 * @param username
+	 */
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
@@ -264,8 +275,6 @@ public class Controller
 //
 //	}
 
-
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                   PREFERENCE CONTROLLER                           /////////////////
@@ -276,18 +285,17 @@ public class Controller
 	@GetMapping("/preferences/get/all")
 	public List<Preference> getAllPreferences()
 	{
-		
 		List<Preference> allPs = repository.getAllPreferences();
 		return allPs;
 	}
-	
+
 	@GetMapping("/preferences/user/{username}")
 	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
 	{
 		List<Preference> prefForUser = repository.getPreferencesForUser(username);
 		return prefForUser;
 	}
-	
+
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,

@@ -32,8 +32,7 @@ public class FoodmeRepository {
 		u.setLastName(lastName);
 		u.setEmail(email);
 		u.setPassword(password);
-		u.setLikes(new ArrayList<String>());
-		u.setDislikes(new ArrayList<String>());
+		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 		entityManager.persist(u);
 		return u;
 	}
