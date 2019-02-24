@@ -310,7 +310,7 @@ public class Controller
 	 * @param username
 	 * @return
 	 */
-	@PostMapping("/users/{user}/allliked/")
+	@GetMapping("/users/{user}/allliked/")
 	public List<Restaurant> allLiked(@PathVariable("user") String username){
 		List<Restaurant> liked = repository.listAllLiked(username);
 		

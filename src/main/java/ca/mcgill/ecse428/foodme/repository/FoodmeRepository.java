@@ -148,6 +148,7 @@ public class FoodmeRepository {
 		restaurant.setRestaurantName(restaurantName);
 		restaurant.setAppUser(appUser);
 		entityManager.merge(restaurant);
+		entityManager.persist(restaurant);
 		//entityManager.merge(appUser);
 	}
 	

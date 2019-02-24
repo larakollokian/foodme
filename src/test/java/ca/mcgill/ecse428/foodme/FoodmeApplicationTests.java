@@ -350,8 +350,13 @@ public class FoodmeApplicationTests
      * Test UT for listing all the restaurants liked
      * @throws InvalidInputException
      */
-	@Ignore
-    //@Test
+
+    @Test
+    public void testContains() {
+    	
+    }
+    
+    @Test
 	public void testListAll () throws InvalidInputException {
 		AppUser user;
 		String id = "E8RJkjfdcwgtyoPMjQ_Olg";
