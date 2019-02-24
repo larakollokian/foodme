@@ -164,11 +164,18 @@ public class FoodmeRepository {
 		List<Restaurant>likedAndDisliked = q.getResultList();
 		//filter through that list for only liked and not disliked either from db or here.
 		
+		if(likedAndDisliked.isEmpty()) {
+			return null;
+		}
+		
 		List<Restaurant> liked = new ArrayList<Restaurant>();
 		for(Restaurant r: likedAndDisliked) {
 			if(r.isLiked()) {
 				liked.add(r);
 			}
+		}
+		if(liked.isEmpty()) {
+			return null;
 		}
 
 		//return liked;
