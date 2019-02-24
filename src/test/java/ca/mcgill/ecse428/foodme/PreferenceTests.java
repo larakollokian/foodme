@@ -13,12 +13,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityManager;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FoodmeApplication.class)
 public class PreferenceTests {
-    private AppUser appUser;
 
     @Mock
     EntityManager entityManager;
@@ -28,7 +29,8 @@ public class PreferenceTests {
 
     @Test
     public void testAddPreference() {
-        if(foodmeRepository.getAppUser("Tester123") == null)
+        AppUser appUser;
+        if(foodmeRepository.getAppUser("Tester123") == null) // Create new user if doesn't exist
             appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
         else
             appUser = foodmeRepository.getAppUser("Tester123");
@@ -37,20 +39,32 @@ public class PreferenceTests {
         String priceRange = "$$$";
         String rating = "four";
 
-        foodmeRepository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+        foodmeRepository.createPreference(appUser, priceRange, distanceRange, cuisine, rating); // Create new preference
         assertEquals(appUser.getPreferences().size(), 1);
     }
 
-//    @Test
-//    public void testEditPreference() {
-//        Preference editPreference = appUser.getPreferences().get(0);
-//        String distanceRange = "fivehundred";
-//        String cuisine = "Mexican";
-//        String priceRange = "$";
-//        String rating = "four";
-//
-//        foodmeRepository.editPreference(appUser, editPreference, priceRange, distanceRange, cuisine, rating, 0);
-//        assertEquals(appUser.getPreferences().get(0).getPrice(), PriceRange.$);
-//    }
+    @Test
+    public void testEditPreference() {
+        AppUser appUser;
+        String username = "Tester123";
+        Preference editPreference = null;
+        if(foodmeRepository.getAppUser(username) == null) // Create new user if doesn't exist
+            appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
+        else
+            appUser = foodmeRepository.getAppUser("Tester123");
 
+        Preference newPreference = foodmeRepository.createPreference(appUser, "$$$", "fivehundred", "Italian", "four"); // Create new preference
+        int pID = newPreference.getPID(); // Get PID of this new preference
+
+        editPreference = foodmeRepository.getPreference(pID);
+
+        String distanceRange = "fivehundred";
+        String cuisine = "Mexican";
+        String priceRange = "$";
+        String rating = "four";
+
+        editPreference = foodmeRepository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+        assertEquals(editPreference.getPrice(), PriceRange.$); // Check to see that the price range changed!
+        assertEquals(editPreference.getPID(), pID); // Make sure PID didn't change
+    }
 }
