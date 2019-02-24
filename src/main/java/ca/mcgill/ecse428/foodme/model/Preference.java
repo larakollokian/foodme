@@ -21,31 +21,10 @@ public class Preference
 	private PriceRange price;
 	private Rating rating;
 	private int pID;
+	private boolean isDefault;
 
 	//Preference Associations
 	private AppUser appUser;
-
-	//------------------------
-	// CONSTRUCTOR (SHOULD BE DEFAULT)
-	//------------------------
-
-	//  public Preference(DistanceRange aDistance, Cuisine aCuisine, PriceRange aPrice, Rating aRating, String aPID, User aUser)
-	//  {
-	//    distance = aDistance;
-	//    cuisine = aCuisine;
-	//    price = aPrice;
-	//    rating = aRating;
-	//    pID = aPID;
-	//    boolean didAddUser = setUser(aUser);
-	//    if (!didAddUser)
-	//    {
-	//      throw new RuntimeException("Unable to create preference due to user");
-	//    }
-	//  }
-
-	//------------------------
-	// INTERFACE
-	//------------------------
 
 	public boolean setDistance(DistanceRange aDistance)
 	{
@@ -85,6 +64,14 @@ public class Preference
 		this.pID = aPID;
 		wasSet = true;
 		return wasSet;
+	}
+	
+	public boolean getIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 
 	public DistanceRange getDistance()
