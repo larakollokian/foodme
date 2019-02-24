@@ -140,40 +140,6 @@ public class Controller
 	}
 
 	/**
-	 * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
-	 * @param location
-	 * @param price
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/search/price/")
-	public ResponseEntity<String> searchByPriceRange (
-			@RequestParam("location") String location,
-			@RequestParam("price") String price) throws Exception{
-
-		// Set up url
-		String url = null;
-		if (location != null) {
-			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
-		} else {
-			throw new Exception("You are missing a location to make a query!");
-		}
-
-		// Add headers (e.g. Authentication for Yelp Fusion API access)
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Bearer " + APIKey);
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-		// Response
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-		return response;
-	}
-
-	/**
 	 * get user with username from database
 	 * 
 	 * @param username
@@ -287,5 +253,80 @@ public class Controller
 			System.out.println("The preference ID provided is not associated to this user");
 		}
 		return editPreference;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////                  BUSINESS SEARCH CONTROLLER                       /////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
+	 * @param location
+	 * @param price
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/search/price/")
+	public ResponseEntity<String> searchByPriceRange (
+			@RequestParam("location") String location,
+			@RequestParam("price") String price) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (location != null) {
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+	}
+
+	/**
+	 * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
+	 * @param location
+	 * @param price
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/search/price/")
+	public ResponseEntity<String> searchByPriceRange (
+			@RequestParam("longitude") String longitude,
+			@RequestParam("latitude") String latitude,
+			@RequestParam("price") String price) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (longitude != null && latitude != null) {
+			url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
+		} else {
+			throw new Exception("You are missing longitude & latitude to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
 	}
 }
