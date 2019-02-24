@@ -1,5 +1,7 @@
 package ca.mcgill.ecse428.foodme;
 
+import java.util.Scanner;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 
@@ -16,6 +18,11 @@ public class FoodmeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FoodmeApplication.class, args);
+		
+        System.out.println("Press 'Enter' to terminate");
+        new Scanner(System.in).nextLine();
+        System.out.println("terminating application...");
+        System.exit(1);
 	}
 
 

@@ -18,6 +18,7 @@ import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.repository.*;
+import ca.mcgill.ecse428.foodme.security.Password;
 import java.text.ParseException;
 import java.util.*;
 
@@ -173,6 +174,55 @@ public class Controller
 		return response;
 	}
 
+	
+	/**
+	 * Method that searches restaurant and sort them by best_match, rating, review_count or distance
+	 * If recommand param is set to 1, it will return random restaurant from the result
+	 * @param location
+	 * @param sortby: best_match, rating, review_count or distance
+	 * @param recommand: 1-> True, 0-> False
+	 * @return ResponseEntity
+	 * @throws Exception
+	 */
+	@GetMapping("/search/{location}/{sortby}/{recommand}/")
+	public ResponseEntity<String> searchSortByDistance (
+			@PathVariable("location") String location,
+			@PathVariable("sortby") String sortby,
+			@PathVariable("recommand") int recommand) throws Exception
+	{
+		// Set up url
+		String url = null;
+		String extraParam = "";
+		if (location != null) {
+			if (recommand == 1) {
+				Random rand = new Random();
+				int randomOffset = rand.nextInt(50);
+				String offset = Integer.toString(randomOffset);
+				extraParam = extraParam + "&offset="+ offset+ "&limit=1";
+			}
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
+
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		
+		return response;
+	}
+	
+	
+	
+	
 	/**
 	 * get user with username from database
 	 * 
@@ -240,6 +290,12 @@ public class Controller
 
 	//}
 
+	@GetMapping("/password/random/{n}")
+	public String getRandomPassword(@PathVariable("n")int length)
+	{
+		String randPassword = Password.generateRandomPassword(length);
+		return randPassword;
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
