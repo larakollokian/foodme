@@ -8,8 +8,13 @@ import javax.persistence.Query;
 import ca.mcgill.ecse428.foodme.model.*;
 
 import ca.mcgill.ecse428.foodme.security.Password;
+import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.*;
 
 import java.text.ParseException;
@@ -22,6 +27,14 @@ public class FoodmeRepository {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
+
+//	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
+//
+//	@Autowired
+//	AuthenticationService authentication;
+//
+//	@Autowired
+//	public FoodmeRepository(){}
 
 	@Transactional
 	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password)
@@ -225,7 +238,7 @@ public class FoodmeRepository {
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time 
-	 * @param aRestaurant
+	 * @param
 	 * @return
 	 */
 	// public boolean isRestaurantOpen(Restaurant aRestaurant) {
@@ -245,5 +258,51 @@ public class FoodmeRepository {
 		
 	// 	return true;
 	// }
+
+// TODO test method when not too many connections
+//	public ResponseEntity<List> getAllRestaurants(String location) throws InvalidInputException{
+//
+//		String url = null;
+//		if (location != null) {
+//			url = "https://api.yelp.com/v3/businesses/search?location=" + location;
+//		} else {
+//			return null;
+//		}
+//
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.add("Authorization", "Bearer " + APIKey);
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//		HttpEntity<Void> entity = new HttpEntity<>(headers);
+//
+//		// Response
+//		RestTemplate restTemplate = new RestTemplate();
+//		ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+//
+//		return response;
+//
+//	}
+
+// TODO test method when not too many connections
+//	public Object getRestaurant(String id){
+//		String url = null;
+//		if (location != null) {
+//			url = "https://api.yelp.com/v3/businesses/" + id;
+//		} else {
+//			return null;
+//		}
+//
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.add("Authorization", "Bearer " + APIKey);
+//		headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//		HttpEntity<Void> entity = new HttpEntity<>(headers);
+//
+//		// Response
+//		RestTemplate restTemplate = new RestTemplate();
+//		ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
+//
+//		return response;
+//	}
 
 }

@@ -1,11 +1,10 @@
 package ca.mcgill.ecse428.foodme;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,28 +28,28 @@ import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FoodmeApplicationTests 
+public class FoodmeApplicationTests
 {
 	private static final String testUsername = "Tester123";
 	private static final String testFirstName = "Test";
 	private static final String testLastName = "User";
 	private static final String testEmail = "student@mcgill.ca";
 	private static final String testPassword = "password";
-	
+
 	private static final String USERNAME = "test";
 	private static final String FIRSTNAME = "John";
 	private static final String LASTNAME="Doe";
 	private static String EMAIL="johnDoe@hotmail.ca";
 	private String PASSWORD = "HelloWorld123";
-	
+
     @Autowired
     private AuthenticationService authentication;
-	
+
 	@InjectMocks
 	Controller controller;
 
 	@Mock
-	FoodmeRepository repository = Mockito.mock(FoodmeRepository.class);
+	FoodmeRepository repository = Mockito.mock(FoodmeRepository.class, Mockito.RETURNS_DEEP_STUBS);
 
 	/**
 	 * Initializing the controller before starting all the tests
@@ -61,7 +60,7 @@ public class FoodmeApplicationTests
 		controller = new Controller();
 		MockitoAnnotations.initMocks(this);
 	}
-	
+
 	@Before
 	public void setMockOutput() throws InvalidInputException {
 	    try {
@@ -81,22 +80,22 @@ public class FoodmeApplicationTests
 	        e.printStackTrace();
         }
 	}
-	
+
 	@Test
 	public void contextLoads() {
 	}
-	
+
 	/**
-	 * Initial test to make sure all is working. Verifies if the home page of the web site displays "Hello, World!" 
+	 * Initial test to make sure all is working. Verifies if the home page of the web site displays "Hello, World!"
 	 */
 	@Test
-	public void testGreeting() 
+	public void testGreeting()
 	{
-		assertEquals("Hello world!", controller.greeting());	
+		assertEquals("Hello world!", controller.greeting());
 	}
-	
+
 	@Test
-	public void testTestCreateUser() 
+	public void testTestCreateUser()
 	{
 		AppUser u = new AppUser();
 		u.setUsername(testUsername);
@@ -104,16 +103,16 @@ public class FoodmeApplicationTests
 		u.setLastName(testLastName);
 		u.setEmail(testEmail);
 		u.setPassword(testPassword);
-		u.setPreferences(new ArrayList<Preference>());                                                                                      
+		u.setPreferences(new ArrayList<Preference>());
 		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 
 		when(repository.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword)).thenReturn(u);
 		assertEquals(controller.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword),u);
 		Mockito.verify(repository).testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword);
 	}
-	
+
     @Test
-    public void testDeleteUser() 
+    public void testDeleteUser()
     {
     	AppUser appUser;
         if(repository.getAppUser(testUsername) == null)
@@ -169,7 +168,7 @@ public class FoodmeApplicationTests
         assertEquals(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating), editPreference);
         Mockito.verify(repository).editPreference(newPreference, priceRange, distanceRange, cuisine, rating);
     }
-    
+
     @Test
     public void testLoginWithValidPassword() throws InvalidInputException{
 
@@ -275,6 +274,44 @@ public class FoodmeApplicationTests
         }
 
         assertEquals("Invalid login password!!!",error);
+    }
+
+    @Test
+    public void testRestaurantList() { //getAllRestaurants(string Location)
+
+//        List allRestaurant=controller.getAllRestaurants("montreal");
+//        assertTrue(allRestaurant.isEmpty());
+    }
+
+    @Test
+    public void testRestaurantInfo() { //getRestaurant(String id)
+
+//        Object restaurant=controller.getRestaurant("WavvLdfdP6g8aZTtbBQHTw");
+//        assertTrue(restaurant.name.compareToIgnoreCase("Gary Danko"));
+    }
+
+    @Test
+    public void testRemoveLike() {
+
+	    //       AppUser user;
+//	    user = repository.createAccount("Test", "Test", "Test", "Test@Test.com", "69");
+//  TODO
+//    	Create restaurant
+//      add a like for the restaurant for user
+        // remove like
+        //assert if removed
+    }
+
+    @Test
+    public void testRemoveDislike() {
+        //       AppUser user;
+//	    user = repository.createAccount("Test", "Test", "Test", "Test@Test.com", "69");
+//
+//    	TODO
+//    	Create restaurant
+//      add a dislike for the restaurant for user
+        // remove dislike
+        //assert if removed;
     }
 
     @Test
