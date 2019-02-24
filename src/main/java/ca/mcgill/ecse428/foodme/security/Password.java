@@ -11,6 +11,10 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Base64.Decoder;
+import org.apache.commons.text.RandomStringGenerator;
+import static org.apache.commons.text.CharacterPredicates.DIGITS;
+import static org.apache.commons.text.CharacterPredicates.LETTERS;
+
 
 public class Password {
     
@@ -67,6 +71,20 @@ public class Password {
             throw new AuthenticationException("Invalid Password");
         }
 
+    }
+    /**
+     * Generate a random password 
+	 * @param n
+     * @return n character long random password 
+	 */
+    public static String generateRandomPassword(int n) {
+    	RandomStringGenerator generator = new RandomStringGenerator.Builder()
+    	        .withinRange('0', 'z')
+    	        .filteredBy(LETTERS, DIGITS)
+    	        .build();
+    	String randPassword = generator.generate(n);
+    	
+    	return randPassword;
     }
 
 }
