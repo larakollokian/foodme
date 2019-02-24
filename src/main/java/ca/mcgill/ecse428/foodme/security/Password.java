@@ -61,7 +61,7 @@ public class Password {
         String hashOfInput = hash(password, base64Decoder.decode(saltAndPass[0]));
         boolean isEqual = hashOfInput.equals(saltAndPass[1]);
         if(!isEqual){
-            throw new Exception("Wrong password");
+            throw new AuthenticationException("Wrong password");
         }
     }
 }

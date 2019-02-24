@@ -37,12 +37,10 @@ public class AppUserTests {
             appUser = foodmeRepository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
         else
             appUser = foodmeRepository.getAppUser("Tester123");
-            String username = appUser.getUsername();
+        String username = appUser.getUsername();
 
         //    appUser = foodmeRepository.deleteUser(username);
-            assertEquals(1, appUser);
-
-
+        assertEquals(1, appUser);
     }
 
 }
