@@ -177,24 +177,24 @@ public class Controller
 	
 	/**
 	 * Method that searches restaurant and sort them by best_match, rating, review_count or distance
-	 * If recommand param is set to 1, it will return random restaurant from the result
+	 * If recommend param is set to 1, it will return random restaurant from the result
 	 * @param location
 	 * @param sortby: best_match, rating, review_count or distance
-	 * @param recommand: 1-> True, 0-> False
+	 * @param recommend: 1-> True, 0-> False
 	 * @return ResponseEntity
 	 * @throws Exception
 	 */
-	@GetMapping("/search/{location}/{sortby}/{recommand}/")
+	@GetMapping("/search/{location}/{sortby}/{recommend}/")
 	public ResponseEntity<String> searchSortByDistance (
 			@PathVariable("location") String location,
 			@PathVariable("sortby") String sortby,
-			@PathVariable("recommand") int recommand) throws Exception
+			@PathVariable("recommand") int recommend) throws Exception
 	{
 		// Set up url
 		String url = null;
 		String extraParam = "";
 		if (location != null) {
-			if (recommand == 1) {
+			if (recommend == 1) {
 				Random rand = new Random();
 				int randomOffset = rand.nextInt(50);
 				String offset = Integer.toString(randomOffset);

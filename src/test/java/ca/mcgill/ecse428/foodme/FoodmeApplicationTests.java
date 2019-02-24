@@ -6,6 +6,8 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -327,10 +329,32 @@ public class FoodmeApplicationTests
     		
     		// length should be equal
     		assertEquals(lenOfPassword, p1.length());
-    		assertEquals(lenOfPassword, p2.length());		
+    		assertEquals(lenOfPassword, p2.length());
+    		
+    		// generated passwords should not equal, unless in extreme case
+    		assertNotEquals(p1, p2);	
     	}
     }
     
+    @Test
+    public void testSearchSortByDistance() {
+    	String response = null; // need to be replaced with the http response
+    	boolean failed = false;
+		Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
+		Matcher m = p.matcher(response);
+		
+		double a = (double) 0.0;
+		// loop through all the distances, break if there is a failure  
+		while (!failed && m.find()){
+			double b = Double.parseDouble(m.group(1));
+			if (a > b) {
+				failed = true;
+			}
+			a = b;
+		}
+		assertEquals(failed, false);
+		
+    }
     
     
 }
