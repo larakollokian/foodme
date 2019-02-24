@@ -343,7 +343,7 @@ public class FoodmeApplicationTests
     
     @Test
     public void testSearchSortByDistance() {
-    	String response = null; // need to be replaced with the http response
+    	String response = null; // TODO: need to be replaced with the http response
     	boolean failed = false;
 		Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
 		Matcher m = p.matcher(response);
