@@ -118,11 +118,14 @@ public class Controller
 				try {
 					if (password.length() >= 6) {
 						try {
-							// TODO Check if username already exists in the database (i.e. check username uniqueness)
-							if (username.length() >= 1) {
-								u = repository.createAccount(username, firstName, lastName, email, password);
+							if(getAppUser(username) == null) {
+								if (username.length() >= 1) {
+									u = repository.createAccount(username, firstName, lastName, email, password);
+								} else {
+									throw new InvalidInputException("Your username must have at least 1 character!");
+								}
 							} else {
-								throw new InvalidInputException("Your username must have at least 1 character!");
+								throw new InvalidInputException("This username already exists!");
 							}
 						} catch (NullPointerException e) {
 							throw new InvalidInputException("Please enter a username");
@@ -150,7 +153,6 @@ public class Controller
 	 * @return
 	 * @throws Exception
 	 */
-	// TODO This method does not work at the moment
 	@GetMapping("/search/price/")
 	public ResponseEntity<String> searchByPriceRange (
 	        @RequestParam("location") String location,
