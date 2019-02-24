@@ -11,23 +11,84 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
 
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.mcgill.ecse428.foodme.model.AppUser;
-import ca.mcgill.ecse428.foodme.model.Preference;
+import ca.mcgill.ecse428.foodme.controller.Controller;
+import ca.mcgill.ecse428.foodme.model.*;
+import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
+import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
+import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FoodmeApplicationTests {
+public class FoodmeApplicationTests 
+{
+	private static final String testUsername = "Tester123";
+	private static final String testFirstName = "Test";
+	private static final String testLastName = "User";
+	private static final String testEmail = "student@mcgill.ca";
+	private static final String testPassword = "password";
+	
+	private static final String USERNAME = "test";
+	private static final String FIRSTNAME = "John";
+	private static final String LASTNAME="Doe";
+	private static String EMAIL="johnDoe@hotmail.ca";
+	private String PASSWORD = "HelloWorld123";
+	
+    @Autowired
+    private AuthenticationService authentication;
+	
+	@InjectMocks
+	Controller controller;
 
+	@Mock
+	FoodmeRepository repository = Mockito.mock(FoodmeRepository.class);
+
+	/**
+	 * Initializing the controller before starting all the tests
+	 */
+	@Before
+	public void setUp()
+	{
+		controller = new Controller();
+		MockitoAnnotations.initMocks(this);
+	}
+	
+	@Before
+	public void setMockOutput() throws InvalidInputException {
+	    try {
+            AppUser user = new AppUser();
+            user.setUsername(USERNAME);
+            user.setLastName(LASTNAME);
+            user.setFirstName(FIRSTNAME);
+            user.setPassword(Password.getSaltedHash(PASSWORD));
+            user.setEmail(EMAIL);
+
+            Mockito.when(repository.getNumberUsers()).thenReturn(1);
+            Mockito.when(repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
+            Mockito.when(repository.getAppUser(USERNAME)).thenReturn(user);
+            Mockito.when(repository.getAppUser("none")).thenReturn(null);
+        }
+	    catch(Exception e){
+	        e.printStackTrace();
+        }
+	}
+	
 	@Test
 	public void contextLoads() {
 	}
@@ -363,4 +424,3 @@ public class FoodmeApplicationTests {
 		assertEquals(1, liked.size());
 	}
 }
-
