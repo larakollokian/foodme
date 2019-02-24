@@ -16,7 +16,7 @@ public class Password {
     
     private static final int iterations = 200;
     private static final int saltLen = 8;
-    private static final int desiredKeyLen = 128;
+    private static final int desiredKeyLen = 126;
     
     private static final Encoder base64Encoder = Base64.getEncoder();
     private static final Decoder base64Decoder = Base64.getDecoder();
@@ -43,7 +43,7 @@ public class Password {
             throw new IllegalArgumentException("Empty passwords are not supported.");
         SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         SecretKey key = f.generateSecret(new PBEKeySpec(
-            password.toCharArray(), salt, iterations, desiredKeyLen)
+                password.toCharArray(), salt, iterations, desiredKeyLen)
         );
         return base64Encoder.encodeToString(key.getEncoded());
     }
@@ -54,14 +54,19 @@ public class Password {
      * @throws Exception when the password is not equal to the storedHash
 	 */
     public static void check(String password, String storedHash) throws Exception {
+        System.out.println(password);
+        System.out.println(storedHash);
         String[] saltAndPass = storedHash.split("\\$");
         if (saltAndPass.length != 2) {
             throw new IllegalStateException("The stored password hash is formatted incorrectly.");
         }
         String hashOfInput = hash(password, base64Decoder.decode(saltAndPass[0]));
-        boolean isEqual = hashOfInput.equals(saltAndPass[1]);
-        if(!isEqual){
-            throw new AuthenticationException("Wrong password");
+        System.out.println(hashOfInput);
+        System.out.println(saltAndPass[1]);
+        if(!hashOfInput.equals(saltAndPass[1])){
+            throw new AuthenticationException("Invalid Password");
         }
+
     }
+
 }

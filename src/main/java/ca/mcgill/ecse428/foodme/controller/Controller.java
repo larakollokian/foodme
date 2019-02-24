@@ -86,13 +86,14 @@ public class Controller
 
 	/* Attempts to login and returns the session if successful
 	 * @param username
-	 * @return sessionGuid
-	 * @throws AuthenticationException
+	 * @param password
+	 * @return TRUE if the account is authenticated
 	 */
-	@PostMapping(value = { "/login" })
-	public String login(@RequestParam String username, @RequestParam String password) throws Exception {
+	@GetMapping("/users/auth/{username}/{password}")
+	public String login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
 		return authentication.login(username, password);
 	}
+
 	/**
 	 * Method that creates a new account for a user. Username must be unique.
 	 * @param username

@@ -144,7 +144,6 @@ public class TestAuthenticationService {
 
         assertEquals(1, foodRepo.getNumberUsers());
 
-
         String password = "Hello";
 
         try{
