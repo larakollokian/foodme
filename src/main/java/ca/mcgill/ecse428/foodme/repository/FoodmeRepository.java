@@ -100,7 +100,7 @@ public class FoodmeRepository {
 	public AppUser getAppUser(String username){
 
 		if(entityManager.find(AppUser.class, username) == null) {
-			System.out.println("Cannot delete a user that does not exist");
+			System.out.println("This user does not exist");
 		}
 		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
