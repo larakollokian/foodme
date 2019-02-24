@@ -19,8 +19,7 @@ import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.repository.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -67,10 +66,10 @@ public class Controller
 	/////////////////                     APP USER CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
+
+	@PostMapping("/users/testCreate/{username}/{firstName}/{lastName}/{email}/{password}")
 	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
-								  @PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
+			@PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
 	{
 		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
 		return u;
@@ -149,8 +148,8 @@ public class Controller
 	 */
 	@GetMapping("/search/price/")
 	public ResponseEntity<String> searchByPriceRange (
-	        @RequestParam("location") String location,
-            @RequestParam("price") String price) throws Exception{
+			@RequestParam("location") String location,
+			@RequestParam("price") String price) throws Exception{
 
 		// Set up url
 		String url = null;
@@ -161,17 +160,17 @@ public class Controller
 		}
 
 		// Add headers (e.g. Authentication for Yelp Fusion API access)
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + APIKey);
-        headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        // Response
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-        return response;
+		return response;
 	}
 
 	/**
@@ -206,20 +205,13 @@ public class Controller
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
-
-		try {
-			repository.deleteUser(username);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-
+		repository.deleteUser(username);
 		
 		// Response r = new Response();
 		// try {
 		// 	repository.deleteUser(username);
 		// 	r.setResponse(true);
-			
+
 		// } catch (NullPointerException e) {
 		// 	r.setResponse(false);
 		// 	r.setError("No such User exists");
@@ -232,43 +224,22 @@ public class Controller
 
 
 		AppUser u = repository.getAppUser(username);
-		
+
 		// if(u.getPassword() == oPassword) {
 		// 	System.out.println("Error: New password cannot be the same as old password");
 		// } 
 		// else {
 		u.setPassword(nPassword);
 		return u;
-		}
+	}
 
-		// AppUser u = repository.getAppUser(username);
-		// u.setPassword(password);
-		// return;
-	
-	
+	// AppUser u = repository.getAppUser(username);
+	// u.setPassword(password);
+	// return;
+
+
 	//}
 
-
-	
-
-	
-//	@GetMapping("/users/get/all")
-//	public List<AppUser> getAllUsers() {
-//
-//		List<String> users = repository.getAllUsers();
-//		List<AppUser> fullUser = new ArrayList<AppUser>();
-//
-//		for(String u: users) {
-//			fullUser.add(repository.getAppUser(u));
-//		}
-//		if(fullUser.isEmpty())
-//		{
-//			System.out.println("There are no users in the database");
-//			return null;
-//		}
-//		return fullUser;
-//
-//	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////

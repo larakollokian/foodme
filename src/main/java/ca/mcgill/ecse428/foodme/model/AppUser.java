@@ -129,6 +129,10 @@ public class AppUser
 		return this.preferences;
 	}
 
+	public void setPreferences(List<Preference> preferences) {
+		this.preferences = preferences;
+	}
+
 	public int numberOfPreferences()
 	{
 		int number = this.preferences.size();
