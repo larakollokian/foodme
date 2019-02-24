@@ -326,22 +326,24 @@ public class FoodmeApplicationTests
     	restaurant.setRestaurantID(id);
     	return restaurant;
     }
-    /**
-     * Test UT for adding a restaurant to the liked list
-     * @throws InvalidInputException
-     */
-    @Test
-	public void testAddLike () throws InvalidInputException {
-		AppUser user;
-	    user = repository.createAccount("Ali", "Baba", "baba", "baba@gmail.com", "22");
-
-    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
-    	helperCreateRestaurant("nameRestaurant", 11223);
-
-    	//assertEquals(0, user.getLikesAnsDislikes().size());
-	    //repository.addLiked(USERNAME, id);
-	    //assertEquals(1, user.getLikesAnsDislikes().size());
-	}
+    
+    //TODO currently merged in one with testListAll()
+//    /**
+//     * Test UT for adding a restaurant to the liked list
+//     * @throws InvalidInputException
+//     */
+//    @Test
+//	public void testAddLike () throws InvalidInputException {
+//		AppUser user;
+//	    user = repository.createAccount("Ali", "Baba", "baba", "baba@gmail.com", "22");
+//
+//    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+//    	helperCreateRestaurant("nameRestaurant", 11223);
+//
+//    	assertEquals(0, user.getLikesAnsDislikes().size());
+//	    repository.addLiked(USERNAME, id);
+//	    assertEquals(1, user.getLikesAnsDislikes().size());
+//	}
     
     /**
      * Test UT for listing all the restaurants liked
@@ -350,10 +352,11 @@ public class FoodmeApplicationTests
 	@Test
 	public void testListAll () throws InvalidInputException {
 		AppUser user;
+		String id = "E8RJkjfdcwgtyoPMjQ_Olg";
 		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
 		assertTrue(liked.isEmpty());
-		repository.addLiked(USERNAME, "RestaurantA");
+		repository.addLiked(USERNAME, id);
 		
 		repository.listAllLiked(USERNAME);
 		assertEquals(1, liked.size());
