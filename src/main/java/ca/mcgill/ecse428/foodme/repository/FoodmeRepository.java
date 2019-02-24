@@ -7,13 +7,16 @@ import javax.persistence.Query;
 
 import ca.mcgill.ecse428.foodme.model.*;
 
+import ca.mcgill.ecse428.foodme.security.Password;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 
+@SuppressWarnings("Duplicates")
 @Repository
 public class FoodmeRepository {
 	
@@ -21,7 +24,7 @@ public class FoodmeRepository {
 	private EntityManager entityManager;
 
 	@Transactional
-	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password) 
+	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password)
 	{
 		AppUser u = new AppUser();
 		u.setUsername(username);
@@ -34,7 +37,40 @@ public class FoodmeRepository {
 		return u;
 	}
 
+	/**
+	 * Method to create an new account
+	 * @param username The user's chosen username
+	 * @param firstName The user's first name
+	 * @param lastName The user's last name
+	 * @param email The user's email address
+	 * @param password The user's password
+	 * @return User entity that was created
+	 */
 	@Transactional
+	public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws InvalidInputException {
+
+		AppUser u = new AppUser();
+		u.setUsername(username);
+		u.setFirstName(firstName);
+		u.setLastName(lastName);
+		u.setEmail(email);
+
+		String passwordHash="";
+
+		try {
+			passwordHash = Password.getSaltedHash(password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		u.setPassword(passwordHash);
+		u.setLikes(new ArrayList<String>());
+		u.setDislikes(new ArrayList<String>());
+		entityManager.persist(u);
+		return u;
+	}
+
+	@Transactional
+
 	public Preference createPreference(AppUser user, String priceRange, String distanceRange, String cuisine, String rating){
 		Preference preference = new Preference();
 		preference.setPrice(PriceRange.valueOf(priceRange));
@@ -61,21 +97,36 @@ public class FoodmeRepository {
 
 	@Transactional
 	public AppUser getAppUser(String username){
+
+		if(entityManager.find(AppUser.class, username) == null) {
+			System.out.println("This user does not exist");
+		}
+		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		return appUser;
+		}
+		return null;
 	}
-	
+
 	/**
 	 * gets all users in database using native SQL query statements
 	 * @return list of AppUsers
 	 */
 	@Transactional
-	public List<AppUser> getAllUsers() 
+	public List<AppUser> getAllUsers()
 	{
 		Query q = entityManager.createNativeQuery("SELECT * FROM app_user");
 		@SuppressWarnings("unchecked")
 		List<AppUser> users = q.getResultList();
 		return users;
+	}
+	/**
+	 *gets number of users
+	 * @return number of users
+	 */
+	@Transactional
+	public int getNumberUsers(){
+		return getAllUsers().size();
 	}
 
 	@Transactional
@@ -83,64 +134,65 @@ public class FoodmeRepository {
 		Preference preference = entityManager.find(Preference.class, pID);
 		return preference;
 	}
-
-//	public Restaurant restaurant;
-//	public User user;
-//	private List<Restaurant> liked;
-//	
-//	/**
-//	 * Method to like a restaurant so its in the user list of liked restaurant
-//	 * @param restaurant The restaurant a user likes
-//	 * @return void The method returns nothing, this change will be saved in the database
-//	 */
-//	public void isLiked(Restaurant restaurant) {
-//		liked=user.getLiked();
-//		liked.add(restaurant);
-//		user.setLiked(liked);
-//	}
-//	
-//	/**
-//	 * Method to list all the liked restaurants of a user
-//	 * @return The list of all the liked restaurants
-//	 */
-//	public List<Restaurant> listAllLiked() {
-//		List<Restaurant> liked = user.getLiked();
-//		return liked;
-//	}
+	
+	/**
+	 * Method to like a restaurant so its in the user list of liked restaurant
+	 * @param restaurant The restaurant a user likes
+	 * @return void The method returns nothing, this change will be saved in the database
+	 */
+	@Transactional
+	public void isLiked(String username, String restaurant) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		appUser.addLike(restaurant);
+	}
+	
+	/**
+	 * Method to list all the liked restaurants of a user
+	 * @return The list of all the liked restaurants
+	 */
+	public List<String> listAllLiked(String username) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		
+		//TODO change the query to what is in the db
+//		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
+//		@SuppressWarnings("unchecked")
+//		List<String> liked = q.getResultList();
+		
+		//return liked;
+		return appUser.getLikes();
+	}
 	
 
-/**
+	/**
 	 * Method that allows users to update their account's password
-	 * @param aUser
+	 * @param username
 	 * @param newPassword
 	 */
+
+
 	@Transactional
 	public AppUser changePassword(String username, String newPassword) {
 		AppUser u = entityManager.find(AppUser.class, username);
 		u.setPassword(newPassword);
 		entityManager.merge(u);
 		return u;
-		
 	}
-	
 
 	/**
 	 * Method that allows users to delete their account
-	 * @param aUser
+	 * @param username
 	 */
 	@Transactional
 	public void deleteUser(String username) throws ParseException {
+
+		if(entityManager.find(AppUser.class, username) == null) {
+			System.out.println("Cannot delete a user that does not exist");
+		}
+		else {
 		AppUser u = entityManager.find(AppUser.class, username);
 		entityManager.remove(u);
-		entityManager.detach(u);
-		
-		// aUser.setUsername(null);
-		// aUser.setLikes(null);
-		// aUser.setDislikes(null);
-		// aUser.setEmail(null);
-		// aUser.setFirstName(null);
-		// aUser.setLastName(null);
-		// aUser.setPassword(null);
+		//entityManager.detach(u);
+		}
 	}
 
 	/**

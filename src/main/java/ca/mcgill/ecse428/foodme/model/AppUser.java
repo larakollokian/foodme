@@ -1,5 +1,7 @@
 package ca.mcgill.ecse428.foodme.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.*;
 
 //import javax.persistence.CascadeType;
@@ -141,6 +143,7 @@ public class AppUser
 
 	public void addPreference(Preference aPreference)
 	{
+
 		if(this.preferences == null)
 		{
 			this.preferences = new ArrayList<Preference>();
