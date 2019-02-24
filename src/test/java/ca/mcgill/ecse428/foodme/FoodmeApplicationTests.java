@@ -130,46 +130,46 @@ public class FoodmeApplicationTests
         repository.deleteUser(username);
         assertEquals(repository.getAppUser(testUsername), null);
     }
-    
+
     @Test
-    public void testAddPreference() {
-        AppUser appUser;
-        if(repository.getAppUser("Tester123") == null) // Create new user if doesn't exist
-            appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = repository.getAppUser("Tester123");
+    public void testAddPreference() throws InvalidInputException{
+        AppUser appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
         String distanceRange = "fivehundred";
         String cuisine = "Italian";
         String priceRange = "$$$";
         String rating = "four";
 
-        repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating); // Create new preference
-        assertEquals(appUser.getPreferences().size(), 1);
+        Preference newPreference = new Preference();
+        when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
+        assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
+        Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
     }
 
     @Test
     public void testEditPreference() {
-        AppUser appUser;
         String username = "Tester123";
-        Preference editPreference = null;
-        if(repository.getAppUser(username) == null) // Create new user if doesn't exist
-            appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = repository.getAppUser("Tester123");
-
-        Preference newPreference = repository.createPreference(appUser, "$$$", "fivehundred", "Italian", "four"); // Create new preference
-        int pID = newPreference.getPID(); // Get PID of this new preference
-
-        editPreference = repository.getPreference(pID);
-
+        AppUser appUser = repository.testCreateUser(username, "Test", "User", "student@mcgill.ca", "password");
         String distanceRange = "fivehundred";
-        String cuisine = "Mexican";
-        String priceRange = "$";
+        String cuisine = "Italian";
+        String priceRange = "$$$";
         String rating = "four";
 
-        editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
-        assertEquals(editPreference.getPrice(), PriceRange.$); // Check to see that the price range changed!
-        assertEquals(editPreference.getPID(), pID); // Make sure PID didn't change
+        Preference newPreference = new Preference();
+        when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
+        assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
+        Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+
+        int pID = newPreference.getPID();
+        Preference editPreference = repository.getPreference(pID);
+
+        distanceRange = "fivehundred";
+        cuisine = "Mexican";
+        priceRange = "$";
+        rating = "four";
+
+        when(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating)).thenReturn(editPreference);
+        assertEquals(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating), editPreference);
+        Mockito.verify(repository).editPreference(newPreference, priceRange, distanceRange, cuisine, rating);
     }
     
     @Test
