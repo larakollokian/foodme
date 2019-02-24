@@ -323,6 +323,23 @@ public class FoodmeApplicationTests
             return;
         }
     }
+    
+    @Test
+    public void testChangePassword() throws InvalidInputException {
+    	AppUser user = new AppUser();
+    	
+    	try {
+    		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+    	} catch (InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
+    	
+    	String pass = "Hello";
+    	user.setPassword(pass);
+    	assertEquals(pass, user.getPassword());
+    	
+    	
+    }
 
     @Test
     public void testGenerateRandomPassword() {
@@ -340,6 +357,8 @@ public class FoodmeApplicationTests
     		assertNotEquals(p1, p2);	
     	}
     }
+    
+    
     
     @Test
     public void testSearchSortByDistance() {
