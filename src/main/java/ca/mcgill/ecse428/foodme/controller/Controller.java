@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -312,4 +313,64 @@ public class Controller
 		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
 		return editPreference;
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////                        LIKED CONTROLLER                           /////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Controller Method that takes a user and the ID of the restaurants they liked to add it in their liked restaurants
+	 * @param username of the user on the application
+	 * @param restaurant ID of the restaurant
+	 */
+	@PostMapping("/users/{user}/liked/{id}")
+	public void addLiked(@PathVariable("user") String username, @PathVariable("id") String id) {
+		repository.addLiked(username, id);
+	}
+	
+	@PostMapping("/users/{user}/allliked/")
+	public List<String> allLiked(@PathVariable("user") String username){
+		List<String> liked = repository.listAllLiked(username);
+		
+//		for(String like: liked) {
+//			ResponseEntity<String> likedRestaurant = lookUpRestaurantByID();
+//		}
+		return liked;
+		
+		
+	}
+	
+	/**
+	 * Controller method that calls the API to return a restaurant based on its id
+	 * @param id
+	 * @return Restaurant and all its information associated with it
+	 * @throws Exception
+	 */
+	@GetMapping("/businesses/{id}")
+	public ResponseEntity<String> lookUpRestaurantByID (@RequestParam("id") String id) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (id != null) {
+			url = "https://api.yelp.com/v3/businesses/" + id;
+		} else {
+			throw new Exception("You are missing the id to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // Response
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        return response;
+	}
+	
 }

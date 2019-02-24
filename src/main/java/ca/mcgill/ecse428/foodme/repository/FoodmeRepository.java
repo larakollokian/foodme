@@ -127,9 +127,10 @@ public class FoodmeRepository {
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void isLiked(String username, String restaurant) {
+	public void addLiked(String username, String id) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.addLike(restaurant);
+		appUser.addLike(id);
+		entityManager.merge(appUser);
 	}
 	
 	/**
@@ -138,14 +139,8 @@ public class FoodmeRepository {
 	 */
 	public List<String> listAllLiked(String username) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		
-		//TODO change the query to what is in the db
-//		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
-//		@SuppressWarnings("unchecked")
-//		List<String> liked = q.getResultList();
-		
-		//return liked;
-		return appUser.getLikes();
+		List<String> id = appUser.getLikes();
+		return id;
 	}
 	
 
