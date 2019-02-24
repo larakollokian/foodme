@@ -1,9 +1,6 @@
-/*PLEASE DO NOT EDIT THIS CODE*/
-/*This code was generated using the UMPLE 1.29.1.4408.bc0cac3a4 modeling language!*/
-
 package ca.mcgill.ecse428.foodme.model;
 
-
+import ca.mcgill.ecse428.foodme.model.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -23,31 +20,10 @@ public class Preference
 	private Rating rating;
 
 	private int pID;
+	private boolean isDefault;
 
 	//Preference Associations
 	private AppUser appUser;
-
-	//------------------------
-	// CONSTRUCTOR (SHOULD BE DEFAULT)
-	//------------------------
-
-	//  public Preference(DistanceRange aDistance, Cuisine aCuisine, PriceRange aPrice, Rating aRating, String aPID, User aUser)
-	//  {
-	//    distance = aDistance;
-	//    cuisine = aCuisine;
-	//    price = aPrice;
-	//    rating = aRating;
-	//    pID = aPID;
-	//    boolean didAddUser = setUser(aUser);
-	//    if (!didAddUser)
-	//    {
-	//      throw new RuntimeException("Unable to create preference due to user");
-	//    }
-	//  }
-
-	//------------------------
-	// INTERFACE
-	//------------------------
 
 	public boolean setDistance(DistanceRange aDistance)
 	{
@@ -87,6 +63,14 @@ public class Preference
 		this.pID = aPID;
 		wasSet = true;
 		return wasSet;
+	}
+	
+	public boolean getIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 
 	public DistanceRange getDistance()
@@ -135,7 +119,7 @@ public class Preference
 
 
 	@ManyToOne
-	//@JoinColumn(name = "user")
+	//@JoinColumn(name = "app_user")
 	@JsonIgnore
 	public AppUser getUser()
 	{

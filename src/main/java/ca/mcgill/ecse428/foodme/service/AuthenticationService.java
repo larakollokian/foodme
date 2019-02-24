@@ -62,14 +62,20 @@ public class AuthenticationService {
 	 * @throws AuthenticationException 
 
 	 */
-	public String login(String username, String password) throws AuthenticationException{
-		AppUser user;	
+	public String login(String username, String password) throws Exception{
+		AppUser user = null;
 		try{
 			user = findUserByUsername(username);
 			Password.check(password, user.getPassword());
 		}
+		catch(InvalidSessionException e){
+			throw new InvalidSessionException("User does not exist");
+		}
+		catch(AuthenticationException e){
+			throw new AuthenticationException("Invalid login password!!!",e);
+		}
 		catch(Exception e){
-			throw new AuthenticationException("Invalid login information!!!",e);
+			e.printStackTrace();
 		}
 			
 		if (sessionByUser.containsKey(user.getUsername())) {
@@ -89,5 +95,6 @@ public class AuthenticationService {
 	 */
 	public void logout(String username) {
 		userBySession.remove(sessionByUser.remove(username));
+
 	}
 }

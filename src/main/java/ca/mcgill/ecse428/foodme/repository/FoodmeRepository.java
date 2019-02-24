@@ -7,6 +7,7 @@ import javax.persistence.Query;
 
 import ca.mcgill.ecse428.foodme.model.*;
 
+import ca.mcgill.ecse428.foodme.security.Password;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -15,7 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 
-@SuppressWarnings("Duplicates")
+//@SuppressWarnings("Duplicates")
 @Repository
 public class FoodmeRepository {
 	
@@ -31,8 +32,8 @@ public class FoodmeRepository {
 		u.setLastName(lastName);
 		u.setEmail(email);
 		u.setPassword(password);
-		u.setLikes(new ArrayList<String>());
-		u.setDislikes(new ArrayList<String>());
+		u.setPreferences(new ArrayList<Preference>());
+		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 		entityManager.persist(u);
 		return u;
 	}
@@ -54,11 +55,17 @@ public class FoodmeRepository {
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
 		u.setEmail(email);
-		u.setPassword(password);
-		u.setLikes(new ArrayList<String>());
-		u.setDislikes(new ArrayList<String>());
-		entityManager.persist(u);
 
+		String passwordHash="";
+
+		try {
+			passwordHash = Password.getSaltedHash(password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		u.setPassword(passwordHash);
+		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
+		entityManager.persist(u);
 		return u;
 	}
 
@@ -92,7 +99,7 @@ public class FoodmeRepository {
 	public AppUser getAppUser(String username){
 
 		if(entityManager.find(AppUser.class, username) == null) {
-			System.out.println("Cannot delete a user that does not exist");
+			System.out.println("This user does not exist");
 		}
 		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
@@ -113,7 +120,14 @@ public class FoodmeRepository {
 		List<AppUser> users = q.getResultList();
 		return users;
 	}
-
+	/**
+	 *gets number of users
+	 * @return number of users
+	 */
+	@Transactional
+	public int getNumberUsers(){
+		return getAllUsers().size();
+	}
 
 	@Transactional
 	public Preference getPreference(int pID){
@@ -121,27 +135,32 @@ public class FoodmeRepository {
 		return preference;
 	}
 	
-	/**
-	 * Method to like a restaurant so its in the user list of liked restaurant
-	 * @param restaurant The restaurant a user likes
-	 * @return void The method returns nothing, this change will be saved in the database
-	 */
-	@Transactional
-	public void addLiked(String username, String id) {
-		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.addLike(id);
-		entityManager.merge(appUser);
-	}
-	
-	/**
-	 * Method to list all the liked restaurants of a user
-	 * @return The list of all the liked restaurants
-	 */
-	public List<String> listAllLiked(String username) {
-		AppUser appUser = entityManager.find(AppUser.class, username);
-		List<String> id = appUser.getLikes();
-		return id;
-	}
+//	/**
+//	 * Method to like a restaurant so its in the user list of liked restaurant
+//	 * @param restaurant The restaurant a user likes
+//	 * @return void The method returns nothing, this change will be saved in the database
+//	 */
+//	@Transactional
+//	public void isLiked(String username, String restaurant) {
+//		AppUser appUser = entityManager.find(AppUser.class, username);
+//		appUser.addLike(restaurant);
+//	}
+//	
+//	/**
+//	 * Method to list all the liked restaurants of a user
+//	 * @return The list of all the liked restaurants
+//	 */
+//	public List<String> listAllLiked(String username) {
+//		AppUser appUser = entityManager.find(AppUser.class, username);
+//		
+//		//TODO change the query to what is in the db
+////		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
+////		@SuppressWarnings("unchecked")
+////		List<String> liked = q.getResultList();
+//		
+//		//return liked;
+//		return appUser.getLikes();
+//	}
 	
 
 	/**
@@ -164,7 +183,7 @@ public class FoodmeRepository {
 	 * @param username
 	 */
 	@Transactional
-	public void deleteUser(String username) throws ParseException {
+	public void deleteUser(String username) /*throws ParseException*/ {
 
 		if(entityManager.find(AppUser.class, username) == null) {
 			System.out.println("Cannot delete a user that does not exist");
