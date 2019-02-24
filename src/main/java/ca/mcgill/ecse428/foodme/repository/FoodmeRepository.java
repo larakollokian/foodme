@@ -15,7 +15,8 @@ import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-@SuppressWarnings("Duplicates")
+
+//@SuppressWarnings("Duplicates")
 @Repository
 public class FoodmeRepository {
 	
@@ -31,8 +32,8 @@ public class FoodmeRepository {
 		u.setLastName(lastName);
 		u.setEmail(email);
 		u.setPassword(password);
-		u.setLikes(new ArrayList<String>());
-		u.setDislikes(new ArrayList<String>());
+		u.setPreferences(new ArrayList<Preference>());
+		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 		entityManager.persist(u);
 		return u;
 	}
@@ -54,11 +55,17 @@ public class FoodmeRepository {
 		u.setFirstName(firstName);
 		u.setLastName(lastName);
 		u.setEmail(email);
-		u.setPassword(password);
-		u.setLikes(new ArrayList<String>());
-		u.setDislikes(new ArrayList<String>());
-		entityManager.persist(u);
 
+		String passwordHash="";
+
+		try {
+			passwordHash = Password.getSaltedHash(password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		u.setPassword(passwordHash);
+		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
+		entityManager.persist(u);
 		return u;
 	}
 
@@ -92,7 +99,7 @@ public class FoodmeRepository {
 	public AppUser getAppUser(String username){
 
 		if(entityManager.find(AppUser.class, username) == null) {
-			System.out.println("Cannot delete a user that does not exist");
+			System.out.println("This user does not exist");
 		}
 		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
@@ -113,7 +120,14 @@ public class FoodmeRepository {
 		List<AppUser> users = q.getResultList();
 		return users;
 	}
-
+	/**
+	 *gets number of users
+	 * @return number of users
+	 */
+	@Transactional
+	public int getNumberUsers(){
+		return getAllUsers().size();
+	}
 
 	@Transactional
 	public Preference getPreference(int pID){
@@ -127,78 +141,122 @@ public class FoodmeRepository {
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void isLiked(String username, String restaurant) {
+	public void addLiked(String username, String restaurantName) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.addLike(restaurant);
-	}	
-
-	/**
-	 * Method to dislike a restaurant so it's in the user list of disliked restaurant
-	 * @param restaurant The ID for arestaurant a user dislikes
-	 * @return void The method returns nothing, this change will be saved in the database
-	 */
-	@Transactional
-	public void addDisliked(String username, String id) {
-		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.addDislike(id);
+		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+		restaurant.setLiked(true);
+		restaurant.setRestaurantName(restaurantName);
+		restaurant.setAppUser(appUser);
+		entityManager.merge(restaurant);
+		//entityManager.merge(appUser);
 	}
 	
 	/**
 	 * Method to list all the liked restaurants of a user
 	 * @return The list of all the liked restaurants
 	 */
-	public List<String> listAllLiked(String username) {
+	public List<Restaurant> listAllLiked(String username) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		
 		//TODO change the query to what is in the db
-//		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
-//		@SuppressWarnings("unchecked")
-//		List<String> liked = q.getResultList();
+		Query q = entityManager.createNativeQuery("SELECT FROM restaurant WHERE app_user= :user and liked=true");
+		q.setParameter("user", username);
+		@SuppressWarnings("unchecked")
+		List<Restaurant>likedAndDisliked = q.getResultList();
+		//filter through that list for only liked and not disliked either from db or here.
+		if(likedAndDisliked.isEmpty()) {
+			return Collections.emptyList();
+		}
 		
-		//return liked;
-		return appUser.getLikes();
+		List<Restaurant> liked = new ArrayList<Restaurant>();
+		for(Restaurant r: likedAndDisliked) {
+			if(r.isLiked()) {
+				liked.add(r);
+			}
+		}
+		if(liked.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return liked;
+	}
+	
+	/**
+	 * Method to dislike a restaurant so it's in the user list of disliked restaurant
+	 * @param restaurant The ID for arestaurant a user dislikes
+	 * @return void The method returns nothing, this change will be saved in the database
+	 */
+	@Transactional
+	public void addDisliked(String username, String restaurantName) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+
+		restaurant.setDisliked(true);
+		restaurant.setRestaurantName(restaurantName);
+		restaurant.setAppUser(appUser);
+		entityManager.merge(restaurant);
 	}
 
-	/**
-	 * Method to list all the restaurants except those disliked by a user
-	 * @return The list of all the restaurants but those disliked
+/**
+	 * Method to list all the non disliked restaurants of a user
+	 * @return The list of all non disliked restaurants
 	 */
 	public List<Restaurant> listAllButDisliked(String username) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
 		
-		Query q = entityManager.createNativeQuery("SELECT * FROM restaurant WHERE app_user=:user and disliked=false");
+		//TODO change the query to what is in the db
+		Query q = entityManager.createNativeQuery("SELECT FROM restaurant WHERE app_user= :user and disliked=false");
 		q.setParameter("user", username);
-		List<Restaurant> notDisliked=q.getResultList();
-
-		if(notDisliked.isEmpty())
+		@SuppressWarnings("unchecked")
+		List<Restaurant>likedAndDisliked = q.getResultList();
+		//filter through that list for only liked and not disliked either from db or here.
+		if(likedAndDisliked.isEmpty()) {
 			return Collections.emptyList();
-
-		return notDisliked;
+		}
 		
-	}
+		List<Restaurant> notdisliked = new ArrayList<Restaurant>();
+		for(Restaurant r: likedAndDisliked) {
+			if(!r.isDisliked()) {
+				notdisliked.add(r);
+			}
+		}
+		if(notdisliked.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return notdisliked;
+	}	
 
 	/**
-	 * Method to remove a like for a restaurant so it dissapears from the liked list
-	 * @param restaurant The id for the restaurant a user doesn't like anymore
+	 * Method to remove like for a restaurant
+	 * @param restaurant The restaurant
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void removeLike(String username, String id) {
+	public void remLiked(String username, String restaurantName) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.removeLike(id);
-		entityManager.merge(appUser);
+		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+
+		restaurant.setLiked(false);
+		restaurant.setRestaurantName(restaurantName);
+		restaurant.setAppUser(appUser);
+		entityManager.merge(restaurant);
 	}
 
 	/**
-	 * Method to remove a dislike for a restaurant so it dissapears from the disliked list
-	 * @param restaurant The restaurant a user doesn't dislike anymore
+	 * Method to remove dislike for a restaurant
+	 * @param restaurant The restaurant
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void removeDislike(String username, String id) {
+	public void remDisliked(String username, String restaurantName) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-		appUser.removeDislike(id);
-		entityManager.merge(appUser);
+		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+
+		restaurant.setDisliked(false);
+		restaurant.setRestaurantName(restaurantName);
+		restaurant.setAppUser(appUser);
+		entityManager.merge(restaurant);
 	}
 
 	/**
@@ -221,7 +279,7 @@ public class FoodmeRepository {
 	 * @param username
 	 */
 	@Transactional
-	public void deleteUser(String username) throws ParseException {
+	public void deleteUser(String username) /*throws ParseException*/ {
 
 		if(entityManager.find(AppUser.class, username) == null) {
 			System.out.println("Cannot delete a user that does not exist");

@@ -11,6 +11,10 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Base64.Decoder;
+import org.apache.commons.text.RandomStringGenerator;
+import static org.apache.commons.text.CharacterPredicates.DIGITS;
+import static org.apache.commons.text.CharacterPredicates.LETTERS;
+
 
 public class Password {
     
@@ -61,7 +65,23 @@ public class Password {
         String hashOfInput = hash(password, base64Decoder.decode(saltAndPass[0]));
         boolean isEqual = hashOfInput.equals(saltAndPass[1]);
         if(!isEqual){
-            throw new Exception("Wrong password");
+            throw new AuthenticationException("Wrong password");
         }
     }
+    
+    /**
+     * Generate a random password 
+	 * @param n
+     * @return n character long random password 
+	 */
+    public static String generateRandomPassword(int n) {
+    	RandomStringGenerator generator = new RandomStringGenerator.Builder()
+    	        .withinRange('0', 'z')
+    	        .filteredBy(LETTERS, DIGITS)
+    	        .build();
+    	String randPassword = generator.generate(n);
+    	
+    	return randPassword;
+    }
+    
 }

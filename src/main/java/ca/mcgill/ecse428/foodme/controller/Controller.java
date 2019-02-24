@@ -1,11 +1,7 @@
 package ca.mcgill.ecse428.foodme.controller;
 
-import ca.mcgill.ecse428.foodme.model.AppUser;
-import ca.mcgill.ecse428.foodme.model.Preference;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
-import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,24 +9,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.repository.*;
-import java.util.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -39,7 +29,8 @@ public class Controller
 	@Autowired
 	FoodmeRepository repository;
 	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
-
+	String googleApiKey = "AIzaSyAbDiuDSRG-3oyFUzlS0SOy1g5b0n49dus";
+	
 	@Autowired 
 	AuthenticationService authentication;
 
@@ -71,16 +62,16 @@ public class Controller
 			return "Hello, " + name + "!";
 		}
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                     APP USER CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
+
+	@PostMapping("/users/testCreate/{username}/{firstName}/{lastName}/{email}/{password}")
 	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
-								  @PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
+			@PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
 	{
 		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
 		return u;
@@ -93,9 +84,10 @@ public class Controller
 	 * @throws AuthenticationException
 	 */
 	@PostMapping(value = { "/login" })
-	public String login(@RequestParam String username, @RequestParam String password) throws AuthenticationException {
+	public String login(@RequestParam String username, @RequestParam String password) throws Exception {
 		return authentication.login(username, password);
 	}
+
 	/**
 	 * Method that creates a new account for a user. Username must be unique.
 	 * @param username
@@ -121,11 +113,14 @@ public class Controller
 				try {
 					if (password.length() >= 6) {
 						try {
-							// TODO Check if username already exists in the database (i.e. check username uniqueness)
-							if (username.length() >= 1) {
-								u = repository.createAccount(username, firstName, lastName, email, password);
+							if(getAppUser(username) == null) {
+								if (username.length() >= 1) {
+									u = repository.createAccount(username, firstName, lastName, email, password);
+								} else {
+									throw new InvalidInputException("Your username must have at least 1 character!");
+								}
 							} else {
-								throw new InvalidInputException("Your username must have at least 1 character!");
+								throw new InvalidInputException("This username already exists!");
 							}
 						} catch (NullPointerException e) {
 							throw new InvalidInputException("Please enter a username");
@@ -153,11 +148,10 @@ public class Controller
 	 * @return
 	 * @throws Exception
 	 */
-	// TODO This method does not work at the moment
 	@GetMapping("/search/price/")
 	public ResponseEntity<String> searchByPriceRange (
-	        @RequestParam("location") String location,
-            @RequestParam("price") String price) throws Exception{
+			@RequestParam("location") String location,
+			@RequestParam("price") String price) throws Exception{
 
 		// Set up url
 		String url = null;
@@ -168,11 +162,134 @@ public class Controller
 		}
 
 		// Add headers (e.g. Authentication for Yelp Fusion API access)
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+	}
+
+	/**
+	 * Method that searches restaurant and sort them by best_match, rating, review_count or distance
+	 * If recommend param is set to 1, it will return random restaurant from the result
+	 * @param location
+	 * @param sortby: best_match, rating, review_count or distance
+	 * @param recommend: 1-> True, 0-> False
+	 * @return ResponseEntity
+	 * @throws Exception
+	 */
+	@GetMapping("/search/{location}/{sortby}/{recommend}/")
+	public ResponseEntity<String> searchSortByDistance (
+			@PathVariable("location") String location,
+			@PathVariable("sortby") String sortby,
+			@PathVariable("recommand") int recommend) throws Exception
+	{
+		// Set up url
+		String url = null;
+		String extraParam = "";
+		if (location != null) {
+			if (recommend == 1) {
+				Random rand = new Random();
+				int randomOffset = rand.nextInt(50);
+				String offset = Integer.toString(randomOffset);
+				extraParam = extraParam + "&offset="+ offset+ "&limit=1";
+			}
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
+
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		
+		return response;
+	}
+	
+	
+	/**
+	 * Method that searches restaurants using google API
+	 * @param location
+	 * @return ResponseEntity
+	 * @throws Exception
+	 */
+	@GetMapping("/search/google/{location}/")
+	public ResponseEntity<String> searchGoogle (
+			@PathVariable("location") String location) throws Exception
+	{
+		// Set up url
+		String url = null;
+		if (location != null) {
+			String query = "restaurants+in+" + location;
+			url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&key=" + googleApiKey;
+
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		HttpEntity<Void> entity = null;
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		
+		return response;
+	}
+	
+	/**
+	 * get user with username from database
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@GetMapping("/users/get/{username}")
+	public AppUser getAppUser(@PathVariable("username")String username) 
+	{
+		AppUser u = repository.getAppUser(username);
+		return u;
+	}
+	
+	/**
+	 * Method that searches restaurants based on type of cuisine, must select from the list of cuisines available in the yelp API 
+	 * Due to the API's limits we can only return restaurants that currently have a review
+	 * @param cuisine
+	 * @param location
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/search/cuisine/")
+	public ResponseEntity<String> searchByCuisine (
+	        @RequestParam("location") String location,
+            @RequestParam("cuisine") Cuisine cuisine) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (location != null) {
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine;
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
-        entity.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         // Response
         RestTemplate restTemplate = new RestTemplate();
@@ -180,6 +297,7 @@ public class Controller
 
         return response;
 	}
+
 
 	/**
 	 * Gets all users in the database. If there are none, returns an empty list
@@ -192,24 +310,21 @@ public class Controller
 		return allUsers;
 	}
 
-
+	/**
+	 * delete user with username from database
+	 * 
+	 * @param username
+	 */
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
-
-		try {
-			repository.deleteUser(username);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-
+		repository.deleteUser(username);
 		
 		// Response r = new Response();
 		// try {
 		// 	repository.deleteUser(username);
 		// 	r.setResponse(true);
-			
+
 		// } catch (NullPointerException e) {
 		// 	r.setResponse(false);
 		// 	r.setError("No such User exists");
@@ -222,49 +337,27 @@ public class Controller
 
 
 		AppUser u = repository.getAppUser(username);
-		
+
 		// if(u.getPassword() == oPassword) {
 		// 	System.out.println("Error: New password cannot be the same as old password");
 		// } 
 		// else {
 		u.setPassword(nPassword);
 		return u;
-		}
-
-		// AppUser u = repository.getAppUser(username);
-		// u.setPassword(password);
-		// return;
-	
-	
-	//}
-
-	@GetMapping("/users/get/{username}")
-	public AppUser getAppUser(@PathVariable("username")String username) {
-		AppUser u = repository.getAppUser(username);
-		return u;
 	}
 
-	
+	// AppUser u = repository.getAppUser(username);
+	// u.setPassword(password);
+	// return;
 
-	
-//	@GetMapping("/users/get/all")
-//	public List<AppUser> getAllUsers() {
-//
-//		List<String> users = repository.getAllUsers();
-//		List<AppUser> fullUser = new ArrayList<AppUser>();
-//
-//		for(String u: users) {
-//			fullUser.add(repository.getAppUser(u));
-//		}
-//		if(fullUser.isEmpty())
-//		{
-//			System.out.println("There are no users in the database");
-//			return null;
-//		}
-//		return fullUser;
-//
-//	}
 
+	//}
+	@GetMapping("/password/random/{n}")
+	public String getRandomPassword(@PathVariable("n")int length)
+	{
+		String randPassword = Password.generateRandomPassword(length);
+		return randPassword;
+	}
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -277,25 +370,24 @@ public class Controller
 	@GetMapping("/preferences/get/all")
 	public List<Preference> getAllPreferences()
 	{
-		
 		List<Preference> allPs = repository.getAllPreferences();
 		return allPs;
 	}
-	
+
 	@GetMapping("/preferences/user/{username}")
 	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
 	{
 		List<Preference> prefForUser = repository.getPreferencesForUser(username);
 		return prefForUser;
 	}
-	
+
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
 
 		AppUser appUser = repository.getAppUser(username);
-		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+		Preference preference = repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
 		return preference;
 	}
 
@@ -304,12 +396,15 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
-		AppUser appUser = repository.getAppUser(username);
-		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
-		int index = preferenceList.indexOf(editPreference);
-
-		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+		if(editPreference.getUser().getUsername().equals(username))
+		{
+			editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+		}
+		else
+		{
+			System.out.println("The preference ID provided is not associated to this user");
+		}
 		return editPreference;
 	}
 
@@ -321,31 +416,91 @@ public class Controller
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@PostMapping("users/{user}/disliked/{id}")
-	public Boolean addDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
-		try {
-			repository.addDisliked(username, id);
-		} catch (Exception e) {
-			return false;
-		}
+	public void addDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
 		
-		return true;
+		repository.addDisliked(username, id);
+		
 	}
 
 	@PostMapping("users/{user}/removedisliked/{id}")
 	public void removeDisliked(@PathVariable("user") String username, @PathVariable("id") String id) { 
-		repository.removeDislike(username, id);
+		repository.remDisliked(username, id);
 	}
 
-	@PostMapping("users/{user}/alldisliked/")
-	public List<Restaurant> allDisliked(@PathVariable("user") String username) {
-		List<Restaurant> disliked = repository.listAllDisliked(username);
+	@PostMapping("users/{user}/allbutdisliked/")
+	public List<Restaurant> allButDisliked(@PathVariable("user") String username) {
+		List<Restaurant> disliked = repository.listAllButDisliked(username);
 
 		return disliked;
 	}
 	
-	@PostMapping("users/{user}/removeliked/{id}")
-	public void removeLiked(@PathVariable("user") String username, @PathVariable("id") String id) { 
-		repository.removeLike(username, id);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////                        LIKED CONTROLLER                           /////////////////
+	/////////////////                                                                   /////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Controller Method that takes a user and the ID of the restaurants they liked to add it in their liked restaurants
+	 * @param username of the user on the application
+	 * @param restaurant ID of the restaurant
+	 */
+	@PostMapping("/users/{user}/liked/{id}")
+	public void addLiked(@PathVariable("user") String username, @PathVariable("id") String id) {
+		repository.addLiked(username, id);
+	}
+	
+	/**
+	 * Controller Method that takes a user and list all its liked restaurants
+	 * @param username
+	 * @return
+	 */
+	@PostMapping("/users/{user}/allliked/")
+	public List<Restaurant> allLiked(@PathVariable("user") String username){
+		List<Restaurant> liked = repository.listAllLiked(username);
+		
+//		for(String like: liked) {
+//			ResponseEntity<String> likedRestaurant = lookUpRestaurantByID();
+//		}
+		return liked;
+		
+		
 	}
 
+	@PostMapping("users/{user}/removeliked/{id}")
+	public void removeLiked(@PathVariable("user") String username, @PathVariable("id") String id) { 
+		repository.remLiked(username, id);
+	}
+	
+	/**
+	 * Controller method that calls the API to return a restaurant based on its id
+	 * @param id
+	 * @return Restaurant and all its information associated with it
+	 * @throws Exception
+	 */
+	@GetMapping("/businesses/{id}")
+	public ResponseEntity<String> lookUpRestaurantByID (@RequestParam("id") String id) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (id != null) {
+			url = "https://api.yelp.com/v3/businesses/" + id;
+		} else {
+			throw new Exception("You are missing the id to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // Response
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        return response;
+	}
+	
 }
