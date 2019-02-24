@@ -248,11 +248,6 @@ public class Controller
 	
 	//}
 
-	@GetMapping("/users/get/{username}")
-	public AppUser getAppUser(@PathVariable("username")String username) {
-		AppUser u = repository.getAppUser(username);
-		return u;
-	}
 
 	
 
