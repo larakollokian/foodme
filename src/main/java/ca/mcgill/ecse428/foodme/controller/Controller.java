@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.repository.*;
 import java.text.ParseException;
 import java.util.*;
