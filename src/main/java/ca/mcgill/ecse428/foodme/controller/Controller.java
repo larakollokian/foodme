@@ -67,7 +67,7 @@ public class Controller
 	/////////////////                     APP USER CONTROLLER                           /////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	@PostMapping("/users/create/{username}/{firstName}/{lastName}/{email}/{password}")
 	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
 								  @PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
@@ -75,7 +75,6 @@ public class Controller
 		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
 		return u;
 	}
-
 
 	/* Attempts to login and returns the session if successful
 	 * @param username
