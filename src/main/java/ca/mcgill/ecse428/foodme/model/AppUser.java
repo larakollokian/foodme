@@ -20,11 +20,10 @@ public class AppUser
 	private String lastName;
 	private String email;
 	private String password;
-	private List<String> likes;
-	private List<String> dislikes;
 
 	//User Associations
 	private List<Preference> preferences;
+	private List<Restaurant> likesAnsDislikes;
 
 	public boolean setUsername(String aUsername)
 	{
@@ -66,22 +65,6 @@ public class AppUser
 		return wasSet;
 	}
 
-	public boolean setLikes(List<String> aLikes)
-	{
-		boolean wasSet = false;
-		this.likes = aLikes;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setDislikes(List<String> aDislikes)
-	{
-		boolean wasSet = false;
-		this.dislikes = aDislikes;
-		wasSet = true;
-		return wasSet;
-	}
-
 	@Id
 	public String getUsername()
 	{
@@ -108,51 +91,26 @@ public class AppUser
 		return this.password;
 	}
 
-	@ElementCollection(targetClass=String.class)
-	public List<String> getLikes()
-	{
-		if(this.likes == null)
-		{
-			this.likes = new ArrayList<String>();
-		}
-		return this.likes;
-	}
-	
-	public void addLike(String like)
-	{
-		this.likes.add(like);
-	}
-	
-	public boolean removeLike(String like)
-	{
-		if(this.likes.contains(like))
-		{
-			this.likes.remove(like);
-			return true;
-		}
-		return false;
+	@Transient
+	@OneToMany(mappedBy = "app_user")
+	public List<Restaurant> getLikesAnsDislikes() {
+		return likesAnsDislikes;
 	}
 
-	@ElementCollection(targetClass=String.class)
-	public List<String> getDislikes()
+	public void setLikesAnsDislikes(List<Restaurant> likesAnsDislikes) {
+		this.likesAnsDislikes = likesAnsDislikes;
+	}
+
+	public void addLikesAnsDislike(Restaurant likesAnsDislike)
 	{
-		if(this.dislikes == null)
-		{
-			this.dislikes = new ArrayList<String>();
-		}
-		return this.dislikes;
+		this.likesAnsDislikes.add(likesAnsDislike);
 	}
 	
-	public void addDislike(String dislike)
+	public boolean removeLikesAnsDislike(Restaurant likesAnsDislike)
 	{
-		this.dislikes.add(dislike);
-	}
-	
-	public boolean removeDisike(String dislike)
-	{
-		if(this.dislikes.contains(dislike))
+		if(this.likesAnsDislikes.contains(likesAnsDislike))
 		{
-			this.dislikes.remove(dislike);
+			this.likesAnsDislikes.remove(likesAnsDislike);
 			return true;
 		}
 		return false;
@@ -209,15 +167,11 @@ public class AppUser
 		}
 	}
 
-	public String toString()
-	{
-		return super.toString() + "["+
-				"username" + ":" + getUsername()+ "," +
-				"firstName" + ":" + getFirstName()+ "," +
-				"lastName" + ":" + getLastName()+ "," +
-				"email" + ":" + getEmail()+ "," +
-				"password" + ":" + getPassword()+ "]" + System.getProperties().getProperty("line.separator") +
-				"  " + "likes" + "=" + (getLikes() != null ? !getLikes().equals(this)  ? getLikes().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-				"  " + "dislikes" + "=" + (getDislikes() != null ? !getDislikes().equals(this)  ? getDislikes().toString().replaceAll("  ","    ") : "this" : "null");
+	@Override
+	public String toString() {
+		return "AppUser [username=" + username + ", firstName=" + firstName + ", lastName=" + lastName + ", email="
+				+ email + ", password=" + password + ", preferences=" + preferences + ", likesAnsDislikes="
+				+ likesAnsDislikes + "]";
 	}
+
 }
