@@ -2,12 +2,18 @@ package ca.mcgill.ecse428.foodme;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.List;
+
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.mcgill.ecse428.foodme.controller.Controller;
@@ -128,46 +135,46 @@ public class FoodmeApplicationTests
         repository.deleteUser(username);
         assertEquals(repository.getAppUser(testUsername), null);
     }
-    
+
     @Test
-    public void testAddPreference() {
-        AppUser appUser;
-        if(repository.getAppUser("Tester123") == null) // Create new user if doesn't exist
-            appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = repository.getAppUser("Tester123");
+    public void testAddPreference() throws InvalidInputException{
+        AppUser appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
         String distanceRange = "fivehundred";
         String cuisine = "Italian";
         String priceRange = "$$$";
         String rating = "four";
 
-        repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating); // Create new preference
-        assertEquals(appUser.getPreferences().size(), 1);
+        Preference newPreference = new Preference();
+        when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
+        assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
+        Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
     }
 
     @Test
     public void testEditPreference() {
-        AppUser appUser;
         String username = "Tester123";
-        Preference editPreference = null;
-        if(repository.getAppUser(username) == null) // Create new user if doesn't exist
-            appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = repository.getAppUser("Tester123");
-
-        Preference newPreference = repository.createPreference(appUser, "$$$", "fivehundred", "Italian", "four"); // Create new preference
-        int pID = newPreference.getPID(); // Get PID of this new preference
-
-        editPreference = repository.getPreference(pID);
-
+        AppUser appUser = repository.testCreateUser(username, "Test", "User", "student@mcgill.ca", "password");
         String distanceRange = "fivehundred";
-        String cuisine = "Mexican";
-        String priceRange = "$";
+        String cuisine = "Italian";
+        String priceRange = "$$$";
         String rating = "four";
 
-        editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
-        assertEquals(editPreference.getPrice(), PriceRange.$); // Check to see that the price range changed!
-        assertEquals(editPreference.getPID(), pID); // Make sure PID didn't change
+        Preference newPreference = new Preference();
+        when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
+        assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
+        Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+
+        int pID = newPreference.getPID();
+        Preference editPreference = repository.getPreference(pID);
+
+        distanceRange = "fivehundred";
+        cuisine = "Mexican";
+        priceRange = "$";
+        rating = "four";
+
+        when(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating)).thenReturn(editPreference);
+        assertEquals(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating), editPreference);
+        Mockito.verify(repository).editPreference(newPreference, priceRange, distanceRange, cuisine, rating);
     }
     
     @Test
@@ -317,5 +324,85 @@ public class FoodmeApplicationTests
         }
     }
 
+    @Test
+    public void testGenerateRandomPassword() {
+    	int lenOfPassword = 16;
+    	
+    	for(int i=0; i<100; i++) {
+    		String p1 = Password.generateRandomPassword(lenOfPassword);
+    		String p2 = Password.generateRandomPassword(lenOfPassword);
+    		
+    		// length should be equal
+    		assertEquals(lenOfPassword, p1.length());
+    		assertEquals(lenOfPassword, p2.length());
+    		
+    		// generated passwords should not equal, unless in extreme case
+    		assertNotEquals(p1, p2);	
+    	}
+    }
+    
+    @Test
+    public void testSearchSortByDistance() {
+    	String response = null; // need to be replaced with the http response
+    	boolean failed = false;
+		Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
+		Matcher m = p.matcher(response);
+		
+		double a = (double) 0.0;
+		// loop through all the distances, break if there is a failure  
+		while (!failed && m.find()){
+			double b = Double.parseDouble(m.group(1));
+			if (a > b) {
+				failed = true;
+			}
+			a = b;
+		}
+		assertEquals(failed, false);
+		
+    }
+    
+    
+    public Restaurant helperCreateRestaurant(String restaurantID, int id) {
+    	Restaurant restaurant = new Restaurant();
+    	restaurant.setRestaurantName(restaurantID);
+    	restaurant.setRestaurantID(id);
+    	return restaurant;
+    }
+    
+    //TODO currently merged in one with testListAll()
+//    /**
+//     * Test UT for adding a restaurant to the liked list
+//     * @throws InvalidInputException
+//     */
+//    @Test
+//	public void testAddLike () throws InvalidInputException {
+//		AppUser user;
+//	    user = repository.createAccount("Ali", "Baba", "baba", "baba@gmail.com", "22");
+//
+//    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+//    	helperCreateRestaurant("nameRestaurant", 11223);
+//
+//    	assertEquals(0, user.getLikesAnsDislikes().size());
+//	    repository.addLiked(USERNAME, id);
+//	    assertEquals(1, user.getLikesAnsDislikes().size());
+//	}
+    
+    /**
+     * Test UT for listing all the restaurants liked
+     * @throws InvalidInputException
+     */
+	@Ignore
+    //@Test
+	public void testListAll () throws InvalidInputException {
+		AppUser user;
+		String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
+		assertTrue(liked.isEmpty());
+		repository.addLiked(USERNAME, id);
+		
+		repository.listAllLiked(USERNAME);
+		assertEquals(1, liked.size());
+	}
 }
 
