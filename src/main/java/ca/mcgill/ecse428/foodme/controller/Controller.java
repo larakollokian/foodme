@@ -6,6 +6,7 @@ import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
 import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -168,11 +165,11 @@ public class Controller
 		}
 
 		// Add headers (e.g. Authentication for Yelp Fusion API access)
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
-        entity.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         // Response
         RestTemplate restTemplate = new RestTemplate();
@@ -295,7 +292,7 @@ public class Controller
 			@RequestParam String cuisine, @RequestParam String rating) {
 
 		AppUser appUser = repository.getAppUser(username);
-		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+		Preference preference = repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
 		return preference;
 	}
 
@@ -304,8 +301,6 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
-		AppUser appUser = repository.getAppUser(username);
-		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
 		if(editPreference.getUser().getUsername().equals(username))
 		{
