@@ -1,6 +1,9 @@
+/*PLEASE DO NOT EDIT THIS CODE*/
+/*This code was generated using the UMPLE 1.29.1.4408.bc0cac3a4 modeling language!*/
+
 package ca.mcgill.ecse428.foodme.model;
 
-import ca.mcgill.ecse428.foodme.model.*;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -119,7 +122,7 @@ public class Preference
 
 
 	@ManyToOne
-	//@JoinColumn(name = "app_user")
+	@JoinColumn(name = "app_user")
 	@JsonIgnore
 	public AppUser getUser()
 	{
