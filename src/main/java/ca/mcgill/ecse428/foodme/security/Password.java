@@ -74,7 +74,7 @@ public class Password {
 	 * @param n
      * @return n character long random password 
 	 */
-    public String genRandomPassword(int n) {
+    public static String generateRandomPassword(int n) {
     	RandomStringGenerator generator = new RandomStringGenerator.Builder()
     	        .withinRange('0', 'z')
     	        .filteredBy(LETTERS, DIGITS)

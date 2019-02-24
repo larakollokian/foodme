@@ -317,5 +317,21 @@ public class FoodmeApplicationTests
         }
     }
 
+    @Test
+    public void testGenerateRandomPassword() {
+    	int lenOfPassword = 16;
+    	
+    	for(int i=0; i<100; i++) {
+    		String p1 = Password.generateRandomPassword(lenOfPassword);
+    		String p2 = Password.generateRandomPassword(lenOfPassword);
+    		
+    		// length should be equal
+    		assertEquals(lenOfPassword, p1.length());
+    		assertEquals(lenOfPassword, p2.length());		
+    	}
+    }
+    
+    
+    
 }
 
