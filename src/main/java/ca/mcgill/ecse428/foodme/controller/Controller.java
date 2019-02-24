@@ -1,11 +1,7 @@
 package ca.mcgill.ecse428.foodme.controller;
 
-import ca.mcgill.ecse428.foodme.model.AppUser;
-import ca.mcgill.ecse428.foodme.model.Preference;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
-import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,21 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-
 import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.repository.*;
-import java.util.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +61,7 @@ public class Controller
 			return "Hello, " + name + "!";
 		}
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                     APP USER CONTROLLER                           /////////////////
@@ -96,6 +86,7 @@ public class Controller
 	public String login(@RequestParam String username, @RequestParam String password) throws Exception {
 		return authentication.login(username, password);
 	}
+
 	/**
 	 * Method that creates a new account for a user. Username must be unique.
 	 * @param username
@@ -121,11 +112,14 @@ public class Controller
 				try {
 					if (password.length() >= 6) {
 						try {
-							// TODO Check if username already exists in the database (i.e. check username uniqueness)
-							if (username.length() >= 1) {
-								u = repository.createAccount(username, firstName, lastName, email, password);
+							if(getAppUser(username) == null) {
+								if (username.length() >= 1) {
+									u = repository.createAccount(username, firstName, lastName, email, password);
+								} else {
+									throw new InvalidInputException("Your username must have at least 1 character!");
+								}
 							} else {
-								throw new InvalidInputException("Your username must have at least 1 character!");
+								throw new InvalidInputException("This username already exists!");
 							}
 						} catch (NullPointerException e) {
 							throw new InvalidInputException("Please enter a username");
@@ -153,7 +147,6 @@ public class Controller
 	 * @return
 	 * @throws Exception
 	 */
-	// TODO This method does not work at the moment
 	@GetMapping("/search/price/")
 	public ResponseEntity<String> searchByPriceRange (
 	        @RequestParam("location") String location,
@@ -168,17 +161,30 @@ public class Controller
 		}
 
 		// Add headers (e.g. Authentication for Yelp Fusion API access)
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
-        entity.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         // Response
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         return response;
+	}
+
+	/**
+	 * get user with username from database
+	 * 
+	 * @param username
+	 * @return
+	 */
+	@GetMapping("/users/get/{username}")
+	public AppUser getAppUser(@PathVariable("username")String username) 
+	{
+		AppUser u = repository.getAppUser(username);
+		return u;
 	}
 
 	/**
@@ -192,7 +198,11 @@ public class Controller
 		return allUsers;
 	}
 
-
+	/**
+	 * delete user with username from database
+	 * 
+	 * @param username
+	 */
 	@PostMapping("/users/delete/{username}")
 	public void deleteUser(@PathVariable("username")String username)
 	{
@@ -265,8 +275,6 @@ public class Controller
 //
 //	}
 
-
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                   PREFERENCE CONTROLLER                           /////////////////
@@ -277,25 +285,24 @@ public class Controller
 	@GetMapping("/preferences/get/all")
 	public List<Preference> getAllPreferences()
 	{
-		
 		List<Preference> allPs = repository.getAllPreferences();
 		return allPs;
 	}
-	
+
 	@GetMapping("/preferences/user/{username}")
 	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
 	{
 		List<Preference> prefForUser = repository.getPreferencesForUser(username);
 		return prefForUser;
 	}
-	
+
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
 
 		AppUser appUser = repository.getAppUser(username);
-		Preference preference =  repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+		Preference preference = repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
 		return preference;
 	}
 
@@ -304,8 +311,6 @@ public class Controller
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
 
-		AppUser appUser = repository.getAppUser(username);
-		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
 		if(editPreference.getUser().getUsername().equals(username))
 		{

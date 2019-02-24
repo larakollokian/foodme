@@ -32,8 +32,7 @@ public class FoodmeRepository {
 		u.setLastName(lastName);
 		u.setEmail(email);
 		u.setPassword(password);
-		u.setLikes(new ArrayList<String>());
-		u.setDislikes(new ArrayList<String>());
+		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 		entityManager.persist(u);
 		return u;
 	}
@@ -102,6 +101,7 @@ public class FoodmeRepository {
 		if(entityManager.find(AppUser.class, username) == null) {
 			System.out.println("Cannot delete a user that does not exist");
 			return null;
+			System.out.println("This user does not exist");
 		}
 		else {
 		AppUser appUser = entityManager.find(AppUser.class, username);
