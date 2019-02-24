@@ -107,8 +107,12 @@ public class AppUser
 		this.likesAnsDislikes = likesAnsDislikes;
 	}
 
-	public void addLikesAnsDislike(Restaurant likesAnsDislike)
-	{
+	public void addLikesAnsDislike(Restaurant likesAnsDislike){
+		
+		if(this.likesAnsDislikes == null)
+		{
+			this.likesAnsDislikes = new ArrayList<Restaurant>();
+		}
 		this.likesAnsDislikes.add(likesAnsDislike);
 	}
 	

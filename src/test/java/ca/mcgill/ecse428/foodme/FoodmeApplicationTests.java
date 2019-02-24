@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -317,5 +318,39 @@ public class FoodmeApplicationTests
         }
     }
 
+    /**
+     * Test UT for adding a restaurant to the liked list
+     * @throws InvalidInputException
+     */
+    @Test
+	public void addLike () throws InvalidInputException {
+		AppUser user;
+    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+	    user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+	    repository.addLiked(USERNAME, id);
+	    assertEquals(1, user.getLikesAnsDislikes().size());
+	}
+    
+    /**
+     * Test UT for listing all the restaurants liked
+     * @throws InvalidInputException
+     */
+	@Test
+	public void listAll () throws InvalidInputException {
+		int count =0;
+		AppUser user;
+	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
+	    user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+	    
+	    for (Restaurant r: user.getLikesAnsDislikes()) {
+	    	if(user.getLikesAnsDislikes().isEmpty()) {
+	    		count=0;
+	    	}
+	    	else if(r.isLiked()) {
+	    		count++;
+	    	}
+	    }
+	    assertEquals(liked.size(), count);
+	}
 }
 

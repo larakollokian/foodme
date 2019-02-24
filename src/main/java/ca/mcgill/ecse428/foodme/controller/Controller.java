@@ -295,27 +295,32 @@ public class Controller
 	/////////////////                                                                   /////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//	/**
-//	 * Controller Method that takes a user and the ID of the restaurants they liked to add it in their liked restaurants
-//	 * @param username of the user on the application
-//	 * @param restaurant ID of the restaurant
-//	 */
-//	@PostMapping("/users/{user}/liked/{id}")
-//	public void addLiked(@PathVariable("user") String username, @PathVariable("id") String id) {
-//		repository.addLiked(username, id);
-//	}
-//	
-//	@PostMapping("/users/{user}/allliked/")
-//	public List<String> allLiked(@PathVariable("user") String username){
-//		List<String> liked = repository.listAllLiked(username);
-//		
-////		for(String like: liked) {
-////			ResponseEntity<String> likedRestaurant = lookUpRestaurantByID();
-////		}
-//		return liked;
-//		
-//		
-//	}
+	/**
+	 * Controller Method that takes a user and the ID of the restaurants they liked to add it in their liked restaurants
+	 * @param username of the user on the application
+	 * @param restaurant ID of the restaurant
+	 */
+	@PostMapping("/users/{user}/liked/{id}")
+	public void addLiked(@PathVariable("user") String username, @PathVariable("id") String id) {
+		repository.addLiked(username, id);
+	}
+	
+	/**
+	 * Controller Method that takes a user and list all its liked restaurants
+	 * @param username
+	 * @return
+	 */
+	@PostMapping("/users/{user}/allliked/")
+	public List<Restaurant> allLiked(@PathVariable("user") String username){
+		List<Restaurant> liked = repository.listAllLiked(username);
+		
+//		for(String like: liked) {
+//			ResponseEntity<String> likedRestaurant = lookUpRestaurantByID();
+//		}
+		return liked;
+		
+		
+	}
 	
 	/**
 	 * Controller method that calls the API to return a restaurant based on its id
