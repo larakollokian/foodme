@@ -307,9 +307,14 @@ public class Controller
 		AppUser appUser = repository.getAppUser(username);
 		List<Preference> preferenceList = appUser.getPreferences();
 		Preference editPreference = repository.getPreference(pID);
-		int index = preferenceList.indexOf(editPreference);
-
-		editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+		if(editPreference.getUser().getUsername().equals(username))
+		{
+			editPreference = repository.editPreference(editPreference, priceRange, distanceRange, cuisine, rating);
+		}
+		else
+		{
+			System.out.println("The preference ID provided is not associated to this user");
+		}
 		return editPreference;
 	}
 }
