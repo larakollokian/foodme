@@ -97,6 +97,18 @@ public class FoodmeRepository {
 		entityManager.merge(editPreference);
 		return editPreference;
 	}
+	
+	/**
+	 * Method to delete a preference
+	 * @param preference id
+	 * @return the deleted preference
+	 */
+	@Transactional
+	public Preference deletePreference(int Pid) {
+		Preference p = entityManager.find(Preference.class, Pid);
+		entityManager.remove(p);
+		return p;
+	}
 
 	@Transactional
 	public AppUser getAppUser(String username){
