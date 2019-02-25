@@ -9,11 +9,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
 
 
+import jdk.nashorn.internal.parser.JSONParser;
+import net.minidev.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +28,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.mcgill.ecse428.foodme.controller.Controller;
@@ -35,6 +39,8 @@ import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
+
+import javax.xml.ws.Response;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -54,12 +60,11 @@ public class FoodmeApplicationTests
 	
     @Autowired
     private AuthenticationService authentication;
+
+    FoodmeRepository repository = Mockito.mock(FoodmeRepository.class, Mockito.RETURNS_DEEP_STUBS);
 	
 	@InjectMocks
 	Controller controller;
-
-	@Mock
-	FoodmeRepository repository = Mockito.mock(FoodmeRepository.class, Mockito.RETURNS_DEEP_STUBS);
 
 	/**
 	 * Initializing the controller before starting all the tests
@@ -287,17 +292,21 @@ public class FoodmeApplicationTests
     }
 
     @Test
-    public void testRestaurantList() { //getAllRestaurants(string Location)
+    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
 
-//        List allRestaurant=controller.getAllRestaurants("montreal");
-//        assertTrue(allRestaurant.isEmpty());
+
+        ResponseEntity<String> allRestaurant= repository.getAllRestaurants("montreal");
+        //JSONParser parser = new JSONParser();
+        //JSONObject json = (JSONObject) parser.parse();
+        assertTrue(!Objects.isNull(allRestaurant));
     }
 
     @Test
     public void testRestaurantInfo() { //getRestaurant(String id)
-
-//        Object restaurant=controller.getRestaurant("WavvLdfdP6g8aZTtbBQHTw");
+//
+        Object restaurant=repository.getRestaurant("WavvLdfdP6g8aZTtbBQHTw");
 //        assertTrue(restaurant.name.compareToIgnoreCase("Gary Danko"));
+        assertTrue(!Objects.isNull(restaurant));
     }
 
     @Test

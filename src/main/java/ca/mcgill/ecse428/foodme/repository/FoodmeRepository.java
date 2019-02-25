@@ -28,7 +28,7 @@ public class FoodmeRepository {
 	@PersistenceContext
 	private EntityManager entityManager;
 
-//	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
+	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
 //
 //	@Autowired
 //	AuthenticationService authentication;
@@ -278,50 +278,59 @@ public class FoodmeRepository {
 	// 	return true;
 	// }
 
-// TODO test method when not too many connections
-//	public ResponseEntity<List> getAllRestaurants(String location) throws InvalidInputException{
-//
-//		String url = null;
-//		if (location != null) {
-//			url = "https://api.yelp.com/v3/businesses/search?location=" + location;
-//		} else {
-//			return null;
-//		}
-//
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.add("Authorization", "Bearer " + APIKey);
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//		HttpEntity<Void> entity = new HttpEntity<>(headers);
-//
-//		// Response
-//		RestTemplate restTemplate = new RestTemplate();
-//		ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
-//
-//		return response;
-//
-//	}
+	/**
+	 * This is the method to get all the restaurants from a location (ie montreal)
+	 * @param location
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public ResponseEntity<String> getAllRestaurants(String location) throws InvalidInputException{
 
-// TODO test method when not too many connections
-//	public Object getRestaurant(String id){
-//		String url = null;
-//		if (location != null) {
-//			url = "https://api.yelp.com/v3/businesses/" + id;
-//		} else {
-//			return null;
-//		}
-//
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.add("Authorization", "Bearer " + APIKey);
-//		headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//		HttpEntity<Void> entity = new HttpEntity<>(headers);
-//
-//		// Response
-//		RestTemplate restTemplate = new RestTemplate();
-//		ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.GET, entity, Object.class);
-//
-//		return response;
-//	}
+		String url = null;
+		if (location != null) {
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location;
+		} else {
+			return null;
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+
+	}
+
+	/**
+	 * This is the method to get a restaurant's info based on its ID
+	 * @param id
+	 * @return
+	 */
+	public ResponseEntity<String> getRestaurant(String id){
+		String url = null;
+		if (id != null) {
+			url = "https://api.yelp.com/v3/businesses/" + id;
+		} else {
+			return null;
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+	}
 
 }
