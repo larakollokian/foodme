@@ -31,6 +31,26 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    @Test
+    public void testLoginWithInvalidPassword() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/auth/raylabs/none"), HttpMethod.GET, entity, String.class);
+        String expected ="{\"response\":false,\"error\":\"Invalid Password\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    @Test
+    public void testLoginWithInvalidUsername() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/auth/none/none"), HttpMethod.GET, entity, String.class);
+        //String expected = "{\"username\":raylabs,\"password\":raylabs}";
+        String expected ="{\"response\":false,\"error\": \"User does not exist\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
