@@ -104,7 +104,7 @@ public class Controller {
      * @return The new user
      * @throws InvalidInputException
      */
-    @PostMapping("/users/create/{username}/")
+    @PostMapping("/users/create/{username}")
     public AppUser createAccount(
             @PathVariable("username") String username,
             @RequestParam("firstName") String firstName,
@@ -154,7 +154,7 @@ public class Controller {
      * @return
      * @throws Exception
      */
-    @GetMapping("/search/price/")
+    @GetMapping("/search/price")
     public ResponseEntity<String> searchByPriceRange(
             @RequestParam("location") String location,
             @RequestParam("price") String price) throws Exception {
@@ -180,6 +180,14 @@ public class Controller {
 
         return response;
     }
+    
+    
+    @GetMapping("/search/topRating")
+    public ResponseEntity<String> searchByPriceRange()
+    {
+    	//TODO figure this out
+    	return null;
+    }
 
     /**
      * Method that searches restaurant and sort them by best_match, rating, review_count or distance
@@ -191,7 +199,7 @@ public class Controller {
      * @return ResponseEntity
      * @throws Exception
      */
-    @GetMapping("/search/{location}/{sortby}/{recommend}/")
+    @GetMapping("/search/{location}/{sortby}/{recommend}")
     public ResponseEntity<String> searchSortByDistance(
             @PathVariable("location") String location,
             @PathVariable("sortby") String sortby,
@@ -235,7 +243,7 @@ public class Controller {
      * @return ResponseEntity
      * @throws Exception
      */
-    @PostMapping("/search/{sortby}/{recommend}/")
+    @PostMapping("/search/{sortby}/{recommend}")
     public ResponseEntity<String> searchByLongLat(
     		@RequestParam("long") String longitude,
     		@RequestParam("lat") String latitude,
@@ -281,7 +289,7 @@ public class Controller {
      * @return ResponseEntity
      * @throws Exception
      */
-    @GetMapping("/search/google/{location}/")
+    @GetMapping("/search/google/{location}")
     public ResponseEntity<String> searchGoogle(
             @PathVariable("location") String location) throws Exception {
         // Set up url
@@ -324,7 +332,7 @@ public class Controller {
 	 * @return
 	 * @throws Exception
 	 */
-	@GetMapping("/search/cuisine/")
+	@GetMapping("/search/cuisine")
 	public ResponseEntity<String> searchByCuisine (
 	        @RequestParam("location") String location,
             @RequestParam("cuisine") Cuisine cuisine) throws Exception{
@@ -433,7 +441,7 @@ public class Controller {
 		return prefForUser;
 	}
 
-	@PostMapping("/users/{user}/preferences/")
+	@PostMapping("/users/{user}/preferences")
 	public Preference addPreference(
 			@PathVariable("user") String username, @RequestParam String priceRange, @RequestParam String distanceRange,
 			@RequestParam String cuisine, @RequestParam String rating) {
@@ -443,7 +451,7 @@ public class Controller {
 		return preference;
 	}
 
-	@PostMapping("/users/{user}/preferences/{pID}/")
+	@PostMapping("/users/{user}/preferences/{pID}")
 	public Preference editPreference(
 			@PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String priceRange,
 			@RequestParam String distanceRange, @RequestParam String cuisine, @RequestParam String rating){
@@ -527,7 +535,7 @@ public class Controller {
 	 * @param username
 	 * @return
 	 */
-	@PostMapping("/users/{user}/allliked/")
+	@PostMapping("/users/{user}/allliked")
 	public List<Restaurant> allLiked(@PathVariable("user") String username){
 		List<Restaurant> liked = repository.listAllLiked(username);
 		
