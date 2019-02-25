@@ -356,6 +356,21 @@ public class FoodmeApplicationTests
     	
     }
     
+    @Test 
+    public void testhttplogout()
+    {
+    	
+    }
+    
+    @Test
+    public void testhttpsignup() {
+    	
+    }
+    
+    @Test
+    public void testhttpcuisine() {
+    	
+    }
     /**
      * Test UT for listing all the restaurants liked
      * @throws InvalidInputException
