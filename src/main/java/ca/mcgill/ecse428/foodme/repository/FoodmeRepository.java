@@ -11,6 +11,7 @@ import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -29,12 +30,6 @@ public class FoodmeRepository {
 	private EntityManager entityManager;
 
 	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
-//
-//	@Autowired
-//	AuthenticationService authentication;
-//
-//	@Autowired
-//	public FoodmeRepository(){}
 
 	@Transactional
 	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password)
@@ -150,7 +145,7 @@ public class FoodmeRepository {
 	
 	/**
 	 * Method to like a restaurant so its in the user list of liked restaurant
-	 * @param restaurant The restaurant a user likes
+	 * @param restaurantName The restaurant a user likes
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
@@ -163,14 +158,14 @@ public class FoodmeRepository {
 		entityManager.merge(restaurant);
 		//entityManager.merge(appUser);
 	}
-
+	
 	/**
 	 * Method to list all the liked restaurants of a user
 	 * @return The list of all the liked restaurants
 	 */
 	public List<Restaurant> listAllLiked(String username) {
 		AppUser appUser = entityManager.find(AppUser.class, username);
-
+		
 		//TODO change the query to what is in the db
 		Query q = entityManager.createNativeQuery("SELECT FROM restaurant WHERE app_user= :user and liked=true");
 		q.setParameter("user", username);
@@ -180,7 +175,7 @@ public class FoodmeRepository {
 		if(likedAndDisliked.isEmpty()) {
 			return Collections.emptyList();
 		}
-
+		
 		List<Restaurant> liked = new ArrayList<Restaurant>();
 		for(Restaurant r: likedAndDisliked) {
 			if(r.isLiked()) {
@@ -203,9 +198,19 @@ public class FoodmeRepository {
 
 
 	@Transactional
-	public AppUser changePassword(String username, String newPassword) {
+	public AppUser changePassword(String username,String oldPassword, String newPassword) throws Exception {
 		AppUser u = entityManager.find(AppUser.class, username);
-		u.setPassword(newPassword);
+		try{
+			try {
+				Password.check(oldPassword,u.getPassword());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e){
+			throw new AuthenticationException("Invalid Password");
+		}
+		u.setPassword(Password.getSaltedHash(newPassword));
 		entityManager.merge(u);
 		return u;
 	}
@@ -240,24 +245,24 @@ public class FoodmeRepository {
 		return preferences;
 	}
 
-	/**
-	 * getting the paramaters for a specific user
-	 * @param username
-	 * @return list of parameters
-	 */
-	@Transactional
-	public List<Preference> getPreferencesForUser(String username) 
-	{
-		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
-		q.setParameter("user", username);
-		@SuppressWarnings("unchecked")
-		List<Preference> preferences = q.getResultList();
-		return preferences;
-	}
+//	/**
+//	 * getting the paramaters for a specific user
+//	 * @param username
+//	 * @return list of parameters
+//	 */
+//	@Transactional
+//	public List<Preference> getPreferencesForUser(String username)
+//	{
+//		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
+//		q.setParameter("user", username);
+//		@SuppressWarnings("unchecked")
+//		List<Preference> preferences = q.getResultList();
+//		return preferences;
+//	}
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time 
-	 * @param
+	 * @param aRestaurant
 	 * @return
 	 */
 	// public boolean isRestaurantOpen(Restaurant aRestaurant) {
