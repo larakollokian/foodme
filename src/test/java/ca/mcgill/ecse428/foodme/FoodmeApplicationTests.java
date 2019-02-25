@@ -288,6 +288,18 @@ public class FoodmeApplicationTests
 		
     }
     
+    @Test
+    public void testRandomRestaurantRecommendation() throws Exception {
+    	
+    	String response1 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
+    							 .andExpect(status().isOk())
+    							 .andReturn().getResponse().getContentAsString();
+    	
+    	String response2 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
+				 .andExpect(status().isOk())
+				 .andReturn().getResponse().getContentAsString();
+		assertNotEquals(response1, response2);
+    }
     
 
     public Restaurant helperCreateRestaurant(String restaurantID, int id) {
