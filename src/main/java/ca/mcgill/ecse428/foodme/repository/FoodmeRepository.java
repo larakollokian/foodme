@@ -8,8 +8,6 @@ import javax.persistence.Query;
 import ca.mcgill.ecse428.foodme.model.*;
 
 import ca.mcgill.ecse428.foodme.security.Password;
-import ca.mcgill.ecse428.foodme.service.AuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import org.springframework.stereotype.Repository;
@@ -17,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 
 //@SuppressWarnings("Duplicates")
@@ -154,21 +149,28 @@ public class FoodmeRepository {
 		Preference preference = entityManager.find(Preference.class, pID);
 		return preference;
 	}
-	
+
 	/**
 	 * Method to like a restaurant so its in the user list of liked restaurant
 	 * @param restaurantName The restaurant a user likes
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
-	public void addLiked(String username, String restaurantName) {
-		AppUser appUser = entityManager.find(AppUser.class, username);
+	public Restaurant addLiked(String username, String restaurantName) {
+		AppUser appUser = getAppUser(username);
+
 		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+		if(restaurant == null){
+			restaurant = new Restaurant();
+			restaurant.setRestaurantName(restaurantName);
+			entityManager.persist(restaurant);
+		}
 		restaurant.setLiked(true);
-		restaurant.setRestaurantName(restaurantName);
 		restaurant.setAppUser(appUser);
 		entityManager.merge(restaurant);
-		//entityManager.merge(appUser);
+		appUser.addLikesAnsDislike(restaurant);
+		entityManager.merge(appUser);
+		return restaurant;
 	}
 	
 	/**

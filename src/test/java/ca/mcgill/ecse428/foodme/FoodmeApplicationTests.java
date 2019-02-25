@@ -309,23 +309,42 @@ public class FoodmeApplicationTests
     	return restaurant;
     }
 
-    //TODO currently merged in one with testListAll()
-//    /**
-//     * Test UT for adding a restaurant to the liked list
-//     * @throws InvalidInputException
-//     */
-//    @Test
-//	public void testAddLike () throws InvalidInputException {
-//		AppUser user;
-//	    user = repository.createAccount("Ali", "Baba", "baba", "baba@gmail.com", "22");
+ //   TODO currently merged in one with testListAll()
+
+//	@Test
+//	public void testAddPreference() throws InvalidInputException{
+//		AppUser appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
+//		String distanceRange = "fivehundred";
+//		String cuisine = "Italian";
+//		String priceRange = "$$$";
+//		String rating = "four";
 //
-//    	String id = "E8RJkjfdcwgtyoPMjQ_Olg";
-//    	helperCreateRestaurant("nameRestaurant", 11223);
-//
-//    	assertEquals(0, user.getLikesAnsDislikes().size());
-//	    repository.addLiked(USERNAME, id);
-//	    assertEquals(1, user.getLikesAnsDislikes().size());
+//		Preference newPreference = new Preference();
+//		when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
+//		assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
+//		Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
 //	}
+
+	/**
+     * Test UT for adding a restaurant to the liked list
+     * @throws InvalidInputException
+     */
+    @Test
+	public void testAddLiked () throws InvalidInputException {
+		AppUser user;
+		String restaurant_name = "E8RJkjfdcwgtyoPMjQ_Olg";
+		try {
+			user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+		} catch (InvalidInputException e){
+			throw new InvalidInputException("Invalid input format.");
+		}
+
+		Restaurant restaurant = new Restaurant();
+
+		when(repository.addLiked(user.getUsername(),restaurant_name)).thenReturn(restaurant);
+    	assertEquals(repository.addLiked(user.getUsername(),restaurant_name),restaurant);
+    	Mockito.verify(repository).addLiked(user.getUsername(),restaurant_name);
+	}
 
     /**
      * Test UT for listing all the restaurants liked
