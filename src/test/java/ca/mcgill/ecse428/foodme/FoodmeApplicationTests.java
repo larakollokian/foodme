@@ -44,7 +44,7 @@ import javax.xml.ws.Response;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FoodmeApplicationTests 
+public class FoodmeApplicationTests
 {
 	private static final String testUsername = "Tester123";
 	private static final String testFirstName = "Test";
@@ -79,18 +79,18 @@ public class FoodmeApplicationTests
 	@Test
 	public void contextLoads() {
 	}
-	
+
 	/**
-	 * Initial test to make sure all is working. Verifies if the home page of the web site displays "Hello, World!" 
+	 * Initial test to make sure all is working. Verifies if the home page of the web site displays "Hello, World!"
 	 */
 	@Test
-	public void testGreeting() 
+	public void testGreeting()
 	{
-		assertEquals("Hello world!", controller.greeting());	
+		assertEquals("Hello world!", controller.greeting());
 	}
-	
+
 	@Test
-	public void testTestCreateUser() 
+	public void testTestCreateUser()
 	{
 		AppUser u = new AppUser();
 		u.setUsername(testUsername);
@@ -98,14 +98,14 @@ public class FoodmeApplicationTests
 		u.setLastName(testLastName);
 		u.setEmail(testEmail);
 		u.setPassword(testPassword);
-		u.setPreferences(new ArrayList<Preference>());                                                                                      
+		u.setPreferences(new ArrayList<Preference>());
 		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
 
 		when(repository.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword)).thenReturn(u);
 		assertEquals(controller.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword),u);
 		Mockito.verify(repository).testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword);
 	}
-	
+
 //    @Test
 //    public void testDeleteUser()
 //    {
@@ -184,17 +184,6 @@ public class FoodmeApplicationTests
 
     	}catch (Exception e) {
             e.printStackTrace();
-        }
-        catch (AuthenticationException e) {
-            fail("User login failed: "  + e.getMessage());
-            return;
-        } catch (InvalidSessionException e) {
-            fail("User session invalid: "  + e.getMessage());
-            return;
-        }
-	    catch (Exception e){
-            fail(e.getMessage());
-            return;
         }
 
     }
@@ -342,41 +331,24 @@ public class FoodmeApplicationTests
     }
 
     @Test
-    public void testChangePassword() throws InvalidInputException {
-    	AppUser user = new AppUser();
-
-    	try {
-    		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-    	} catch (InvalidInputException e){
-            throw new InvalidInputException("Invalid input format.");
-        }
-
-    	String pass = "Hello";
-    	user.setPassword(pass);
-    	assertEquals(pass, user.getPassword());
-
-
-    }
-
-    @Test
     public void testGenerateRandomPassword() {
     	int lenOfPassword = 16;
-    	
+
     	for(int i=0; i<100; i++) {
     		String p1 = Password.generateRandomPassword(lenOfPassword);
     		String p2 = Password.generateRandomPassword(lenOfPassword);
-    		
+
     		// length should be equal
     		assertEquals(lenOfPassword, p1.length());
     		assertEquals(lenOfPassword, p2.length());
-    		
+
     		// generated passwords should not equal, unless in extreme case
-    		assertNotEquals(p1, p2);	
+    		assertNotEquals(p1, p2);
     	}
     }
-    
-    
-    
+
+
+
 //    @Test
 //    public void testSearchSortByDistance() {
 //    	String response = null; // TODO: need to be replaced with the http response
@@ -396,15 +368,15 @@ public class FoodmeApplicationTests
 //		assertEquals(failed, false);
 //
 //    }
-    
-    
+
+
     public Restaurant helperCreateRestaurant(String restaurantID, int id) {
     	Restaurant restaurant = new Restaurant();
     	restaurant.setRestaurantName(restaurantID);
     	restaurant.setRestaurantID(id);
     	return restaurant;
     }
-    
+
     //TODO currently merged in one with testListAll()
 //    /**
 //     * Test UT for adding a restaurant to the liked list
@@ -422,7 +394,7 @@ public class FoodmeApplicationTests
 //	    repository.addLiked(USERNAME, id);
 //	    assertEquals(1, user.getLikesAnsDislikes().size());
 //	}
-    
+
     /**
      * Test UT for listing all the restaurants liked
      * @throws InvalidInputException
@@ -436,7 +408,7 @@ public class FoodmeApplicationTests
 	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
 		assertTrue(liked.isEmpty());
 		repository.addLiked(USERNAME, id);
-		
+
 		repository.listAllLiked(USERNAME);
 		assertEquals(1, liked.size());
 	}
