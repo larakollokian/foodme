@@ -272,14 +272,41 @@ public class Controller
 	 * @throws Exception
 	 */
 	@GetMapping("/search/cuisine/")
-	public ResponseEntity<String> searchByCuisine (
+	public ResponseEntity<String> searchByCuisineAndLocation (
 	        @RequestParam("location") String location,
             @RequestParam("cuisine") Cuisine cuisine) throws Exception{
 
 		// Set up url
 		String url = null;
 		if (location != null) {
-			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&categories=" + cuisine;
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine.toString();
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // Response
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        return response;
+	}
+	@GetMapping("/search/cuisine/")
+	public ResponseEntity<String> searchByCuisineAndCoordinates (
+	        @RequestParam("longitude") float longitude,
+	        @RequestParam("latitude")float latitude,
+            @RequestParam("cuisine") Cuisine cuisine) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (longitude != 0 && latitude !=0) {
+			url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" +latitude+  "&cuisine=" + cuisine.toString();
 		} else {
 			throw new Exception("You are missing a location to make a query!");
 		}
