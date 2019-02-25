@@ -28,7 +28,10 @@ public class Controller
 {
 	@Autowired
 	FoodmeRepository repository;
-	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
+	String APIKey2 = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
+	// use key 2 if reached limit
+	String APIKey ="iizHPtdCW4rr-XRqaih845CQv7BJliVQHwIB8R1-SYh6CfQOfZAcyUJsfXasZ4fuE6nRodL66Qk5yB3Y0z3d2pPOEDIB7bp2z5DxeHv3K7ku8txm8IoG9OVpHU9gXHYx";
+
 	String googleApiKey = "AIzaSyAbDiuDSRG-3oyFUzlS0SOy1g5b0n49dus";
 	
 	@Autowired 
@@ -188,7 +191,7 @@ public class Controller
 	public ResponseEntity<String> searchSortByDistance (
 			@PathVariable("location") String location,
 			@PathVariable("sortby") String sortby,
-			@PathVariable("recommand") int recommend) throws Exception
+			@PathVariable("recommend") int recommend) throws Exception
 	{
 		// Set up url
 		String url = null;
