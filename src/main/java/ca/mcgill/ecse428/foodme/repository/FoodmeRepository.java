@@ -142,27 +142,20 @@ public class FoodmeRepository {
 	 */
 	@Transactional
 	public Preference getDefaultPreference(String username) {
-		/*
-		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user AND is_default=true");
-		q.setParameter("user", username);
-		@SuppressWarnings("unchecked")
 		
-		List<Preference> preferences = q.getResultList();
-		if (preferences.size()!=0) {
+		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user AND is_default= :default", Preference.class);
+		q.setParameter("user", username);
+		q.setParameter("default", true);
+		@SuppressWarnings("unchecked")
+		List<Preference> preferences = (List<Preference>) q.getResultList(); 
+		if(preferences.size() != 0)
+		{
 			return preferences.get(0);
 		}
-		else 
+		else
+		{
 			return null;
-			*/
-		
-		List<Preference> lp = getPreferencesForUser(username); 
-		for (int i = 0; i < lp.size(); i++) {
-			Preference p = lp.get(i);
-			if(p.getIsDefault()==true)
-				
-				return lp.get(i);
 		}
-		return null;
 	}
 
 	@Transactional
