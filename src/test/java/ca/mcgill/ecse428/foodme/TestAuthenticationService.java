@@ -28,16 +28,16 @@ public class TestAuthenticationService {
     private FoodmeRepository foodRepo;
 
 
-	private static final String USERNAME = "test";
-	private static final String FIRSTNAME = "John";
-	private static final String LASTNAME="Doe";
-	private static String EMAIL="johnDoe@hotmail.ca";
-	private String PASSWORD = "HelloWorld123";
+    private static final String USERNAME = "test";
+    private static final String FIRSTNAME = "John";
+    private static final String LASTNAME="Doe";
+    private static String EMAIL="johnDoe@hotmail.ca";
+    private String PASSWORD = "HelloWorld123";
 
 
-	@Before
-	public void setMockOutput() throws InvalidInputException {
-	    try {
+    @Before
+    public void setMockOutput() throws InvalidInputException {
+        try {
             AppUser user = new AppUser();
             user.setUsername(USERNAME);
             user.setLastName(LASTNAME);
@@ -50,34 +50,34 @@ public class TestAuthenticationService {
             Mockito.when(foodRepo.getAppUser(USERNAME)).thenReturn(user);
             Mockito.when(foodRepo.getAppUser("none")).thenReturn(null);
         }
-	    catch(Exception e){
-	        e.printStackTrace();
+        catch(Exception e){
+            e.printStackTrace();
         }
-	}
+    }
 
     @Test
     public void testLoginWithValidPassword() throws InvalidInputException{
 
-	    AppUser user;
-	    try {
+        AppUser user;
+        try {
             user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
         }
-	    catch(InvalidInputException e){
+        catch(InvalidInputException e){
             throw new InvalidInputException("Invalid input format.");
         }
 
-	    assertEquals(1, foodRepo.getNumberUsers());
+        assertEquals(1, foodRepo.getNumberUsers());
 
-	    String password = "HelloWorld123";
-	    try{
-	        //First login
-	        String oldSession = authentication.login(user.getUsername(),password);
+        String password = "HelloWorld123";
+        try{
+            //First login
+            String oldSession = authentication.login(user.getUsername(),password);
 
-	        //Login twice, should be in a new session
-	        String newSession = authentication.login(user.getUsername(),password);
-	        assertNotEquals(oldSession,newSession);
+            //Login twice, should be in a new session
+            String newSession = authentication.login(user.getUsername(),password);
+            assertNotEquals(oldSession,newSession);
 
-	        //Ensure old session is invalid
+            //Ensure old session is invalid
             try {
                 authentication.getUserBySession(oldSession);
                 fail("Invalidated session, no exception thrown");
@@ -95,7 +95,7 @@ public class TestAuthenticationService {
             fail("User session invalid: "  + e.getMessage());
             return;
         }
-	    catch (Exception e){
+        catch (Exception e){
             fail(e.getMessage());
             return;
         }
@@ -122,7 +122,7 @@ public class TestAuthenticationService {
         }
         //Expected
         catch(InvalidSessionException e){
-           error += e.getMessage();
+            error += e.getMessage();
         }
         catch(Exception e){
             fail(e.getMessage());
@@ -133,7 +133,7 @@ public class TestAuthenticationService {
     }
     @Test
     public void testLoginWithWrongPassword() throws InvalidInputException{
-	    String error ="";
+        String error ="";
         AppUser user;
         try {
             user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
@@ -143,7 +143,6 @@ public class TestAuthenticationService {
         }
 
         assertEquals(1, foodRepo.getNumberUsers());
-
 
         String password = "Hello";
 
@@ -203,4 +202,3 @@ public class TestAuthenticationService {
     }
 
 }
-

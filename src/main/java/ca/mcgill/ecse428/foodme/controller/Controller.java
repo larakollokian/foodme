@@ -22,6 +22,7 @@ import ca.mcgill.ecse428.foodme.repository.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @CrossOrigin
@@ -80,11 +81,11 @@ public class Controller
 
 	/* Attempts to login and returns the session if successful
 	 * @param username
-	 * @return sessionGuid
-	 * @throws AuthenticationException
+	 * @param password
+	 * @return TRUE if the account is authenticated
 	 */
-	@PostMapping(value = { "/login" })
-	public String login(@RequestParam String username, @RequestParam String password) throws Exception {
+	@GetMapping("/users/auth/{username}/{password}")
+	public String login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
 		return authentication.login(username, password);
 	}
 
@@ -315,15 +316,16 @@ public class Controller
 	 * 
 	 * @param username
 	 */
-	@PostMapping("/users/delete/{username}")
-	public void deleteUser(@PathVariable("username")String username)
-	{
+	// @PostMapping("/users/delete/{username}")
+	// public void deleteUser(@PathVariable("username")String username)
+	// {
 
-		try {
-			repository.deleteUser(username);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+	// 	try {
+	// 		repository.deleteUser(username);
+	// 	} catch (ParseException e) {
+	// 		e.printStackTrace();
+	// 	}
+//}
 
 
 		
@@ -337,14 +339,13 @@ public class Controller
 		// 	r.setError("No such User exists");
 		// }
 		// return r;	
-	}
+	
 
 	@PostMapping("/users/changePassword/{username}/old/{oPassword}/new/{nPassword}")
 	public AppUser changePassword(@PathVariable("username")String username,@PathVariable("oPassword")String oPassword, @PathVariable("nPassword")String nPassword) {
 
 
 		AppUser u = repository.getAppUser(username);
-		
 		// if(u.getPassword() == oPassword) {
 		// 	System.out.println("Error: New password cannot be the same as old password");
 		// } 
@@ -401,12 +402,12 @@ public class Controller
 		return allPs;
 	}
 
-	@GetMapping("/preferences/user/{username}")
-	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
-	{
-		List<Preference> prefForUser = repository.getPreferencesForUser(username);
-		return prefForUser;
-	}
+//	@GetMapping("/preferences/user/{username}")
+//	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
+//	{
+//		List<Preference> prefForUser = repository.getPreferencesForUser(username);
+//		return prefForUser;
+//	}
 
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
@@ -444,7 +445,7 @@ public class Controller
 	/**
 	 * Controller Method that takes a user and the ID of the restaurants they liked to add it in their liked restaurants
 	 * @param username of the user on the application
-	 * @param restaurant ID of the restaurant
+	 * @param id of the restaurant
 	 */
 	@PostMapping("/users/{user}/liked/{id}")
 	public void addLiked(@PathVariable("user") String username, @PathVariable("id") String id) {
