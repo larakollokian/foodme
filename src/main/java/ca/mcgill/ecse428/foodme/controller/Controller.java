@@ -9,6 +9,7 @@ import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -18,61 +19,60 @@ import java.util.Random;
 
 @RestController
 @CrossOrigin
-public class Controller 
-{
-	@Autowired
-	FoodmeRepository repository;
-	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
-	String googleApiKey = "AIzaSyAbDiuDSRG-3oyFUzlS0SOy1g5b0n49dus";
-	
-	@Autowired 
-	AuthenticationService authentication;
+public class Controller {
+    @Autowired
+    FoodmeRepository repository;
+
+    String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
+    String googleApiKey = "AIzaSyAbDiuDSRG-3oyFUzlS0SOy1g5b0n49dus";
+
+    @Autowired
+    AuthenticationService authentication;
+//
+//	@Autowired
+//	public Controller(){}
 
 
-	/**
-	 * Greeting on home page of the website
-	 * @return hello world
-	 */
-	@RequestMapping("/")
-	public String greeting()
-	{
-		return "Hello world!";
-	}
+    /**
+     * Greeting on home page of the website
+     *
+     * @return hello world
+     */
+    @RequestMapping("/")
+    public String greeting() {
+        return "Hello world!";
+    }
 
-	/**
-	 * Name specific greeting
-	 * @param name
-	 * @return hello + name
-	 */
-	@PostMapping("/{name}")
-	public String greeting(@PathVariable("name")String name)
-	{
-		if(name == null)
-		{
-			return "Hello world!";
-		}
-		else
-		{
-			return "Hello, " + name + "!";
-		}
-	}
+    /**
+     * Name specific greeting
+     *
+     * @param name
+     * @return hello + name
+     */
+    @PostMapping("/{name}")
+    public String greeting(@PathVariable("name") String name) {
+        if (name == null) {
+            return "Hello world!";
+        } else {
+            return "Hello, " + name + "!";
+        }
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////                                                                   /////////////////
-	/////////////////                     APP USER CONTROLLER                           /////////////////
-	/////////////////                                                                   /////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////                                                                   /////////////////
+    /////////////////                     APP USER CONTROLLER                           /////////////////
+    /////////////////                                                                   /////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@PostMapping("/users/testCreate/{username}/{firstName}/{lastName}/{email}/{password}")
-	public AppUser testCreateUser(@PathVariable("username")String username, @PathVariable("firstName")String firstName,
-			@PathVariable("lastName")String lastName, @PathVariable("email")String email, @PathVariable("password")String password)
-	{
-		AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
-		return u;
-	}
+    @PostMapping("/users/testCreate/{username}/{firstName}/{lastName}/{email}/{password}")
+    public AppUser testCreateUser(@PathVariable("username") String username, @PathVariable("firstName") String firstName,
+                                  @PathVariable("lastName") String lastName, @PathVariable("email") String email, @PathVariable("password") String password) {
+        AppUser u = repository.testCreateUser(username, firstName, lastName, email, password);
+        return u;
+    }
 
 
-	/* Attempts to login and returns the session if successful
+    /* Attempts to login and returns the session if successful
 	 * @param username
 	 * @param password
 	 * @return TRUE if the account is authenticated
@@ -82,58 +82,59 @@ public class Controller
 		return authentication.login(username, password);
 	}
 
-	/**
-	 * Method that creates a new account for a user. Username must be unique.
-	 * @param username
-	 * @param firstName
-	 * @param lastName
-	 * @param email
-	 * @param password
-	 * @return The new user
-	 * @throws InvalidInputException
-	 */
-	@PostMapping("/users/create/{username}/")
-	public AppUser createAccount(
-			@PathVariable("username") String username,
-			@RequestParam("firstName")String firstName,
-			@RequestParam("lastName")String lastName,
-			@RequestParam("email")String email,
-			@RequestParam("password")String password) throws InvalidInputException
-	{
-		AppUser u;
+    /**
+     * Method that creates a new account for a user. Username must be unique.
+     *
+     * @param username
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @param password
+     * @return The new user
+     * @throws InvalidInputException
+     */
+    @PostMapping("/users/create/{username}/")
+    public AppUser createAccount(
+            @PathVariable("username") String username,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password) throws InvalidInputException {
+        AppUser u;
 
-		try {
-			if (email.contains("@") && email.contains(".")) {
-				try {
-					if (password.length() >= 6) {
-						try {
-							if(getAppUser(username) == null) {
-								if (username.length() >= 1) {
-									u = repository.createAccount(username, firstName, lastName, email, password);
-								} else {
-									throw new InvalidInputException("Your username must have at least 1 character!");
-								}
-							} else {
-								throw new InvalidInputException("This username already exists!");
-							}
-						} catch (NullPointerException e) {
-							throw new InvalidInputException("Please enter a username");
-						}
-					} else {
-						throw new InvalidInputException("Your password must be longer than 6 characters!");
-					}
-				} catch (NullPointerException e) {
-					throw new InvalidInputException("Please enter a password");
-				}
-			} else {
-				throw new InvalidInputException("This is not a valid email address!");
-			}
-		} catch (NullPointerException e) {
-			throw new InvalidInputException("This is not a valid email address!");
-		}
+        try {
+            if (email.contains("@") && email.contains(".")) {
+                try {
+                    if (password.length() >= 6) {
+                        try {
+                            if (getAppUser(username) == null) {
+                                if (username.length() >= 1) {
+                                    u = repository.createAccount(username, firstName, lastName, email, password);
+                                } else {
+                                    throw new InvalidInputException("Your username must have at least 1 character!");
+                                }
+                            } else {
+                                throw new InvalidInputException("This username already exists!");
+                            }
+                        } catch (NullPointerException e) {
+                            throw new InvalidInputException("Please enter a username");
+                        }
+                    } else {
+                        throw new InvalidInputException("Your password must be longer than 6 characters!");
+                    }
+                } catch (NullPointerException e) {
+                    throw new InvalidInputException("Please enter a password");
+                }
+            } else {
+                throw new InvalidInputException("This is not a valid email address!");
+            }
+        } catch (NullPointerException e) {
+            throw new InvalidInputException("This is not a valid email address!");
+        }
 
-		return u;
-	}
+        return u;
+    }
+
 
 	/**
 	 * get user with username from database
@@ -323,7 +324,41 @@ public class Controller
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
         return response;
+    }
+
+    /**
+     * Controller method to get all restaurants from a location
+     * @param location
+     * @return
+     */
+    @GetMapping("/restaurants/{location}")
+    public String getAllRestaurants(@PathVariable("location") String location) {
+        ResponseEntity<String> restaurants = null;
+        try {
+            restaurants = repository.getAllRestaurants(location);
+        } catch (InvalidInputException e) {
+            e.printStackTrace();
+        }
+        return restaurants.getBody();
+    }
+
+    /**
+     * Controller method to get a restaurant's data based on its id
+     * @param id
+     * @return
+     */
+    	@GetMapping("/restaurant/{id}")
+	public String getRestaurant(@PathVariable("id") String id)
+	{
+		ResponseEntity<String> restaurant = null;
+		try {
+			restaurant = repository.getRestaurant(id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return restaurant.getBody();
 	}
+<<<<<<< HEAD
 
 	/**
 	 * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
@@ -503,5 +538,4 @@ public class Controller
 
 		return response;
 	}
-	
 }
