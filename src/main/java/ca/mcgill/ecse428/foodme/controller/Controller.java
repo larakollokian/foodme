@@ -1,5 +1,6 @@
 package ca.mcgill.ecse428.foodme.controller;
 
+import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
@@ -87,7 +88,19 @@ public class Controller {
 	public Response login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
         //No exception thrown means the authentication succeeded
         Response r = new Response();
-        authentication.login(username, password);
+        try {
+			authentication.login(username, password);
+		}
+        catch(AuthenticationException e){
+        	r.setResponse(false);
+        	r.setError("Invalid Password");
+        	return r;
+		}
+        catch(InvalidSessionException e){
+        	r.setResponse(false);
+        	r.setError("User does not exist");
+        	return r;
+		}
 	    r.setResponse(true);
 	    r.setError(null);
 	    return r;
