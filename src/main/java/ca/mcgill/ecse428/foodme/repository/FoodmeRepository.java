@@ -109,6 +109,61 @@ public class FoodmeRepository {
 		entityManager.remove(p);
 		return p;
 	}
+	
+	
+	/**
+	 * Method to set default preference
+	 * @param id
+	 * @param username
+	 * @return the default preference
+	 */
+	@Transactional
+	public Preference setDefaultPreference(int Pid,String username) {
+		Preference olddp = getDefaultPreference(username);	
+		
+		if (olddp!=null) {
+			olddp.setIsDefault(false); //model setter
+			entityManager.merge(olddp);
+		}
+		
+		Preference dp = entityManager.find(Preference.class, Pid);
+		if (dp!=null) {
+			dp.setIsDefault(true); //model setter
+			entityManager.merge(dp);
+			return dp;
+		}
+		return null;
+	}
+	
+	/**
+	 * Method to get default preference
+	 * @param username
+	 * @return preference
+	 */
+	@Transactional
+	public Preference getDefaultPreference(String username) {
+		/*
+		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user AND is_default=true");
+		q.setParameter("user", username);
+		@SuppressWarnings("unchecked")
+		
+		List<Preference> preferences = q.getResultList();
+		if (preferences.size()!=0) {
+			return preferences.get(0);
+		}
+		else 
+			return null;
+			*/
+		
+		List<Preference> lp = getPreferencesForUser(username); 
+		for (int i = 0; i < lp.size(); i++) {
+			Preference p = lp.get(i);
+			if(p.getIsDefault()==true)
+				
+				return lp.get(i);
+		}
+		return null;
+	}
 
 	@Transactional
 	public AppUser getAppUser(String username){
@@ -259,20 +314,20 @@ public class FoodmeRepository {
 		return preferences;
 	}
 
-//	/**
-//	 * getting the paramaters for a specific user
-//	 * @param username
-//	 * @return list of parameters
-//	 */
-//	@Transactional
-//	public List<Preference> getPreferencesForUser(String username)
-//	{
-//		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
-//		q.setParameter("user", username);
-//		@SuppressWarnings("unchecked")
-//		List<Preference> preferences = q.getResultList();
-//		return preferences;
-//	}
+	/**
+	 * getting the paramaters for a specific user
+	 * @param username
+	 * @return list of parameters
+	 */
+	@Transactional
+	public List<Preference> getPreferencesForUser(String username)
+	{
+		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
+		q.setParameter("user", username);
+		@SuppressWarnings("unchecked")
+		List<Preference> preferences = q.getResultList();
+		return preferences;
+	}
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time 
