@@ -230,17 +230,15 @@ public class Controller {
      * Method that searches restaurant and sort them by best_match, rating, review_count or distance
      * If recommend param is set to 1, it will return random restaurant from the result
      *
-     * @param long
-     * @param lat
      * @param sortby:    best_match, rating, review_count or distance
      * @param recommend: 1-> True, 0-> False
      * @return ResponseEntity
      * @throws Exception
      */
-    @GetMapping("/search/{long}/{lat}/{sortby}/{recommend}/")
+    @PostMapping("/search/{sortby}/{recommend}/")
     public ResponseEntity<String> searchByLongLat(
-            @PathVariable("long") String longitude,
-            @PathVariable("lat") String latitude,
+    		@RequestParam("long") String longitude,
+    		@RequestParam("lat") String latitude,
             @PathVariable("sortby") String sortby,
             @PathVariable("recommend") int recommend) throws Exception {
         // Set up url
