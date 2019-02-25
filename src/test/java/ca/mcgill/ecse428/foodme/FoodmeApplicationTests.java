@@ -47,6 +47,7 @@ public class FoodmeApplicationTests
 	private static final String USERNAME = "test";
 	private static final String FIRSTNAME = "John";
 	private static final String LASTNAME="Doe";
+	private static final String mockMvc = null;
 	private static String EMAIL="johnDoe@hotmail.ca";
 	private String PASSWORD = "HelloWorld123";
 	
@@ -372,9 +373,17 @@ public class FoodmeApplicationTests
     @Test 
     public void testSearchbyCuisineandLocation() throws Exception 
     {
-    	String response = null; //TODO replace by http response
-    	controller.searchByCuisineAndLocation("NYC", Cuisine.afghan );
-    	//assertEquals();
+
+		String response1 = this.mockMvc.perform(get(urlTemplate: "/search/cuisine?location=montreal&cuisine=afghan")); 
+    		.andExpect(status.isOk())
+    		.andReturn().getResponse().getContentAsString();
+    		
+    		String response2 = this.mockMvc.perform(get(urlTemplate: "/search/cuisine?location=montreal&cuisine=afghan")); 
+    		.andExpect(status.isOk())
+    		.andReturn().getResponse().getContentAsString();
+    		
+    	
+    	assertEquals(response1, response2s);
     }
     
    
