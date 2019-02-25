@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
 
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.mcgill.ecse428.foodme.controller.Controller;
@@ -357,7 +357,21 @@ public class FoodmeApplicationTests
     		assertNotEquals(p1, p2);	
     	}
     }
-    
+
+    @Test
+    public void retournerSoldeEnDirect() throws Exception {
+        given().
+        header(HttpHeaders.AUTHORIZATION, oAuth2AccessToken).
+        param("retailerId", retailer).
+        param("date", date).
+        accept(RestConstants.LQ_JSON_CONTENT_V1_0_0).
+        contentType(RestConstants.LQ_JSON_CONTENT_V1_0_0).
+        log().all().
+        when().
+        get("/v1/sales/retailer/").
+        then().
+        statusCode(HttpStatus.OK.value()).log().all();
+    }
     
     
     @Test
