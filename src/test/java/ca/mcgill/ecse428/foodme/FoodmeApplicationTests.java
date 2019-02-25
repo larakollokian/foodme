@@ -4,14 +4,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.List;
 
 
+import jdk.nashorn.internal.parser.JSONParser;
+import net.minidev.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,6 +28,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import ca.mcgill.ecse428.foodme.controller.Controller;
@@ -34,6 +40,8 @@ import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
 
+import javax.xml.ws.Response;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FoodmeApplicationTests 
@@ -44,17 +52,19 @@ public class FoodmeApplicationTests
 	private static final String testEmail = "student@mcgill.ca";
 	private static final String testPassword = "password";
 
-    private static final String USERNAME = "test";
-    private static final String FIRSTNAME = "John";
-    private static final String LASTNAME="Doe";
-    private static String EMAIL="johnDoe@hotmail.ca";
-    private String PASSWORD = "HelloWorld123";
+	private static final String USERNAME = "test";
+	private static final String FIRSTNAME = "John";
+	private static final String LASTNAME="Doe";
+	private static String EMAIL="johnDoe@hotmail.ca";
+	private String PASSWORD = "HelloWorld123";
+
+    @Autowired
+    private AuthenticationService authentication;
+
+    FoodmeRepository repository = Mockito.mock(FoodmeRepository.class, Mockito.RETURNS_DEEP_STUBS);
 
 	@InjectMocks
 	Controller controller;
-
-	@Mock
-	FoodmeRepository repository = Mockito.mock(FoodmeRepository.class);
 
 	/**
 	 * Initializing the controller before starting all the tests
@@ -175,6 +185,177 @@ public class FoodmeApplicationTests
     	}catch (Exception e) {
             e.printStackTrace();
         }
+        catch (AuthenticationException e) {
+            fail("User login failed: "  + e.getMessage());
+            return;
+        } catch (InvalidSessionException e) {
+            fail("User session invalid: "  + e.getMessage());
+            return;
+        }
+	    catch (Exception e){
+            fail(e.getMessage());
+            return;
+        }
+
+    }
+    @Test
+    public void testLoginWithUnExistingUsername() throws InvalidInputException{
+        String error ="";
+        AppUser user;
+        try {
+            user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
+
+        assertEquals(1, repository.getNumberUsers());
+
+        String password = "none";
+        String username ="none";
+
+        try{
+            authentication.login(username,password);
+        }
+        //Expected
+        catch(InvalidSessionException e){
+           error += e.getMessage();
+        }
+        catch(Exception e){
+            fail(e.getMessage());
+            return;
+        }
+
+        assertEquals("User does not exist",error);
+    }
+    @Test
+    public void testLoginWithWrongPassword() throws InvalidInputException{
+	    String error ="";
+        AppUser user;
+        try {
+            user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
+
+        assertEquals(1, repository.getNumberUsers());
+
+
+        String password = "Hello";
+
+        try{
+            authentication.login(user.getUsername(),password);
+        }
+        //Expected
+        catch(AuthenticationException e){
+            error += e.getMessage();
+        }
+        catch(Exception e){
+            fail(e.getMessage());
+            return;
+        }
+
+        assertEquals("Invalid login password!!!",error);
+    }
+
+    @Test
+    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
+
+
+        ResponseEntity<String> allRestaurant= repository.getAllRestaurants("montreal");
+        //JSONParser parser = new JSONParser();
+        //JSONObject json = (JSONObject) parser.parse();
+        assertTrue(!Objects.isNull(allRestaurant));
+    }
+
+    @Test
+    public void testRestaurantInfo() { //getRestaurant(String id)
+//
+        Object restaurant=repository.getRestaurant("WavvLdfdP6g8aZTtbBQHTw");
+//        assertTrue(restaurant.name.compareToIgnoreCase("Gary Danko"));
+        assertTrue(!Objects.isNull(restaurant));
+    }
+
+    @Test
+    public void testRemoveLike() {
+
+	    //       AppUser user;
+//	    user = repository.createAccount("Test", "Test", "Test", "Test@Test.com", "69");
+//  TODO
+//    	Create restaurant
+//      add a like for the restaurant for user
+        // remove like
+        //assert if removed
+    }
+
+    @Test
+    public void testRemoveDislike() {
+        //       AppUser user;
+//	    user = repository.createAccount("Test", "Test", "Test", "Test@Test.com", "69");
+//
+//    	TODO
+//    	Create restaurant
+//      add a dislike for the restaurant for user
+        // remove dislike
+        //assert if removed;
+    }
+
+    @Test
+    public void testLogout()throws InvalidInputException {
+        AppUser user;
+        try {
+            user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
+
+        assertEquals(1, repository.getNumberUsers());
+
+        try {
+            // First login to get the session
+            authentication.login(user.getUsername(), "HelloWorld123");
+
+            // Then logout to invalidate the session
+            authentication.logout(user.getUsername());
+
+            // Usage of the invalidated session should fail
+            try {
+                authentication.getUserBySession(user.getUsername());
+                fail("Invalidated session, no exception thrown");
+            } catch (InvalidSessionException e) {
+                // Expected
+            }
+        } catch (AuthenticationException e) {
+            fail(e.getMessage());
+            return;
+        }
+        catch (InvalidSessionException e) {
+            fail(e.getMessage());
+            return;
+        }
+        catch (Exception e){
+            fail(e.getMessage());
+            return;
+        }
+    }
+
+    @Test
+    public void testChangePassword() throws InvalidInputException {
+    	AppUser user = new AppUser();
+
+    	try {
+    		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+    	} catch (InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
+
+    	String pass = "Hello";
+    	user.setPassword(pass);
+    	assertEquals(pass, user.getPassword());
+
+
     }
 
     @Test
@@ -255,7 +436,7 @@ public class FoodmeApplicationTests
 	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
 		assertTrue(liked.isEmpty());
 		repository.addLiked(USERNAME, id);
-
+		
 		repository.listAllLiked(USERNAME);
 		assertEquals(1, liked.size());
 	}
