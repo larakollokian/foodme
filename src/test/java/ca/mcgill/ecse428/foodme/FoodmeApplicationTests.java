@@ -26,10 +26,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 import ca.mcgill.ecse428.foodme.controller.Controller;
 import ca.mcgill.ecse428.foodme.model.*;
@@ -60,6 +69,8 @@ public class FoodmeApplicationTests
 
     @Autowired
     private AuthenticationService authentication;
+    private MockMvc mockMvc;
+	
 
     FoodmeRepository repository = Mockito.mock(FoodmeRepository.class, Mockito.RETURNS_DEEP_STUBS);
 
@@ -74,6 +85,7 @@ public class FoodmeApplicationTests
 	{
 		controller = new Controller();
 		MockitoAnnotations.initMocks(this);
+		this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 	}
 
 	@Test
@@ -330,45 +342,57 @@ public class FoodmeApplicationTests
 //        }
 //    }
 
-//    @Test
-//    public void testGenerateRandomPassword() {
-//    	int lenOfPassword = 16;
-//
-//    	for(int i=0; i<100; i++) {
-//    		String p1 = Password.generateRandomPassword(lenOfPassword);
-//    		String p2 = Password.generateRandomPassword(lenOfPassword);
-//
-//    		// length should be equal
-//    		assertEquals(lenOfPassword, p1.length());
-//    		assertEquals(lenOfPassword, p2.length());
-//
-//    		// generated passwords should not equal, unless in extreme case
-//    		assertNotEquals(p1, p2);
-//    	}
-//    }
 
 
 
-//    @Test
-//    public void testSearchSortByDistance() {
-//    	String response = null; // TODO: need to be replaced with the http response
-//    	boolean failed = false;
-//		Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
-//		Matcher m = p.matcher(response);
-//
-//		double a = (double) 0.0;
-//		// loop through all the distances, break if there is a failure
-//		while (!failed && m.find()){
-//			double b = Double.parseDouble(m.group(1));
-//			if (a > b) {
-//				failed = true;
-//			}
-//			a = b;
-//		}
-//		assertEquals(failed, false);
-//
-//    }
-
+    @Test
+    public void testGenerateRandomPassword() {
+    	int lenOfPassword = 16;
+    	
+    	for(int i=0; i<100; i++) {
+    		String p1 = Password.generateRandomPassword(lenOfPassword);
+    		String p2 = Password.generateRandomPassword(lenOfPassword);
+    		
+    		// length should be equal
+    		assertEquals(lenOfPassword, p1.length());
+    		assertEquals(lenOfPassword, p2.length());
+    		
+    		// generated passwords should not equal, unless in extreme case
+    		assertNotEquals(p1, p2);	
+    	}
+    }
+    
+    
+    
+    @Test
+    public void testSearchSortByDistance() throws Exception {
+    	
+    	MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
+    							 .andDo(print())
+    							 .andExpect(status().isOk())
+    							 .andReturn();
+    	String response = mvcResult.getResponse().getContentAsString();
+    	System.out.println("\n\nResponse:");
+    	System.out.println(response);
+    	//String response = ""; // TODO: need to be replaced with the http response
+    	boolean failed = false;
+		Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
+		Matcher m = p.matcher(response);
+		
+		double a = (double) 0.0;
+		// loop through all the distances, break if there is a failure  
+		while (!failed && m.find()){
+			double b = Double.parseDouble(m.group(1));
+			if (a > b) {
+				failed = true;
+			}
+			a = b;
+		}
+		assertEquals(failed, false);
+		
+    }
+    
+    
 
     public Restaurant helperCreateRestaurant(String restaurantID, int id) {
     	Restaurant restaurant = new Restaurant();

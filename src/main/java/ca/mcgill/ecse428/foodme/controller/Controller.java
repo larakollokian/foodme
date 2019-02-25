@@ -190,7 +190,7 @@ public class Controller {
     public ResponseEntity<String> searchSortByDistance(
             @PathVariable("location") String location,
             @PathVariable("sortby") String sortby,
-            @PathVariable("recommand") int recommend) throws Exception {
+            @PathVariable("recommend") int recommend) throws Exception {
         // Set up url
         String url = null;
         String extraParam = "";
@@ -202,6 +202,55 @@ public class Controller {
                 extraParam = extraParam + "&offset=" + offset + "&limit=1";
             }
             url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
+
+        } else {
+            throw new Exception("You are missing a location to make a query!");
+        }
+
+        // Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // Response
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        return response;
+    }
+    
+    /**
+     * Method that searches restaurant and sort them by best_match, rating, review_count or distance
+     * If recommend param is set to 1, it will return random restaurant from the result
+     *
+     * @param long
+     * @param lat
+     * @param sortby:    best_match, rating, review_count or distance
+     * @param recommend: 1-> True, 0-> False
+     * @return ResponseEntity
+     * @throws Exception
+     */
+    @GetMapping("/search/{long}/{lat}/{sortby}/{recommend}/")
+    public ResponseEntity<String> searchByLongLat(
+            @PathVariable("long") String longitude,
+            @PathVariable("lat") String latitude,
+            @PathVariable("sortby") String sortby,
+            @PathVariable("recommend") int recommend) throws Exception {
+        // Set up url
+        String url = null;
+        String extraParam = "";
+        if (longitude != null && latitude != null) {
+            if (recommend == 1) {
+                Random rand = new Random();
+                int randomOffset = rand.nextInt(50);
+                String offset = Integer.toString(randomOffset);
+                extraParam = extraParam + "&offset=" + offset + "&limit=1";
+            }
+            url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude 
+            							+ "&latitude=" + latitude 
+            							+ "&sort_by=" + sortby + extraParam;
 
         } else {
             throw new Exception("You are missing a location to make a query!");
@@ -353,7 +402,7 @@ public class Controller {
 
 	//}
 	@GetMapping("/password/random/{n}")
-	public String getRandomPassword(@PathVariable("n")int length)
+	public String getRandomPassword(@PathVariable("n") int length)
 	{
 		String randPassword = Password.generateRandomPassword(length);
 		return randPassword;
