@@ -426,12 +426,12 @@ public class Controller {
 		return allPs;
 	}
 
-//	@GetMapping("/preferences/user/{username}")
-//	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
-//	{
-//		List<Preference> prefForUser = repository.getPreferencesForUser(username);
-//		return prefForUser;
-//	}
+	@GetMapping("/preferences/user/{username}")
+	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
+	{
+		List<Preference> prefForUser = repository.getPreferencesForUser(username);
+		return prefForUser;
+	}
 
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
@@ -482,6 +482,30 @@ public class Controller {
 		return deletedPreference;
 	}
 	
+	/**
+	 * Method that gets a default preference
+	 * @param username
+	 * @return Preference
+	 */
+	@GetMapping("/preferences/user/{username}/getDefault")
+	public Preference getDefaultPreferences(@PathVariable("username") String username)
+	{
+		return repository.getDefaultPreference(username);
+	}
+
+	/**
+	 * Method that sets a default preference
+	 * @param pID
+	 * @param username
+	 * @return Preference
+	 */
+	@PostMapping("/preferences/user/{username}/setDefault/{pid}")
+	public Preference setDefaultPreferences(@PathVariable("username") String username, @PathVariable("pid") int pID)
+	{
+		return repository.setDefaultPreference(pID,username);
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                        LIKED CONTROLLER                           /////////////////
