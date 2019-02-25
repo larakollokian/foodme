@@ -56,6 +56,7 @@ public class FoodmeApplicationTests
 	@Mock
 	FoodmeRepository repository = Mockito.mock(FoodmeRepository.class);
 
+
 	/**
 	 * Initializing the controller before starting all the tests
 	 */
@@ -80,8 +81,7 @@ public class FoodmeApplicationTests
 	}
 	
 	@Test
-	public void testTestCreateUser() 
-	{
+	public void testTestCreateUser() {
 		AppUser u = new AppUser();
 		u.setUsername(testUsername);
 		u.setFirstName(testFirstName);
@@ -157,7 +157,6 @@ public class FoodmeApplicationTests
     @Test
     public void testChangePassword() throws InvalidInputException {
     	AppUser user;
-        boolean passwordChanged = false;
     	try {
     		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
     	} catch (InvalidInputException e){
