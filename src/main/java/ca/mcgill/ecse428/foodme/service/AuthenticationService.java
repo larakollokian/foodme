@@ -13,7 +13,7 @@ import java.util.*;
 
 @Service
 public class AuthenticationService {
-	
+
 	@Autowired
 	private FoodmeRepository repository;
 
@@ -24,12 +24,12 @@ public class AuthenticationService {
 	 * Constructor
 	 */
 	public AuthenticationService() {}
-	
+
 	/**
-	 * gets an AppUser by session 
+	 * gets an AppUser by session
 	 * @param sessionGuid
-	 * @return AppUser 
-	 * @throws Exception 
+	 * @return AppUser
+	 * @throws Exception
 	 */
 	public AppUser getUserBySession(String sessionGuid) throws InvalidSessionException {
 		String name = userBySession.get(sessionGuid);
@@ -43,7 +43,7 @@ public class AuthenticationService {
 	 * gets an AppUser in the repository using the username
 	 * @param username
 	 * @return AppUser
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private AppUser findUserByUsername(String username) throws InvalidSessionException  {
 
@@ -59,8 +59,7 @@ public class AuthenticationService {
 	 * @param username
 	 * @param password
 	 * @return sessionGuid
-	 * @throws AuthenticationException 
-
+	 * @throws AuthenticationException
 	 */
 	public String login(String username, String password) throws Exception{
 		AppUser user = null;
@@ -77,7 +76,7 @@ public class AuthenticationService {
 		catch(Exception e){
 			e.printStackTrace();
 		}
-			
+
 		if (sessionByUser.containsKey(user.getUsername())) {
 			// Invalidate old session
 			logout(user.getUsername());
@@ -86,8 +85,8 @@ public class AuthenticationService {
 		userBySession.put(sessionGuid, user.getUsername());
 		sessionByUser.put(user.getUsername(), sessionGuid);
 		return sessionGuid;
-		
-		
+
+
 	}
 	/**
 	 * allows to logout having the username

@@ -8,8 +8,14 @@ import javax.persistence.Query;
 import ca.mcgill.ecse428.foodme.model.*;
 
 import ca.mcgill.ecse428.foodme.security.Password;
+import ca.mcgill.ecse428.foodme.service.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.*;
 
 import java.text.ParseException;
@@ -22,6 +28,8 @@ public class FoodmeRepository {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
 
 	@Transactional
 	public AppUser testCreateUser(String username, String firstName, String lastName, String email, String password)
@@ -137,7 +145,7 @@ public class FoodmeRepository {
 	
 	/**
 	 * Method to like a restaurant so its in the user list of liked restaurant
-	 * @param restaurant The restaurant a user likes
+	 * @param restaurantName The restaurant a user likes
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
@@ -190,9 +198,19 @@ public class FoodmeRepository {
 
 
 	@Transactional
-	public AppUser changePassword(String username, String newPassword) {
+	public AppUser changePassword(String username,String oldPassword, String newPassword) throws Exception {
 		AppUser u = entityManager.find(AppUser.class, username);
-		u.setPassword(newPassword);
+		try{
+			try {
+				Password.check(oldPassword,u.getPassword());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e){
+			throw new AuthenticationException("Invalid Password");
+		}
+		u.setPassword(Password.getSaltedHash(newPassword));
 		entityManager.merge(u);
 		return u;
 	}
@@ -227,20 +245,20 @@ public class FoodmeRepository {
 		return preferences;
 	}
 
-	/**
-	 * getting the paramaters for a specific user
-	 * @param username
-	 * @return list of parameters
-	 */
-	@Transactional
-	public List<Preference> getPreferencesForUser(String username) 
-	{
-		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
-		q.setParameter("user", username);
-		@SuppressWarnings("unchecked")
-		List<Preference> preferences = q.getResultList();
-		return preferences;
-	}
+//	/**
+//	 * getting the paramaters for a specific user
+//	 * @param username
+//	 * @return list of parameters
+//	 */
+//	@Transactional
+//	public List<Preference> getPreferencesForUser(String username)
+//	{
+//		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
+//		q.setParameter("user", username);
+//		@SuppressWarnings("unchecked")
+//		List<Preference> preferences = q.getResultList();
+//		return preferences;
+//	}
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time 
@@ -264,5 +282,60 @@ public class FoodmeRepository {
 		
 	// 	return true;
 	// }
+
+	/**
+	 * This is the method to get all the restaurants from a location (ie montreal)
+	 * @param location
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public ResponseEntity<String> getAllRestaurants(String location) throws InvalidInputException{
+
+		String url = null;
+		if (location != null) {
+			url = "https://api.yelp.com/v3/businesses/search?location=" + location;
+		} else {
+			return null;
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+
+	}
+
+	/**
+	 * This is the method to get a restaurant's info based on its ID
+	 * @param id
+	 * @return
+	 */
+	public ResponseEntity<String> getRestaurant(String id){
+		String url = null;
+		if (id != null) {
+			url = "https://api.yelp.com/v3/businesses/" + id;
+		} else {
+			return null;
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+	}
 
 }
