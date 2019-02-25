@@ -460,6 +460,28 @@ public class Controller {
 		return editPreference;
 	}
 	
+	/**
+	 * Method that deletes a preference
+	 * @param pID
+	 * @param username
+	 * @return Preference
+	 */
+	@PostMapping("/users/{user}/preferences/delete/{pID}")
+	public Preference deletePreference(
+			@PathVariable("user") String username, @PathVariable("pID") int pID){
+
+		Preference deletedPreference = repository.getPreference(pID);
+		if(deletedPreference.getUser().getUsername().equals(username))
+		{
+			deletedPreference = repository.deletePreference(pID);
+		}
+		else
+		{
+			System.out.println("The preference ID provided is not associated to this user");
+		}
+		return deletedPreference;
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                        LIKED CONTROLLER                           /////////////////
