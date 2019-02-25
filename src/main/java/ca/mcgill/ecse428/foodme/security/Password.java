@@ -57,7 +57,7 @@ public class Password {
 	 * @param storedHash
      * @throws Exception when the password is not equal to the storedHash
 	 */
-    public static void check(String password, String storedHash) throws Exception {
+    public static boolean check(String password, String storedHash) throws Exception {
         System.out.println(password);
         System.out.println(storedHash);
         String[] saltAndPass = storedHash.split("\\$");
@@ -70,7 +70,7 @@ public class Password {
         if(!hashOfInput.equals(saltAndPass[1])){
             throw new AuthenticationException("Invalid Password");
         }
-
+        return true;
     }
     /**
      * Generate a random password 

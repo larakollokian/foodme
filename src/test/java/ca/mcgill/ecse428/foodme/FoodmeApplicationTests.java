@@ -154,22 +154,28 @@ public class FoodmeApplicationTests
         Mockito.verify(repository).editPreference(newPreference, priceRange, distanceRange, cuisine, rating);
     }
 
-//    @Test
-//    public void testChangePassword() throws InvalidInputException {
-//    	AppUser user = new AppUser();
-//
-//    	try {
-//    		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-//    	} catch (InvalidInputException e){
-//            throw new InvalidInputException("Invalid input format.");
-//        }
-//
-//    	String pass = "Hello";
-//    	user.setPassword(pass);
-//    	assertEquals(pass, user.getPassword());
-//
-//
-//    }
+    @Test
+    public void testChangePassword() throws InvalidInputException {
+    	AppUser user;
+        boolean passwordChanged = false;
+    	try {
+    		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+    	} catch (InvalidInputException e){
+            throw new InvalidInputException("Invalid input format.");
+        }
+    	String newPass = "Hello";
+    	try {
+            repository.changePassword(user.getUsername(), PASSWORD, newPass);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    	try{
+    	    assertTrue(Password.check(newPass,user.getPassword()));
+
+    	}catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void testGenerateRandomPassword() {

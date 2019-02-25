@@ -8,6 +8,7 @@ import javax.persistence.Query;
 import ca.mcgill.ecse428.foodme.model.*;
 
 import ca.mcgill.ecse428.foodme.security.Password;
+import ca.mcgill.ecse428.foodme.service.AuthenticationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -137,7 +138,7 @@ public class FoodmeRepository {
 	
 	/**
 	 * Method to like a restaurant so its in the user list of liked restaurant
-	 * @param restaurant The restaurant a user likes
+	 * @param restaurantName The restaurant a user likes
 	 * @return void The method returns nothing, this change will be saved in the database
 	 */
 	@Transactional
@@ -190,9 +191,19 @@ public class FoodmeRepository {
 
 
 	@Transactional
-	public AppUser changePassword(String username, String newPassword) {
+	public AppUser changePassword(String username,String oldPassword, String newPassword) throws Exception {
 		AppUser u = entityManager.find(AppUser.class, username);
-		u.setPassword(newPassword);
+		try{
+			try {
+				Password.check(oldPassword,u.getPassword());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e){
+			throw new AuthenticationException("Invalid Password");
+		}
+		u.setPassword(Password.getSaltedHash(newPassword));
 		entityManager.merge(u);
 		return u;
 	}
@@ -227,20 +238,20 @@ public class FoodmeRepository {
 		return preferences;
 	}
 
-	/**
-	 * getting the paramaters for a specific user
-	 * @param username
-	 * @return list of parameters
-	 */
-	@Transactional
-	public List<Preference> getPreferencesForUser(String username) 
-	{
-		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
-		q.setParameter("user", username);
-		@SuppressWarnings("unchecked")
-		List<Preference> preferences = q.getResultList();
-		return preferences;
-	}
+//	/**
+//	 * getting the paramaters for a specific user
+//	 * @param username
+//	 * @return list of parameters
+//	 */
+//	@Transactional
+//	public List<Preference> getPreferencesForUser(String username)
+//	{
+//		Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user= :user");
+//		q.setParameter("user", username);
+//		@SuppressWarnings("unchecked")
+//		List<Preference> preferences = q.getResultList();
+//		return preferences;
+//	}
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time 
