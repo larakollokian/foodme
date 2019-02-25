@@ -29,7 +29,8 @@ public class Controller
 	@Autowired
 	FoodmeRepository repository;
 	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
-
+	String googleApiKey = "AIzaSyAbDiuDSRG-3oyFUzlS0SOy1g5b0n49dus";
+	
 	@Autowired 
 	AuthenticationService authentication;
 
@@ -211,6 +212,36 @@ public class Controller
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		
+		return response;
+	}
+	
+	
+	/**
+	 * Method that searches restaurants using google API
+	 * @param location
+	 * @return ResponseEntity
+	 * @throws Exception
+	 */
+	@GetMapping("/search/google/{location}/")
+	public ResponseEntity<String> searchGoogle (
+			@PathVariable("location") String location) throws Exception
+	{
+		// Set up url
+		String url = null;
+		if (location != null) {
+			String query = "restaurants+in+" + location;
+			url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&key=" + googleApiKey;
+
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		HttpEntity<Void> entity = null;
 
 		// Response
 		RestTemplate restTemplate = new RestTemplate();
