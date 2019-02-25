@@ -148,32 +148,51 @@ public class FoodmeRepository {
 		return preference;
 	}
 	
-//	/**
-//	 * Method to like a restaurant so its in the user list of liked restaurant
-//	 * @param restaurant The restaurant a user likes
-//	 * @return void The method returns nothing, this change will be saved in the database
-//	 */
-//	@Transactional
-//	public void isLiked(String username, String restaurant) {
-//		AppUser appUser = entityManager.find(AppUser.class, username);
-//		appUser.addLike(restaurant);
-//	}
-//	
-//	/**
-//	 * Method to list all the liked restaurants of a user
-//	 * @return The list of all the liked restaurants
-//	 */
-//	public List<String> listAllLiked(String username) {
-//		AppUser appUser = entityManager.find(AppUser.class, username);
-//		
-//		//TODO change the query to what is in the db
-////		Query q = entityManager.createNativeQuery("SELECT liked FROM restaurants");
-////		@SuppressWarnings("unchecked")
-////		List<String> liked = q.getResultList();
-//		
-//		//return liked;
-//		return appUser.getLikes();
-//	}
+	/**
+	 * Method to like a restaurant so its in the user list of liked restaurant
+	 * @param restaurant The restaurant a user likes
+	 * @return void The method returns nothing, this change will be saved in the database
+	 */
+	@Transactional
+	public void addLiked(String username, String restaurantName) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+		Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+		restaurant.setLiked(true);
+		restaurant.setRestaurantName(restaurantName);
+		restaurant.setAppUser(appUser);
+		entityManager.merge(restaurant);
+		//entityManager.merge(appUser);
+	}
+
+	/**
+	 * Method to list all the liked restaurants of a user
+	 * @return The list of all the liked restaurants
+	 */
+	public List<Restaurant> listAllLiked(String username) {
+		AppUser appUser = entityManager.find(AppUser.class, username);
+
+		//TODO change the query to what is in the db
+		Query q = entityManager.createNativeQuery("SELECT FROM restaurant WHERE app_user= :user and liked=true");
+		q.setParameter("user", username);
+		@SuppressWarnings("unchecked")
+		List<Restaurant>likedAndDisliked = q.getResultList();
+		//filter through that list for only liked and not disliked either from db or here.
+		if(likedAndDisliked.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Restaurant> liked = new ArrayList<Restaurant>();
+		for(Restaurant r: likedAndDisliked) {
+			if(r.isLiked()) {
+				liked.add(r);
+			}
+		}
+		if(liked.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return liked;
+	}
 	
 
 	/**
