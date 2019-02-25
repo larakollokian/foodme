@@ -373,5 +373,23 @@ public class FoodmeApplicationTests
 //		repository.listAllLiked(USERNAME);
 //		assertEquals(1, liked.size());
 	}
+    
+    @Test
+	public void testListAllRestaurants () throws InvalidInputException {
+    	AppUser user;
+		String id = "E8RJkjfdcwgtyoPMjQ_Olg";
+
+		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+	    List<Preference>preferences = repository.getAllPreferences();
+	    assertEquals(0, 0);
+		
+//TODO
+//		repository.listAllLiked(USERNAME);
+//		assertEquals(1, liked.size());
+	}
+    
+    
+    
+   
 }
 
