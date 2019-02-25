@@ -147,6 +147,7 @@ public class FoodmeRepository {
 		restaurant.setLiked(true);
 		restaurant.setRestaurantName(restaurantName);
 		restaurant.setAppUser(appUser);
+		appUser.addLikesAnsDislike(restaurant);
 		entityManager.merge(restaurant);
 		entityManager.persist(restaurant);
 		//entityManager.merge(appUser);
