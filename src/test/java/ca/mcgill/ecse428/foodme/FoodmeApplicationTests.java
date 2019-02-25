@@ -344,20 +344,11 @@ public class FoodmeApplicationTests
     	
     }
 
+    @Test
+    public void testDeleteUser() throws Exception {
+        
+    }
 
-     @Test
-     //@Ignore
-     public void testControllerListAllLiked() throws Exception {
-         String username = "Marine";
- 
-         RestAssuredMockMvc.given().
-         param("user", username).
-         log().all().
-         when().
-         get("/users/{user}/allliked/").
-         then().
-         statusCode(HttpStatus.OK.value());
-     }
 
     @Test
     public void testGenerateRandomPassword() {
@@ -376,21 +367,21 @@ public class FoodmeApplicationTests
     	}
     }
 
-    @ignore
-    //@Test
-    public void testDeleteUser() throws Exception {
-        given().
-        header(HttpHeaders.AUTHORIZATION).
-        param("username", username).
-        //param("date", date).
-        accept(RestConstants.LQ_JSON_CONTENT_V1_0_0).
-        contentType(RestConstants.LQ_JSON_CONTENT_V1_0_0).
-        log().all().
-        when().
-        get("/v1/sales/retailer/").
-        then().
-        statusCode(HttpStatus.OK.value()).log().all();
-    }
+    // @Ignore
+    // //@Test
+    // public void testDeleteUser() throws Exception {
+    //     given().
+    //     header(HttpHeaders.AUTHORIZATION).
+    //     param("username", username).
+    //     //param("date", date).
+    //     accept(RestConstants.LQ_JSON_CONTENT_V1_0_0).
+    //     contentType(RestConstants.LQ_JSON_CONTENT_V1_0_0).
+    //     log().all().
+    //     when().
+    //     get("/v1/sales/retailer/").
+    //     then().
+    //     statusCode(HttpStatus.OK.value()).log().all();
+    // }
     
     
     @Test
