@@ -383,10 +383,24 @@ public class FoodmeApplicationTests
     		.andReturn().getResponse().getContentAsString();
     		
     	
-    	assertEquals(response1, response2s);
+    	assertEquals(response1, response2);
     }
     
-   
+    @Test 
+    public void testSearchbyCuisineandLocationNoOK() throws Exception 
+    {
+
+		String response1 = this.mockMvc.perform(get(urlTemplate: "/search/cuisine?location=montreal&cuisine=afghan")); 
+    		.andExpect(status.isOk())
+    		.andReturn().getResponse().getContentAsString();
+    		
+    		String response2 = this.mockMvc.perform(get(urlTemplate: "/search/cuisine?location=montreal&cuisine=afghan")); 
+    		.andExpect(status.isOk())
+    		.andReturn().getResponse().getContentAsString();
+    		
+    	
+    	assertEquals(response1, response2);
+    }
     
     //TODO currently merged in one with testListAll()
 //    /**
