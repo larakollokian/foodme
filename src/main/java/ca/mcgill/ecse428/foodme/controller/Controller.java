@@ -84,8 +84,13 @@ public class Controller {
 	 * @return TRUE if the account is authenticated
 	 */
 	@GetMapping("/users/auth/{username}/{password}")
-	public String login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
-		return authentication.login(username, password);
+	public Response login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
+        //No exception thrown means the authentication succeeded
+        Response r = new Response();
+        authentication.login(username, password);
+	    r.setResponse(true);
+	    r.setError(null);
+	    return r;
 	}
 
     /**

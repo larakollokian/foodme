@@ -67,15 +67,13 @@ public class FoodmeApplicationTests
 	private static String EMAIL="johnDoe@hotmail.ca";
 	private String PASSWORD = "HelloWorld123";
 
-    @Autowired
-    private AuthenticationService authentication;
     private MockMvc mockMvc;
-	
 
     FoodmeRepository repository = Mockito.mock(FoodmeRepository.class, Mockito.RETURNS_DEEP_STUBS);
 
 	@InjectMocks
 	Controller controller;
+
 
 	/**
 	 * Initializing the controller before starting all the tests
@@ -179,7 +177,6 @@ public class FoodmeApplicationTests
     @Test
     public void testChangePassword() throws InvalidInputException {
     	AppUser user;
-        boolean passwordChanged = false;
     	try {
     		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
     	} catch (InvalidInputException e){
@@ -199,66 +196,6 @@ public class FoodmeApplicationTests
         }
 
     }
-//    @Test
-//    public void testLoginWithUnExistingUsername() throws InvalidInputException{
-//        String error ="";
-//        AppUser user;
-//        try {
-//            user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-//        }
-//        catch(InvalidInputException e){
-//            throw new InvalidInputException("Invalid input format.");
-//        }
-//
-//        assertEquals(1, repository.getNumberUsers());
-//
-//        String password = "none";
-//        String username ="none";
-//
-//        try{
-//            authentication.login(username,password);
-//        }
-//        //Expected
-//        catch(InvalidSessionException e){
-//           error += e.getMessage();
-//        }
-//        catch(Exception e){
-//            fail(e.getMessage());
-//            return;
-//        }
-//
-//        assertEquals("User does not exist",error);
-//    }
-//    @Test
-//    public void testLoginWithWrongPassword() throws InvalidInputException{
-//	    String error ="";
-//        AppUser user;
-//        try {
-//            user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-//        }
-//        catch(InvalidInputException e){
-//            throw new InvalidInputException("Invalid input format.");
-//        }
-//
-//        assertEquals(1, repository.getNumberUsers());
-//
-//
-//        String password = "Hello";
-//
-//        try{
-//            authentication.login(user.getUsername(),password);
-//        }
-//        //Expected
-//        catch(AuthenticationException e){
-//            error += e.getMessage();
-//        }
-//        catch(Exception e){
-//            fail(e.getMessage());
-//            return;
-//        }
-//
-//        assertEquals("Invalid login password!!!",error);
-//    }
 
     @Test
     public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
@@ -301,47 +238,6 @@ public class FoodmeApplicationTests
         // remove dislike
         //assert if removed;
     }
-
-//    @Test
-//    public void testLogout()throws InvalidInputException {
-//        AppUser user;
-//        try {
-//            user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-//        }
-//        catch(InvalidInputException e){
-//            throw new InvalidInputException("Invalid input format.");
-//        }
-//
-//        assertEquals(1, repository.getNumberUsers());
-//
-//        try {
-//            // First login to get the session
-//            authentication.login(user.getUsername(), "HelloWorld123");
-//
-//            // Then logout to invalidate the session
-//            authentication.logout(user.getUsername());
-//
-//            // Usage of the invalidated session should fail
-//            try {
-//                authentication.getUserBySession(user.getUsername());
-//                fail("Invalidated session, no exception thrown");
-//            } catch (InvalidSessionException e) {
-//                // Expected
-//            }
-//        } catch (AuthenticationException e) {
-//            fail(e.getMessage());
-//            return;
-//        }
-//        catch (InvalidSessionException e) {
-//            fail(e.getMessage());
-//            return;
-//        }
-//        catch (Exception e){
-//            fail(e.getMessage());
-//            return;
-//        }
-//    }
-
 
 
 
