@@ -316,16 +316,12 @@ public class Controller
 	 * 
 	 * @param username
 	 */
-	// @PostMapping("/users/delete/{username}")
-	// public void deleteUser(@PathVariable("username")String username)
-	// {
+	@PostMapping("/users/delete/{username}")
+	public void deleteUser(@PathVariable("username")String username)
+	{
 
-	// 	try {
-	// 		repository.deleteUser(username);
-	// 	} catch (ParseException e) {
-	// 		e.printStackTrace();
-	// 	}
-//}
+		repository.deleteUser(username);
+	}
 
 
 		
