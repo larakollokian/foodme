@@ -369,6 +369,20 @@ public class FoodmeApplicationTests
     	return restaurant;
     }
     
+    @Test
+    public void SearchRestaurantByCuisine() 
+    { try {
+		controller.searchByCuisine("350 5th Ave, New York, NY 10118", Cuisine.afghan);
+	} 
+    catch (Exception e) {
+		e.printStackTrace();
+	} 
+    
+    
+    
+    	
+    }
+    
     //TODO currently merged in one with testListAll()
 //    /**
 //     * Test UT for adding a restaurant to the liked list
