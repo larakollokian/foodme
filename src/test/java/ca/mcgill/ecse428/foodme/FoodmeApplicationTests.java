@@ -419,6 +419,18 @@ public class FoodmeApplicationTests
 //	    assertEquals(1, user.getLikesAnsDislikes().size());
 //	}
 
+/**
+ * UT for disliking a restaurant
+ * @throws InvalidInputException
+ */
+@Test
+public void testAddDislikedRestaurant() throws InvalidInputException {
+	AppUser user;
+	user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+	repository.addDisliked(USERNAME, "Restaurant");
+	assertEquals(user.getLikesAnsDislikes().size(), 1);
+}
+
     /**
      * Test UT for listing all the restaurants liked
      * @throws InvalidInputException
