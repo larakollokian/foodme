@@ -1,5 +1,6 @@
 package ca.mcgill.ecse428.foodme.controller;
 
+import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
@@ -87,7 +88,19 @@ public class Controller {
 	public Response login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
         //No exception thrown means the authentication succeeded
         Response r = new Response();
-        authentication.login(username, password);
+        try {
+			authentication.login(username, password);
+		}
+        catch(AuthenticationException e){
+        	r.setResponse(false);
+        	r.setError("Invalid Password");
+        	return r;
+		}
+        catch(InvalidSessionException e){
+        	r.setResponse(false);
+        	r.setError("User does not exist");
+        	return r;
+		}
 	    r.setResponse(true);
 	    r.setError(null);
 	    return r;
@@ -463,12 +476,12 @@ public class Controller {
 		return allPs;
 	}
 
-//	@GetMapping("/preferences/user/{username}")
-//	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
-//	{
-//		List<Preference> prefForUser = repository.getPreferencesForUser(username);
-//		return prefForUser;
-//	}
+	@GetMapping("/preferences/user/{username}")
+	public List<Preference> getPreferencesForUser(@PathVariable("username") String username)
+	{
+		List<Preference> prefForUser = repository.getPreferencesForUser(username);
+		return prefForUser;
+	}
 
 	@PostMapping("/users/{user}/preferences/")
 	public Preference addPreference(
@@ -519,6 +532,30 @@ public class Controller {
 		return deletedPreference;
 	}
 	
+	/**
+	 * Method that gets a default preference
+	 * @param username
+	 * @return Preference
+	 */
+	@GetMapping("/preferences/user/{username}/getDefault")
+	public Preference getDefaultPreferences(@PathVariable("username") String username)
+	{
+		return repository.getDefaultPreference(username);
+	}
+
+	/**
+	 * Method that sets a default preference
+	 * @param pID
+	 * @param username
+	 * @return Preference
+	 */
+	@PostMapping("/preferences/user/{username}/setDefault/{pid}")
+	public Preference setDefaultPreferences(@PathVariable("username") String username, @PathVariable("pid") int pID)
+	{
+		return repository.setDefaultPreference(pID,username);
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////                                                                   /////////////////
 	/////////////////                        LIKED CONTROLLER                           /////////////////
