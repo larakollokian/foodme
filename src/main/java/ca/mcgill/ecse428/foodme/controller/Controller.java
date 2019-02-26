@@ -182,6 +182,43 @@ public class Controller {
     }
 
     /**
+     * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
+     *
+     * @param longitude
+     * @param latitude
+     * @param price
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/search/price/longitude/latitude/")
+    public ResponseEntity<String> searchByPriceRange(
+            @RequestParam("longitude") String longitude,
+            @RequestParam("latitude") String latitude,
+            @RequestParam("price") String price) throws Exception {
+
+        // Set up url
+        String url = null;
+        if (longitude != null && latitude != null) {
+            url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
+        } else {
+            throw new Exception("You are missing a location to make a query!");
+        }
+
+        // Add headers (e.g. Authentication for Yelp Fusion API access)
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + APIKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // Response
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        return response;
+    }
+
+    /**
      * Method that searches restaurant and sort them by best_match, rating, review_count or distance
      * If recommend param is set to 1, it will return random restaurant from the result
      *
