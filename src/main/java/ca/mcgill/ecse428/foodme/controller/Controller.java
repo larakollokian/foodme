@@ -463,6 +463,43 @@ public class Controller {
 	}
 
 	/**
+	 * Method that searches restaurants based on type of cuisine, must select from the list of cuisines available in the yelp API
+	 * Due to the API's limits we can only return restaurants that currently have a review
+	 * @param cuisine
+	 * @param longitude
+	 * @param latitude
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/search/cuisine/longitude/latitude/")
+	public ResponseEntity<String> searchByCuisine (
+			@RequestParam("longitude") String longitude,
+			@RequestParam("latitude") String latitude,
+			@RequestParam("cuisine") Cuisine cuisine) throws Exception{
+
+		// Set up url
+		String url = null;
+		if (longitude != null && latitude != null) {
+			url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&cuisine=" + cuisine;
+		} else {
+			throw new Exception("You are missing a location to make a query!");
+		}
+
+		// Add headers (e.g. Authentication for Yelp Fusion API access)
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + APIKey);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+
+		HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+		// Response
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+		return response;
+	}
+
+	/**
 	 * Method that searches restaurants using google API
 	 *
 	 * @param location
