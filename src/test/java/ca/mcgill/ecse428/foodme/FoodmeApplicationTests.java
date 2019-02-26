@@ -404,6 +404,61 @@ public class FoodmeApplicationTests
 		assertEquals(response1, response2);
 	}
 
+	@Test
+	public void testSearchByCuisineHTTPOk() throws Exception {
+
+		String response1 = this.mockMvc.perform(get("/search/cuisine/?location=montreal&cuisine=afghan"))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		String response2 = this.mockMvc.perform(get("/search/cuisine/?location=montreal&cuisine=afghan"))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		assertEquals(response1, response2);
+	}
+
+	@Test
+	public void testSearchByCuisineLongLatHTTPOk() throws Exception {
+
+		String response1 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		String response2 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
+				.andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+
+		assertEquals(response1, response2);
+	}
+
+	@Test
+	public void testSearchByCuisineHTTPNotOk() throws Exception {
+
+		String response1 = this.mockMvc.perform(get("/search/cuisine/?price=afghan"))
+				.andExpect(status().is4xxClientError())
+				.andReturn().getResponse().getContentAsString();
+
+		String response2 = this.mockMvc.perform(get("/search/cuisine/?price=afghan"))
+				.andExpect(status().is4xxClientError())
+				.andReturn().getResponse().getContentAsString();
+
+		assertEquals(response1, response2);
+	}
+
+	@Test
+	public void testSearchByCuisineLongLatHTTPNotOk() throws Exception {
+
+		String response1 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?latitude=45.474999&cuisine=afghan"))
+				.andExpect(status().is4xxClientError())
+				.andReturn().getResponse().getContentAsString();
+
+		String response2 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?latitude=45.474999&cuisine=afghan"))
+				.andExpect(status().is4xxClientError())
+				.andReturn().getResponse().getContentAsString();
+
+		assertEquals(response1, response2);
+	}
 
 	public Restaurant helperCreateRestaurant(String restaurantID, int id) {
     	Restaurant restaurant = new Restaurant();
