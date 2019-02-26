@@ -345,7 +345,7 @@ public class FoodmeApplicationTests
 		String response2 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
 				.andExpect(status().isOk())
 				.andReturn().getResponse().getContentAsString();
-		assertEquals(response1, response2);
+		assertNotEquals(response1, response2);
 	}
 
 	@Test
@@ -365,11 +365,11 @@ public class FoodmeApplicationTests
 	@Test
 	public void testSearchByPriceLongLatHTTPOk() throws Exception {
 
-		String response1 = this.mockMvc.perform(get("/search/price/?longitude=-73.623419&latitude=45.474999&price=1"))
+		String response1 = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
 				.andExpect(status().isOk())
 				.andReturn().getResponse().getContentAsString();
 
-		String response2 = this.mockMvc.perform(get("/search/price/?longitude=-73.623419&latitude=45.474999&price=1"))
+		String response2 = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
 				.andExpect(status().isOk())
 				.andReturn().getResponse().getContentAsString();
 
