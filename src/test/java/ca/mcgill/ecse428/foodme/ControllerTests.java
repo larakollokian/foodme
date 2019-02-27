@@ -45,12 +45,11 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/auth/none/none"), HttpMethod.GET, entity, String.class);
-        //String expected = "{\"username\":raylabs,\"password\":raylabs}";
         String expected ="{\"response\":false,\"error\": \"User does not exist\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
-    
+
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
