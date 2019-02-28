@@ -582,7 +582,7 @@ public class Controller {
 	 * @return ResponseEntity
 	 * @throws Exception
 	 */
-	@PostMapping("/search/{sortby}/{recommend}/")
+	@GetMapping("/search/{sortby}/{recommend}/")
 	public ResponseEntity<String> searchByLongLat(
 			@RequestParam("long") String longitude,
 			@RequestParam("lat") String latitude,
