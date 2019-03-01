@@ -48,25 +48,17 @@ public class TestAuthenticationService {
             Mockito.when(foodRepo.getNumberUsers()).thenReturn(1);
             Mockito.when(foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
             Mockito.when(foodRepo.getAppUser(USERNAME)).thenReturn(user);
-            Mockito.when(foodRepo.getAppUser("none")).thenReturn(null);
+            Mockito.doThrow(new InvalidSessionException("User does not exist")).when(foodRepo).getAppUser("none");
         }
         catch(Exception e){
             e.printStackTrace();
         }
     }
 
-
-
     @Test
     public void testLoginWithValidPassword() throws InvalidInputException{
 
-        AppUser user;
-        try {
-            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-        }
-        catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid input format.");
-        }
+        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 
         assertEquals(1, foodRepo.getNumberUsers());
 
@@ -106,21 +98,13 @@ public class TestAuthenticationService {
     @Test
     public void testLoginWithUnExistingUsername() throws InvalidInputException{
         String error ="";
-        AppUser user;
-        try {
-            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-        }
-        catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid input format.");
-        }
+
+        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 
         assertEquals(1, foodRepo.getNumberUsers());
 
-        String password = "none";
-        String username ="none";
-
         try{
-            authentication.login(username,password);
+            authentication.login("none","none");
         }
         //Expected
         catch(InvalidSessionException e){
@@ -136,13 +120,7 @@ public class TestAuthenticationService {
     @Test
     public void testLoginWithWrongPassword() throws InvalidInputException{
         String error ="";
-        AppUser user;
-        try {
-            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-        }
-        catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid input format.");
-        }
+        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 
         assertEquals(1, foodRepo.getNumberUsers());
 
@@ -165,13 +143,8 @@ public class TestAuthenticationService {
 
     @Test
     public void testLogout()throws InvalidInputException {
-        AppUser user;
-        try {
-            user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-        }
-        catch(InvalidInputException e){
-            throw new InvalidInputException("Invalid input format.");
-        }
+
+        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 
         assertEquals(1, foodRepo.getNumberUsers());
 

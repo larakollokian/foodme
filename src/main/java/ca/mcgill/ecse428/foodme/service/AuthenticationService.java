@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 
+
 @Service
 public class AuthenticationService {
 
@@ -46,14 +47,15 @@ public class AuthenticationService {
 	 * @throws Exception
 	 */
 	private AppUser findUserByUsername(String username) throws InvalidSessionException  {
+        AppUser user = null;
+        try {
+            user = repository.getAppUser(username);
+        } catch (InvalidSessionException e) {
+            throw new InvalidSessionException("User does not exist");
+        }
+        return user;
 
-		AppUser user = repository.getAppUser(username);
-		if (user == null){
-			//User no longer/do not exist
-			throw new InvalidSessionException("User does not exist");
-		}
-		return user;
-	}
+    }
 	/**
 	 * allows to login: validate username and password
 	 * @param username
@@ -63,31 +65,32 @@ public class AuthenticationService {
 	 */
 	public String login(String username, String password) throws Exception{
 		AppUser user = null;
-		try{
-			user = findUserByUsername(username);
-			Password.check(password, user.getPassword());
+
+		try {
+            user = findUserByUsername(username);
+            Password.check(password, user.getPassword());
 		}
-		catch(InvalidSessionException e){
-			throw new InvalidSessionException("User does not exist");
-		}
+        catch(InvalidSessionException e){
+            throw new InvalidSessionException("User does not exist");
+        }
 		catch(AuthenticationException e){
-			throw new AuthenticationException("Invalid login password!!!",e);
+			throw new AuthenticationException("Invalid login password!!!");
 		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
 
 		if (sessionByUser.containsKey(user.getUsername())) {
-			// Invalidate old session
-			logout(user.getUsername());
+		    // Invalidate old session
+            logout(user.getUsername());
 		}
-		String sessionGuid = UUID.randomUUID().toString();
-		userBySession.put(sessionGuid, user.getUsername());
-		sessionByUser.put(user.getUsername(), sessionGuid);
-		return sessionGuid;
 
+        String sessionGuid = UUID.randomUUID().toString();
+        userBySession.put(sessionGuid, user.getUsername());
+        sessionByUser.put(user.getUsername(), sessionGuid);
+        return sessionGuid;
 
-	}
+    }
 	/**
 	 * allows to logout having the username
 	 * @param username
