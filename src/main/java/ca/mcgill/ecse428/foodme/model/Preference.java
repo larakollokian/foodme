@@ -6,42 +6,45 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
 @Entity
-@Table(name="preference")
-public class Preference
-{
-	//------------------------
-	// MEMBER VARIABLES
-	//------------------------
+@Table(name="Preferences")
+public class Preference {
 
-	//Preference Attributes
-	private DistanceRange distance;
-	private Cuisine cuisine;
-	private PriceRange price;
-	private Rating rating;
-
+	//Primary key
+	@Id @GeneratedValue(strategy=GenerationType.SEQUENCE)
 	private int pID;
-	private boolean isDefault;
 
-	//Preference Associations
+	//Attributes
+	private String location;
+	private String cuisine;
+	private String price;	//$,$$,$$$,$$$$,$$$$$
+	private String sortBy;	//best_match, rating, review_count, distance
+
+	//Associations
+	@ManyToOne
 	private AppUser appUser;
 
-	public boolean setDistance(DistanceRange aDistance)
-	{
+	public boolean setPID(int aPID) {
 		boolean wasSet = false;
-		this.distance = aDistance;
+		this.pID = aPID;
 		wasSet = true;
 		return wasSet;
 	}
 
-	public boolean setCuisine(Cuisine aCuisine)
-	{
+	public boolean setLocation(String aLocation) {
+		boolean wasSet = false;
+		this.location = aLocation;
+		wasSet = true;
+		return wasSet;
+	}
+
+	public boolean setCuisine(String aCuisine) {
 		boolean wasSet = false;
 		this.cuisine = aCuisine;
 		wasSet = true;
 		return wasSet;
 	}
 
-	public boolean setPrice(PriceRange aPrice)
+	public boolean setPrice(String aPrice)
 	{
 		boolean wasSet = false;
 		this.price = aPrice;
@@ -49,107 +52,54 @@ public class Preference
 		return wasSet;
 	}
 
-	public boolean setRating(Rating aRating)
-	{
+	public boolean setSortBy(String sortBy) {
 		boolean wasSet = false;
-		this.rating = aRating;
+		this.sortBy = sortBy;
 		wasSet = true;
 		return wasSet;
 	}
 
-	public boolean setPID(int aPID)
-	{
-		boolean wasSet = false;
-		this.pID = aPID;
-		wasSet = true;
-		return wasSet;
-	}
-	
-	public boolean getIsDefault() {
-		return isDefault;
-	}
 
-	public void setIsDefault(boolean isDefault) {
-		this.isDefault = isDefault;
-	}
-
-	public DistanceRange getDistance()
-	{
-		if(this.distance == null)
-		{
-			this.distance = DistanceRange.None;
-		}
-		return this.distance;
-	}
-
-	public Cuisine getCuisine()
-	{
-		if(this.cuisine == null)
-		{
-			this.cuisine = Cuisine.None;
-		}
-		return this.cuisine;
-	}
-
-	public PriceRange getPrice()
-	{
-		if(this.price == null)
-		{
-			this.price = PriceRange.None;
-		}
-		return this.price;
-	}
-
-	public Rating getRating()
-	{
-		if(this.rating == null)
-		{
-			this.rating = Rating.None;
-		}
-		return this.rating;
-	}
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-
-	public int getPID()
-	{
+	public int getPID() {
 		return this.pID;
 	}
 
+	public String getLocation() {
+		return this.location;
+	}
 
-	@ManyToOne
-	//@JoinColumn(name = "app_user")
-	@JsonIgnore
-	public AppUser getUser()
-	{
+	public String getCuisine() {
+		return this.cuisine;
+	}
+
+	public String getPrice() {
+		return this.price;
+	}
+
+	public String getSortBy() {
+		return this.sortBy;
+	}
+
+	public AppUser getUser() {
 		return this.appUser;
 	}
 
-	public void setUser(AppUser aUser)
-	{
+	public void setUser(AppUser aUser) {
 		this.appUser = aUser;
 	}
 
-	public void delete()
-	{
-		AppUser placeholderUser = appUser;
+	public void deleteUser() {
 		this.appUser = null;
-		if(placeholderUser != null)
-		{
-			placeholderUser.removePreference(this);
-		}
 	}
-
 
 	public String toString()
 	{
 		return super.toString() + "["+
 				"pID" + ":" + getPID()+ "]" + System.getProperties().getProperty("line.separator") +
-				"  " + "distance" + "=" + (getDistance() != null ? !getDistance().equals(this)  ? getDistance().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+				"  " + "location" + "=" + (getLocation() != null ? !getLocation().equals(this)  ? getLocation().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
 				"  " + "cuisine" + "=" + (getCuisine() != null ? !getCuisine().equals(this)  ? getCuisine().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
 				"  " + "price" + "=" + (getPrice() != null ? !getPrice().equals(this)  ? getPrice().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-				"  " + "rating" + "=" + (getRating() != null ? !getRating().equals(this)  ? getRating().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
+				"  " + "sortBy" + "=" + (getSortBy() != null ? !getSortBy().equals(this)  ? getSortBy().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
 				"  " + "user = "+(getUser()!=null?Integer.toHexString(System.identityHashCode(getUser())):"null");
 	}
 }

@@ -45,21 +45,11 @@ import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
 import ca.mcgill.ecse428.foodme.repository.InvalidInputException;
 import ca.mcgill.ecse428.foodme.security.Password;
-import ca.mcgill.ecse428.foodme.service.AuthenticationException;
-import ca.mcgill.ecse428.foodme.service.AuthenticationService;
-import ca.mcgill.ecse428.foodme.service.InvalidSessionException;
 
-import javax.xml.ws.Response;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class FoodmeApplicationTests
-{
-	private static final String testUsername = "Tester123";
-	private static final String testFirstName = "Test";
-	private static final String testLastName = "User";
-	private static final String testEmail = "student@mcgill.ca";
-	private static final String testPassword = "password";
+public class FoodmeApplicationTests {
 
 	private static final String USERNAME = "test";
 	private static final String FIRSTNAME = "John";
@@ -73,7 +63,6 @@ public class FoodmeApplicationTests
 
 	@InjectMocks
 	Controller controller;
-
 
 	/**
 	 * Initializing the controller before starting all the tests
@@ -100,135 +89,155 @@ public class FoodmeApplicationTests
 	}
 
 	@Test
-	public void testTestCreateUser()
+	public void testCreateAccount()
 	{
 		AppUser u = new AppUser();
-		u.setUsername(testUsername);
-		u.setFirstName(testFirstName);
-		u.setLastName(testLastName);
-		u.setEmail(testEmail);
-		u.setPassword(testPassword);
-		u.setPreferences(new ArrayList<Preference>());
-		u.setLikesAnsDislikes(new ArrayList<Restaurant>());
+		u.setUsername(USERNAME);
+		u.setFirstName(FIRSTNAME);
+		u.setLastName(LASTNAME);
+		u.setEmail(EMAIL);
+        String passwordHash="";
+        try {
+            passwordHash = Password.getSaltedHash(PASSWORD);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        u.setPassword(passwordHash);
+        u.setDefaultPreferenceID(Integer.MIN_VALUE);
 
-		when(repository.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword)).thenReturn(u);
-		assertEquals(controller.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword),u);
-		Mockito.verify(repository).testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword);
+		when(repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD)).thenReturn(u);
+		when(controller.getAppUser(USERNAME)).thenReturn(null);
+        try {
+            assertEquals(controller.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD),u);
+        } catch (InvalidInputException e) {
+            e.printStackTrace();
+        }
+        Mockito.verify(repository).createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
 	}
 
     @Test
-    public void testDeleteUser()
-    {
-    	AppUser appUser;
-        if(repository.getAppUser(testUsername) == null)
-        {
-        	appUser = repository.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword);
+    public void testDeleteUser() {
+        AppUser appUser = repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
+
+        when(repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD)).thenReturn(appUser);
+        try {
+            repository.deleteUser(USERNAME);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        else
-        {
-        	appUser = repository.getAppUser("Tester123");
+        try {
+            Mockito.verify(repository).deleteUser(USERNAME);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        when(repository.testCreateUser(testUsername,testFirstName,testLastName,testEmail,testPassword)).thenReturn(appUser);
-        repository.deleteUser(testUsername);
-		Mockito.verify(repository).deleteUser(testUsername);
     }
 
     @Test
-    public void testAddPreference() throws InvalidInputException{
-        AppUser appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        String distanceRange = "fivehundred";
+    public void testAddPreference() {
+        AppUser appUser = repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
+        String location = "Montreal";
         String cuisine = "Italian";
         String priceRange = "$$$";
-        String rating = "four";
+        String sortBy = "sortBy";
 
         Preference newPreference = new Preference();
-        when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
-        assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
-        Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+        when(repository.createPreference(appUser, priceRange, location, cuisine, sortBy)).thenReturn(newPreference);
+        assertEquals(repository.createPreference(appUser, priceRange, location, cuisine, sortBy), newPreference);
+        Mockito.verify(repository).createPreference(appUser, priceRange, location, cuisine, sortBy);
     }
 
     @Test
     public void testEditPreference() {
-        String username = "Tester123";
-        AppUser appUser = repository.testCreateUser(username, "Test", "User", "student@mcgill.ca", "password");
-        String distanceRange = "fivehundred";
+        AppUser appUser = repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
+        String location = "Montreal";
         String cuisine = "Italian";
         String priceRange = "$$$";
-        String rating = "four";
+        String sortBy = "sortBy";
 
         Preference newPreference = new Preference();
-        when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
-        assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
-        Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+        when(repository.createPreference(appUser, priceRange, location, cuisine, sortBy)).thenReturn(newPreference);
+        assertEquals(repository.createPreference(appUser, priceRange, location, cuisine, sortBy), newPreference);
+        Mockito.verify(repository).createPreference(appUser, priceRange, location, cuisine, sortBy);
 
         int pID = newPreference.getPID();
-        Preference editPreference = repository.getPreference(pID);
+        Preference editPreference = null;
+        try {
+            editPreference = repository.getPreference(pID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        distanceRange = "fivehundred";
+        location = "Montreal";
         cuisine = "Mexican";
         priceRange = "$";
-        rating = "four";
+        sortBy = "rating";
 
-        when(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating)).thenReturn(editPreference);
-        assertEquals(repository.editPreference(newPreference, priceRange, distanceRange, cuisine, rating), editPreference);
-        Mockito.verify(repository).editPreference(newPreference, priceRange, distanceRange, cuisine, rating);
+        when(repository.editPreference(newPreference, priceRange, location, cuisine, sortBy)).thenReturn(editPreference);
+        assertEquals(repository.editPreference(newPreference, priceRange, location, cuisine, sortBy), editPreference);
+        Mockito.verify(repository).editPreference(newPreference, priceRange, location, cuisine, sortBy);
     }
 
-    
+
     @Test
     public void testDeletePreference() {
-        AppUser appUser;
-        String username = "Tester123";
-        Preference aPreference = null;
-        if(repository.getAppUser(username) == null) // Create new user if doesn't exist
-            appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-        else
-            appUser = repository.getAppUser("Tester123");
 
-        
-        Preference newPreference = repository.createPreference(appUser, "$$$", "fivehundred", "Italian", "four");       
-        when(repository.createPreference(appUser, "$$$", "fivehundred", "Italian", "four")).thenReturn(newPreference);
+        AppUser appUser = repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
+
+        Preference newPreference = repository.createPreference(appUser, "$$$", "Montreal", "Italian", "rating");
+        when(repository.createPreference(appUser, "$$$", "Montreal", "Italian", "rating")).thenReturn(newPreference);
         int pID = newPreference.getPID(); // Get PID of this new preference
         repository.deletePreference(pID);
         Mockito.verify(repository).deletePreference(pID);
 
     }
-    
+
     @Test
     public void testDefaultPreference() {
-        String username = "Tester123";
-        AppUser appUser = repository.testCreateUser(username, "Test", "User", "student@mcgill.ca", "password");
-        String distanceRange = "fivehundred";
+        AppUser appUser = repository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
+        String location = "Montreal";
         String cuisine = "Italian";
         String priceRange = "$$$";
-        String rating = "four";
+        String sortBy = "rating";
 
-        Preference newPreference = repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating);
-   //     when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
-   //     assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
-   //     Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+        Preference newPreference = repository.createPreference(appUser, priceRange, location, cuisine, sortBy);
+   //     when(repository.createPreference(appUser, priceRange, location, cuisine, sortBy)).thenReturn(newPreference);
+   //     assertEquals(repository.createPreference(appUser, priceRange, location, cuisine, sortBy), newPreference);
+   //     Mockito.verify(repository).createPreference(appUser, priceRange, location, cuisine, sortBy);
 
-        
         int pID = newPreference.getPID();
-        repository.setDefaultPreference(pID,username);
-        assertEquals(pID, repository.getDefaultPreference(username).getPID());
-        Preference dfPreference = repository.getPreference(pID);
-     //   Preference dfPreference = new Preference();
-        when(repository.getDefaultPreference(username)).thenReturn(dfPreference);
-    //    assertEquals(true, dfPreference.getIsDefault());
-        
-        Mockito.verify(repository).getDefaultPreference(username);
+        try {
+            repository.setDefaultPreference(pID,USERNAME);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            assertEquals(pID, repository.getDefaultPreference(USERNAME).getPID());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Preference dfPreference = null;
+        try {
+            dfPreference = repository.getPreference(pID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            when(repository.getDefaultPreference(USERNAME)).thenReturn(dfPreference);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Mockito.verify(repository).getDefaultPreference(USERNAME);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
     @Test
     public void testChangePassword() throws InvalidInputException {
-    	AppUser user;
-    	try {
-    		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-    	} catch (InvalidInputException e){
-            throw new InvalidInputException("Invalid input format.");
-        }
+    	AppUser user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+
     	String newPass = "Hello";
     	try {
             repository.changePassword(user.getUsername(), PASSWORD, newPass);
@@ -291,25 +300,25 @@ public class FoodmeApplicationTests
     @Test
     public void testGenerateRandomPassword() {
     	int lenOfPassword = 16;
-    	
+
     	for(int i=0; i<100; i++) {
     		String p1 = Password.generateRandomPassword(lenOfPassword);
     		String p2 = Password.generateRandomPassword(lenOfPassword);
-    		
+
     		// length should be equal
     		assertEquals(lenOfPassword, p1.length());
     		assertEquals(lenOfPassword, p2.length());
-    		
+
     		// generated passwords should not equal, unless in extreme case
-    		assertNotEquals(p1, p2);	
+    		assertNotEquals(p1, p2);
     	}
     }
-    
-    
-    
+
+
+
     @Test
     public void testSearchSortByDistance() throws Exception {
-    	
+
     	MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
     							 .andDo(print())
     							 .andExpect(status().isOk())
@@ -321,9 +330,9 @@ public class FoodmeApplicationTests
     	boolean failed = false;
 		Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
 		Matcher m = p.matcher(response);
-		
+
 		double a = (double) 0.0;
-		// loop through all the distances, break if there is a failure  
+		// loop through all the distances, break if there is a failure
 		while (!failed && m.find()){
 			double b = Double.parseDouble(m.group(1));
 			if (a > b) {
@@ -332,9 +341,9 @@ public class FoodmeApplicationTests
 			a = b;
 		}
 		assertEquals(failed, false);
-		
+
     }
-    
+
     @Test
     public void testRandomRestaurantRecommendation() throws Exception {
 
@@ -460,10 +469,10 @@ public class FoodmeApplicationTests
 		assertEquals(response1, response2);
 	}
 
-	public Restaurant helperCreateRestaurant(String restaurantID, int id) {
+	public Restaurant helperCreateRestaurant(String restaurantID, String restaurantName) {
     	Restaurant restaurant = new Restaurant();
-    	restaurant.setRestaurantName(restaurantID);
-    	restaurant.setRestaurantID(id);
+    	restaurant.setRestaurantName(restaurantName);
+    	restaurant.setRestaurantID(restaurantID);
     	return restaurant;
     }
 
@@ -472,15 +481,15 @@ public class FoodmeApplicationTests
 //	@Test
 //	public void testAddPreference() throws InvalidInputException{
 //		AppUser appUser = repository.testCreateUser("Tester123", "Test", "User", "student@mcgill.ca", "password");
-//		String distanceRange = "fivehundred";
+//		String location = "Montreal";
 //		String cuisine = "Italian";
 //		String priceRange = "$$$";
-//		String rating = "four";
+//		String sortBy = "rating";
 //
 //		Preference newPreference = new Preference();
-//		when(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating)).thenReturn(newPreference);
-//		assertEquals(repository.createPreference(appUser, priceRange, distanceRange, cuisine, rating), newPreference);
-//		Mockito.verify(repository).createPreference(appUser, priceRange, distanceRange, cuisine, rating);
+//		when(repository.createPreference(appUser, priceRange, location, cuisine, sortBy)).thenReturn(newPreference);
+//		assertEquals(repository.createPreference(appUser, priceRange, location, cuisine, sortBy), newPreference);
+//		Mockito.verify(repository).createPreference(appUser, priceRange, location, cuisine, sortBy);
 //	}
 
 	/**
@@ -489,19 +498,29 @@ public class FoodmeApplicationTests
      */
     @Test
 	public void testAddLiked () throws InvalidInputException {
-		AppUser user;
-		String restaurant_name = "E8RJkjfdcwgtyoPMjQ_Olg";
-		try {
-			user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-		} catch (InvalidInputException e){
-			throw new InvalidInputException("Invalid input format.");
-		}
+		AppUser user =	repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        String restaurant_id = "E8RJkjfdcwgtyoPMjQ_Olg";
+		String restaurant_name = "Tim Hortons";
 
 		Restaurant restaurant = new Restaurant();
+		restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
 
-		when(repository.addLiked(user.getUsername(),restaurant_name)).thenReturn(restaurant);
-    	assertEquals(repository.addLiked(user.getUsername(),restaurant_name),restaurant);
-    	Mockito.verify(repository).addLiked(user.getUsername(),restaurant_name);
+		try {
+			when(repository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			assertEquals(repository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			Mockito.verify(repository).addLiked(user.getUsername(),restaurant_id,restaurant_name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
     /**
@@ -511,13 +530,16 @@ public class FoodmeApplicationTests
 	@Ignore
     //@Test
 	public void testListAll () throws InvalidInputException {
-		AppUser user;
-		String id = "E8RJkjfdcwgtyoPMjQ_Olg";
-		user = repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-	    List<Restaurant> liked = repository.listAllLiked(USERNAME);
+        AppUser user =	repository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+		String restaurant_id = "E8RJkjfdcwgtyoPMjQ_Olg";
+        String restaurant_name = "Tim Hortons";
+        List<String> liked = repository.listAllLiked(USERNAME);
 		assertTrue(liked.isEmpty());
-		repository.addLiked(USERNAME, id);
-
+		try {
+			repository.addLiked(USERNAME, restaurant_id, restaurant_name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		repository.listAllLiked(USERNAME);
 		assertEquals(1, liked.size());
 	}
