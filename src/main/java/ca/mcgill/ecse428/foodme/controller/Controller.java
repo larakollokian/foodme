@@ -379,6 +379,21 @@ public class Controller {
 		return liked;
 	}
 
+	/**
+	 * Controller Method that takes a user and the ID of the restaurants they disliked to add it in their liked restaurants
+	 * @param username of the user on the application
+	 * @param restaurantID
+	 * @param restaurantName
+	 */
+	@PostMapping("/users/{user}/disliked/{id}")
+	public void addDisliked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @RequestParam String restaurantName) {
+		try {
+			repository.addDisliked(username, restaurantID,restaurantName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
     /**
      * Controller method to get all restaurants from a location
      * @param location

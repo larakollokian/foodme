@@ -264,27 +264,30 @@ public class FoodmeRepository {
 	 */
 	@Transactional
 	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws Exception {
-        AppUser appUser = null;
-        try {
-            appUser = getAppUser(username);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Restaurant restaurant = entityManager.find(Restaurant.class, restaurantID);
+		AppUser appUser = new AppUser();
+		Restaurant restaurant = new Restaurant();
+		try {
+			appUser = entityManager.find(AppUser.class,username);
+			restaurant = entityManager.find(Restaurant.class, restaurantID);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(appUser == null){
+			throw new Exception("User does not exist");
+		}
 		if(restaurant == null){
-			createRestaurant(restaurantID,restaurantName);
+			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 		//Check if restaurant is liked by user
 		if(appUser.getDislikedRestaurants().contains(restaurant)){
-			throw new Exception ("Restaurant is disliked");
+			throw new Exception ("Restaurant is liked");
 		}
-		else {
-			appUser.addlikedRestaurants(restaurant);
-			restaurant.addLikedAppUsers(appUser);
-			entityManager.merge(appUser);
-			entityManager.merge(restaurant);
-			return restaurant;
-		}
+
+		appUser.addlikedRestaurants(restaurant);
+		restaurant.addLikedAppUsers(appUser);
+		entityManager.merge(appUser);
+		entityManager.merge(restaurant);
+		return restaurant;
 	}
 
 	/**
@@ -306,27 +309,31 @@ public class FoodmeRepository {
      */
     @Transactional
     public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws Exception {
-        AppUser appUser = null;
-        try {
-            appUser = getAppUser(username);
-        } catch (Exception e) {
+        AppUser appUser = new AppUser();
+		Restaurant restaurant = new Restaurant();
+		try {
+            appUser = entityManager.find(AppUser.class,username);
+			restaurant = entityManager.find(Restaurant.class, restaurantID);
+		} catch (Exception e) {
             e.printStackTrace();
         }
-        Restaurant restaurant = entityManager.find(Restaurant.class, restaurantID);
-        if(restaurant == null){
-			createRestaurant(restaurantID,restaurantName);
+		if(appUser == null){
+			throw new Exception("User does not exist");
 		}
+        if(restaurant == null){
+			restaurant=createRestaurant(restaurantID,restaurantName);
+		}
+
         //Check if restaurant is liked by user
         if(appUser.getlikedRestaurants().contains(restaurant)){
         	throw new Exception ("Restaurant is liked");
 		}
-        else {
-			appUser.addDislikedRestaurants(restaurant);
-			restaurant.addDislikedAppUsers(appUser);
-			entityManager.merge(appUser);
-			entityManager.merge(restaurant);
-			return restaurant;
-		}
+
+        appUser.addDislikedRestaurants(restaurant);
+        restaurant.addDislikedAppUsers(appUser);
+        entityManager.merge(appUser);
+        entityManager.merge(restaurant);
+        return restaurant;
     }
 
     /**

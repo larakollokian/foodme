@@ -25,8 +25,7 @@ public class ControllerTests {
     public void testLoginSuccess() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/users/auth/raylabs/raylabs"), HttpMethod.GET, entity, String.class);
-        //String expected = "{\"username\":raylabs,\"password\":raylabs}";
+                createURLWithPort("/users/auth/johndoe/helloworld"), HttpMethod.GET, entity, String.class);
         String expected ="{\"response\":true,\"error\":null}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
@@ -35,7 +34,7 @@ public class ControllerTests {
     public void testLoginWithInvalidPassword() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/users/auth/raylabs/none"), HttpMethod.GET, entity, String.class);
+                createURLWithPort("/users/auth/johndoe/none"), HttpMethod.GET, entity, String.class);
         String expected ="{\"response\":false,\"error\":\"Invalid Password\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
