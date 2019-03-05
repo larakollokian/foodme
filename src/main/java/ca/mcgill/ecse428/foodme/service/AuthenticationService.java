@@ -1,7 +1,9 @@
 package ca.mcgill.ecse428.foodme.service;
 
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.security.*;
 import java.util.HashMap;
 
@@ -16,7 +18,7 @@ import java.util.*;
 public class AuthenticationService {
 
 	@Autowired
-	private FoodmeRepository repository;
+	private AppUserRepository repository;
 
 	private static final HashMap<String, String> userBySession = new HashMap<>();
 	private static final HashMap<String, String> sessionByUser = new HashMap<>();
@@ -32,10 +34,10 @@ public class AuthenticationService {
 	 * @return AppUser
 	 * @throws Exception
 	 */
-	public AppUser getUserBySession(String sessionGuid) throws InvalidSessionException {
+	public AppUser getUserBySession(String sessionGuid) throws NullObjectException {
 		String name = userBySession.get(sessionGuid);
 		if (name == null) {
-			throw new InvalidSessionException("Session has expired or is invalid.");
+			throw new NullObjectException("Session has expired or is invalid.");
 		}
 		AppUser user = findUserByUsername(name);
 		return user;
@@ -46,12 +48,12 @@ public class AuthenticationService {
 	 * @return AppUser
 	 * @throws Exception
 	 */
-	private AppUser findUserByUsername(String username) throws InvalidSessionException  {
+	private AppUser findUserByUsername(String username) throws NullObjectException  {
         AppUser user = null;
         try {
             user = repository.getAppUser(username);
-        } catch (InvalidSessionException e) {
-            throw new InvalidSessionException("User does not exist");
+        } catch (NullObjectException e) {
+            throw new NullObjectException("User does not exist");
         }
         return user;
 
@@ -70,14 +72,14 @@ public class AuthenticationService {
             user = findUserByUsername(username);
             Password.check(password, user.getPassword());
 		}
-        catch(InvalidSessionException e){
-            throw new InvalidSessionException("User does not exist");
+        catch(NullObjectException e){
+            throw new NullObjectException(e.getMessage());
         }
 		catch(AuthenticationException e){
 			throw new AuthenticationException("Invalid login password!!!");
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			throw new Exception(e.getMessage());
 		}
 
 		if (sessionByUser.containsKey(user.getUsername())) {
