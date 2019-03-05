@@ -1,5 +1,8 @@
 package ca.mcgill.ecse428.foodme;
 
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.repository.*;
 import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.*;
@@ -19,13 +22,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FoodmeApplication.class)
-public class TestAuthenticationService {
+public class AuthenticationServiceTests {
 
     @Autowired
     private AuthenticationService authentication;
 
     @MockBean
-    private FoodmeRepository foodRepo;
+    private AppUserRepository userRepository;
 
 
     private static final String USERNAME = "test";
@@ -45,10 +48,10 @@ public class TestAuthenticationService {
             user.setPassword(Password.getSaltedHash(PASSWORD));
             user.setEmail(EMAIL);
 
-            Mockito.when(foodRepo.getNumberUsers()).thenReturn(1);
-            Mockito.when(foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
-            Mockito.when(foodRepo.getAppUser(USERNAME)).thenReturn(user);
-            Mockito.doThrow(new InvalidSessionException("User does not exist")).when(foodRepo).getAppUser("none");
+            Mockito.when(userRepository.getNumberUsers()).thenReturn(1);
+            Mockito.when(userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
+            Mockito.when(userRepository.getAppUser(USERNAME)).thenReturn(user);
+            Mockito.doThrow(new NullObjectException("User does not exist")).when(userRepository).getAppUser("none");
         }
         catch(Exception e){
             e.printStackTrace();
@@ -56,11 +59,16 @@ public class TestAuthenticationService {
     }
 
     @Test
-    public void testLoginWithValidPassword() throws InvalidInputException{
+    public void testLoginWithValidPassword() {
+        AppUser user = new AppUser();
+        try {
+             user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(Exception e){
+            //Not expected
+        }
 
-        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-
-        assertEquals(1, foodRepo.getNumberUsers());
+        assertEquals(1, userRepository.getNumberUsers());
 
         String password = "HelloWorld123";
         try{
@@ -75,7 +83,7 @@ public class TestAuthenticationService {
             try {
                 authentication.getUserBySession(oldSession);
                 fail("Invalidated session, no exception thrown");
-            } catch (InvalidSessionException e) {
+            } catch (NullObjectException e) {
                 // Expected
             }
 
@@ -85,7 +93,7 @@ public class TestAuthenticationService {
         catch (AuthenticationException e) {
             fail("User login failed: "  + e.getMessage());
             return;
-        } catch (InvalidSessionException e) {
+        } catch (NullObjectException e) {
             fail("User session invalid: "  + e.getMessage());
             return;
         }
@@ -96,18 +104,23 @@ public class TestAuthenticationService {
 
     }
     @Test
-    public void testLoginWithUnExistingUsername() throws InvalidInputException{
+    public void testLoginWithUnExistingUsername() {
         String error ="";
 
-        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-
-        assertEquals(1, foodRepo.getNumberUsers());
+        AppUser user = new AppUser();
+        try {
+            user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(Exception e){
+            //Not expected
+        }
+        assertEquals(1, userRepository.getNumberUsers());
 
         try{
             authentication.login("none","none");
         }
         //Expected
-        catch(InvalidSessionException e){
+        catch(NullObjectException e){
             error += e.getMessage();
         }
         catch(Exception e){
@@ -120,9 +133,14 @@ public class TestAuthenticationService {
     @Test
     public void testLoginWithWrongPassword() throws InvalidInputException{
         String error ="";
-        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-
-        assertEquals(1, foodRepo.getNumberUsers());
+        AppUser user = new AppUser();
+        try {
+            user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(Exception e){
+            //Not expected
+        }
+        assertEquals(1, userRepository.getNumberUsers());
 
         String password = "Hello";
 
@@ -144,9 +162,14 @@ public class TestAuthenticationService {
     @Test
     public void testLogout()throws InvalidInputException {
 
-        AppUser user = foodRepo.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-
-        assertEquals(1, foodRepo.getNumberUsers());
+        AppUser user = new AppUser();
+        try {
+            user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+        }
+        catch(Exception e){
+            //Not expected
+        }
+        assertEquals(1, userRepository.getNumberUsers());
 
         try {
             // First login to get the session
@@ -159,14 +182,14 @@ public class TestAuthenticationService {
             try {
                 authentication.getUserBySession(user.getUsername());
                 fail("Invalidated session, no exception thrown");
-            } catch (InvalidSessionException e) {
+            } catch (NullObjectException e) {
                 // Expected
             }
         } catch (AuthenticationException e) {
             fail(e.getMessage());
             return;
         }
-        catch (InvalidSessionException e) {
+        catch (NullObjectException e) {
             fail(e.getMessage());
             return;
         }

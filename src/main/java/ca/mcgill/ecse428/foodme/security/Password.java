@@ -4,7 +4,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import ca.mcgill.ecse428.foodme.service.AuthenticationException;
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
 
 import java.security.SecureRandom;
 
@@ -68,7 +68,7 @@ public class Password {
         System.out.println(hashOfInput);
         System.out.println(saltAndPass[1]);
         if(!hashOfInput.equals(saltAndPass[1])){
-            throw new AuthenticationException("Invalid Password");
+            throw new AuthenticationException("Invalid password");
         }
         return true;
     }

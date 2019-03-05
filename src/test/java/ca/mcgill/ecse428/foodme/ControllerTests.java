@@ -26,8 +26,9 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/auth/johndoe/helloworld"), HttpMethod.GET, entity, String.class);
-        String expected ="{\"response\":true,\"error\":null}";
-        JSONAssert.assertEquals(expected, response.getBody(), false);
+//        String expected ="{\"response\":true,\"error\":null}";
+        String expected = "{\"response\":true,\"message\":\"Login successful\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -35,7 +36,7 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/auth/johndoe/none"), HttpMethod.GET, entity, String.class);
-        String expected ="{\"response\":false,\"error\":\"Invalid Password\"}";
+        String expected ="{\"response\":false,\"message\":\"Invalid login password!!!\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
@@ -44,7 +45,7 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/auth/none/none"), HttpMethod.GET, entity, String.class);
-        String expected ="{\"response\":false,\"error\": \"User does not exist\"}";
+        String expected ="{\"response\":false,\"message\":\"User does not exist\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
