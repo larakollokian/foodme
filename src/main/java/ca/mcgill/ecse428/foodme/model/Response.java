@@ -4,6 +4,15 @@ public class Response {
 
         private boolean response;
 
+        private String message;
+        public Response() {
+        }
+
+        public Response(boolean response,String message){
+            this.response = response;
+            this.message = message;
+        }
+
         public boolean getResponse() {
             return response;
         }
@@ -12,14 +21,12 @@ public class Response {
             this.response = response;
         }
 
-        private String error;
-
-        public String getError() {
-            return error;
+        public String getMessage() {
+            return message;
         }
 
-        public void setError(String error) {
-            this.error = error;
+        public void setMessage(String message) {
+            this.message = message;
         }
 
 }
