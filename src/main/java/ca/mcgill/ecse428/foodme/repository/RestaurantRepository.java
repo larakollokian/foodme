@@ -115,6 +115,24 @@ public class RestaurantRepository {
 		return restaurant;
 	}
 
+
+	public Restaurant deleteRestaurant(String restaurantID, String restaurantName) throws InvalidInputException {
+		if(restaurantID.length() == 0 || restaurantName.length() == 0){
+			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
+		}
+		else if (entityManager.find(Restaurant.class,restaurantID) == null){
+			throw new InvalidInputException("Restaurant does not exists");
+		}
+		else {
+			Restaurant restaurant =  entityManager.find(Restaurant.class, restaurantID);
+			entityManager.remove(restaurant);
+			
+			return restaurant;
+
+		}
+		
+	}
+
 	/**
 	 * Method that adds a restaurant and a user to the likedRestaurant list in the database
 	 * @param username
