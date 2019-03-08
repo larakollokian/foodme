@@ -1,8 +1,10 @@
 package ca.mcgill.ecse428.foodme;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -48,7 +50,23 @@ public class ControllerTests {
         String expected ="{\"response\":false,\"message\":\"User does not exist\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
-
+    
+    @Test
+    public void testListAllLiked() throws Exception{
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johndoe/get/all/liked"), HttpMethod.GET, entity, String.class);
+        String result = "[\r\n" + "\"RIIOjIdlzRyESw1BkmQHtw\"\r\n" + "]";
+        JSONAssert.assertEquals(result, response.getBody(), JSONCompareMode.LENIENT);
+    }
+    
+    @Test
+    public void testListAllLikedWithNoRestaurants() throws Exception {
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/test/get/all/liked"), HttpMethod.GET, entity, String.class);
+        Assert.assertTrue(response.toString().contains("User does not have liked restaurants"));
+    }
 
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
