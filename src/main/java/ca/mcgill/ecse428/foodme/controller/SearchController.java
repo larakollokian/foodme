@@ -2,9 +2,12 @@ package ca.mcgill.ecse428.foodme.controller;
 
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Random;
+
+import static org.springframework.web.client.HttpClientErrorException.*;
 
 @RestController
 @RequestMapping("/search")
@@ -23,7 +26,7 @@ public class SearchController {
     }
 
     //Template
-    public ResponseEntity<String> getMapping(String url){
+    public ResponseEntity<String> getMapping(String url) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + APIKey);
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -32,9 +35,16 @@ public class SearchController {
 
         // Response
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-        return response;
+        ResponseEntity<String> response;
+
+        try {
+            response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            return response;
+        } catch (HttpClientErrorException e){
+            throw new Exception("Something went wrong! Please make sure you've put in the right information!");
+        }
     }
+
     /**
      * Controller method that calls the API to return a restaurant based on its id
      * @param id
@@ -42,18 +52,12 @@ public class SearchController {
      * @throws Exception
      */
     @GetMapping("/businesses/{id}")
-    public ResponseEntity<String> lookUpRestaurantByID (@RequestParam("id") String id) throws Exception{
+    public ResponseEntity<String> lookUpRestaurantByID (
+            @RequestParam("id") String id) throws Exception{
 
         // Set up url
-        String url = null;
-        if (id != null) {
-            url = "https://api.yelp.com/v3/businesses/" + id;
-        } else {
-            throw new Exception("You are missing the id to make a query!");
-        }
-
+        String url = "https://api.yelp.com/v3/businesses/" + id;
         return getMapping(url);
-
     }
 
     /**
@@ -70,15 +74,8 @@ public class SearchController {
             @RequestParam("cuisine") String cuisine) throws Exception{
 
         // Set up url
-        String url = null;
-        if (location != null) {
-            url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine;
-        } else {
-            throw new Exception("You are missing a location to make a query!");
-        }
-
+        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine;
         return getMapping(url);
-
     }
 
     /**
@@ -97,15 +94,8 @@ public class SearchController {
             @RequestParam("cuisine") String cuisine) throws Exception{
 
         // Set up url
-        String url = null;
-        if (longitude != null && latitude != null) {
-            url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&cuisine=" + cuisine;
-        } else {
-            throw new Exception("You are missing a location to make a query!");
-        }
-
+        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&cuisine=" + cuisine;
         return getMapping(url);
-
     }
 
     /**
@@ -117,16 +107,11 @@ public class SearchController {
      */
     @GetMapping("/google/{location}/")
     public ResponseEntity<String> searchGoogle(
-            @PathVariable("location") String location) throws Exception {
-        // Set up url
-        String url = null;
-        if (location != null) {
-            String query = "restaurants+in+" + location;
-            url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&key=" + googleApiKey;
+            @PathVariable("location") String location) {
 
-        } else {
-            throw new Exception("You are missing a location to make a query!");
-        }
+        // Set up url
+        String query = "restaurants+in+" + location;
+        String url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&key=" + googleApiKey;
 
         HttpEntity<Void> entity = null;
 
@@ -155,18 +140,15 @@ public class SearchController {
         // Set up url
         String url = null;
         String extraParam = "";
-        if (location != null) {
-            if (recommend == 1) {
-                Random rand = new Random();
-                int randomOffset = rand.nextInt(50);
-                String offset = Integer.toString(randomOffset);
-                extraParam = extraParam + "&offset=" + offset + "&limit=1";
-            }
-            url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
 
-        } else {
-            throw new Exception("You are missing a location to make a query!");
+        if (recommend == 1) {
+            Random rand = new Random();
+            int randomOffset = rand.nextInt(50);
+            String offset = Integer.toString(randomOffset);
+            extraParam = extraParam + "&offset=" + offset + "&limit=1";
         }
+
+        url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
 
         return getMapping(url);
     }
@@ -189,20 +171,17 @@ public class SearchController {
         // Set up url
         String url = null;
         String extraParam = "";
-        if (longitude != null && latitude != null) {
-            if (recommend == 1) {
-                Random rand = new Random();
-                int randomOffset = rand.nextInt(50);
-                String offset = Integer.toString(randomOffset);
-                extraParam = extraParam + "&offset=" + offset + "&limit=1";
-            }
-            url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude
+
+        if (recommend == 1) {
+            Random rand = new Random();
+            int randomOffset = rand.nextInt(50);
+            String offset = Integer.toString(randomOffset);
+            extraParam = extraParam + "&offset=" + offset + "&limit=1";
+        }
+
+        url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude
                     + "&latitude=" + latitude
                     + "&sort_by=" + sortby + extraParam;
-
-        } else {
-            throw new Exception("You are missing a location to make a query!");
-        }
 
         return getMapping(url);
     }
@@ -221,15 +200,9 @@ public class SearchController {
             @RequestParam("price") String price) throws Exception {
 
         // Set up url
-        String url = null;
-        if (location != null) {
-            url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
-        } else {
-            throw new Exception("You are missing a location to make a query!");
-        }
+        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
 
         return getMapping(url);
-
     }
 
     /**
@@ -248,14 +221,8 @@ public class SearchController {
             @RequestParam("price") String price) throws Exception {
 
         // Set up url
-        String url = null;
-        if (longitude != null && latitude != null) {
-            url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
-        } else {
-            throw new Exception("You are missing a location to make a query!");
-        }
+        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
 
         return getMapping(url);
-
     }
 }

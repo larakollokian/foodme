@@ -1,20 +1,17 @@
 package ca.mcgill.ecse428.foodme;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import ca.mcgill.ecse428.foodme.controller.*;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Preference;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import ca.mcgill.ecse428.foodme.security.Password;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,14 +26,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
-import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.security.Password;
 
 
 @RunWith(SpringRunner.class)
@@ -372,9 +370,6 @@ public class FoodmeApplicationTests {
     }
 
 
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////                                                                   /////////////////
     /////////////////                      SEARCH CONTROLLER                            /////////////////
@@ -382,22 +377,21 @@ public class FoodmeApplicationTests {
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    // ===================== DISTANCE ===================== //
+
     @Test
-    public void testSearchSortByDistance() throws Exception {
+    public void testSearchSortByDistanceSuccess() throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
+                .andDo(print()).andExpect(status().isOk()).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         System.out.println("\n\nResponse:");
         System.out.println(response);
-        //String response = ""; // TODO: need to be replaced with the http response
         boolean failed = false;
         Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
         Matcher m = p.matcher(response);
 
-        double a = (double) 0.0;
+        double a = 0.0;
         // loop through all the distances, break if there is a failure
         while (!failed && m.find()){
             double b = Double.parseDouble(m.group(1));
@@ -407,8 +401,9 @@ public class FoodmeApplicationTests {
             a = b;
         }
         assertEquals(failed, false);
-
     }
+
+    // ============== RESTAURANT RECOMMENDATION ============== //
 
     @Test
     public void testRandomRestaurantRecommendation() throws Exception {
@@ -421,6 +416,26 @@ public class FoodmeApplicationTests {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertNotEquals(response1, response2);
+    }
+
+    // ===================== PRICE RANGE ===================== //
+
+    @Test
+    public void testSearchByPrice() throws Exception {
+        String r = searchController.searchByPriceRange("Montreal", "1").getBody().toString();
+        String response = this.mockMvc.perform(get("/search/price/?location=Montreal&price=1"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(r, response);
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByPriceError() throws Exception {
+        try {
+            searchController.searchByPriceRange("", "1").getBody().toString();
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
     }
 
     @Test
@@ -478,6 +493,8 @@ public class FoodmeApplicationTests {
 
         assertEquals(response1, response2);
     }
+
+    // ===================== CUISINE ===================== //
 
     @Test
     public void testSearchByCuisineHTTPOk() throws Exception {
