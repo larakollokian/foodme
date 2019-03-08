@@ -380,7 +380,7 @@ public class FoodmeApplicationTests {
     // ===================== DISTANCE ===================== //
 
     @Test
-    public void testSearchSortByDistanceSuccess() throws Exception {
+    public void testSearchSortByDistance() throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
                 .andDo(print()).andExpect(status().isOk()).andReturn();
@@ -421,18 +421,63 @@ public class FoodmeApplicationTests {
     // ===================== PRICE RANGE ===================== //
 
     @Test
-    public void testSearchByPrice() throws Exception {
-        String r = searchController.searchByPriceRange("Montreal", "1").getBody().toString();
+    public void testSearchByPriceLocation() throws Exception {
+        String r = searchController.searchByPriceRange("Montreal", "1").getBody();
         String response = this.mockMvc.perform(get("/search/price/?location=Montreal&price=1"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertEquals(r, response);
     }
 
+    @Test
+    public void testSearchByPriceLongLat() throws Exception {
+        String r = searchController.searchByPriceRange("-73.623419", "45.474999", "1").getBody();
+        String response = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(r, response);
+    }
+
     @Test //(expected = Exception.class)
-    public void testSearchByPriceError() throws Exception {
+    public void testSearchByPriceErrorLocation() {
         try {
-            searchController.searchByPriceRange("", "1").getBody().toString();
+            searchController.searchByPriceRange("", "1");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByPriceErrorPrice() {
+        try {
+            searchController.searchByPriceRange("Montreal", "");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByPriceErrorLong() {
+        try {
+            searchController.searchByPriceRange("", "45.474999", "1");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByPriceErrorLat() {
+        try {
+            searchController.searchByPriceRange("-73.623419", "", "1");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByPriceErrorLongLatPrice() {
+        try {
+            searchController.searchByPriceRange("-73.623419", "45.474999", "");
         } catch (Exception e) {
             assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
         }
@@ -495,6 +540,69 @@ public class FoodmeApplicationTests {
     }
 
     // ===================== CUISINE ===================== //
+
+    @Test
+    public void testSearchByCuisine() throws Exception {
+        String r = searchController.searchByCuisine("Montreal", "afghan").getBody();
+        String response = this.mockMvc.perform(get("/search/cuisine/?location=Montreal&cuisine=afghan"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(r, response);
+    }
+
+    @Test
+    public void testSearchByCuisineLongLat() throws Exception {
+        String r = searchController.searchByCuisine("-73.623419", "45.474999", "afghan").getBody();
+        String response = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(r, response);
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByCuisineErrorLocation() {
+        try {
+            searchController.searchByCuisine("", "1");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByCuisineErrorPrice() {
+        try {
+            searchController.searchByCuisine("Montreal", "");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByCuisineErrorLong() {
+        try {
+            searchController.searchByCuisine("", "45.474999", "1");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByCuisineErrorLat() {
+        try {
+            searchController.searchByCuisine("-73.623419", "", "1");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchByCuisineErrorLongLatPrice() {
+        try {
+            searchController.searchByCuisine("-73.623419", "45.474999", "");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
 
     @Test
     public void testSearchByCuisineHTTPOk() throws Exception {
