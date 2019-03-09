@@ -1,6 +1,7 @@
 package ca.mcgill.ecse428.foodme;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -55,8 +56,8 @@ public class ControllerTests {
     public void testListAllLiked() throws Exception{
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/johndoe/get/all/liked"), HttpMethod.GET, entity, String.class);
-        String result = "[\r\n" + "\"RIIOjIdlzRyESw1BkmQHtw\"\r\n" + "]";
+                createURLWithPort("/restaurants/yeffo/get/all/liked"), HttpMethod.GET, entity, String.class);
+        String result = "[\r\n" + "\"vNB5fXTa2bH07lgqSQXv3g\"\r\n" + "]";
         JSONAssert.assertEquals(result, response.getBody(), JSONCompareMode.LENIENT);
     }
     
@@ -66,6 +67,34 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/test/get/all/liked"), HttpMethod.GET, entity, String.class);
         Assert.assertTrue(response.toString().contains("User does not have liked restaurants"));
+    }
+    
+    @Test
+    public void testAddLiked() throws Exception {
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johndoe/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
+    	String expected = "{\"response\":true,\"message\":\"User successfully liked Restaurant\"}";
+    	Assert.assertEquals(expected, response.getBody());
+    }
+    
+    @Test
+    public void testRemoveLiked() throws Exception {
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johndoe/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
+    	String expected = "{\"response\":true,\"message\":\"User successfully removed liked Restaurant\"}";
+    	Assert.assertEquals(expected, response.getBody());
+    }
+    
+    @Ignore
+    //@Test
+    public void testRemoveLikedNotInLiked() throws Exception {
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johndoe/removeliked/vNB5fqSQXv3g"), HttpMethod.POST, entity, String.class);
+    	String expected = "{\"response\":true,\"message\":\"User successfully removed liked Restaurant\"}";
+    	Assert.assertEquals(expected, response.getBody());
     }
 
     private String createURLWithPort(String uri) {
