@@ -49,6 +49,22 @@ public class AppUserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Login successful"));
     }
 
+    /** Controller method that attempts to logout
+     * @param username
+     * @return ResponseEntity
+     */
+    @GetMapping("/logout/{username}")
+    public ResponseEntity logout(@PathVariable("username")String username) throws Exception {
+        //No exception thrown means the authentication succeeded
+        try {
+            authentication.logout(username);
+        }
+        catch(AuthenticationException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Logout successful"));
+    }
+
     /**
      * Method that creates a new account for a user. Username must be unique.
      * @param username
