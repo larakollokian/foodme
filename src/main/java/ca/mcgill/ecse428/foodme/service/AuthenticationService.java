@@ -97,7 +97,10 @@ public class AuthenticationService {
 	 * allows to logout having the username
 	 * @param username
 	 */
-	public void logout(String username) {
+	public void logout(String username) throws AuthenticationException {
+		if(sessionByUser.get(username)==null){
+			throw new AuthenticationException("This user is not logged in");
+		}
 		userBySession.remove(sessionByUser.remove(username));
 
 	}

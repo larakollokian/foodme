@@ -49,6 +49,7 @@ public class AppUserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Login successful"));
     }
 
+
     /**
      * Method that creates a new account for a user. Username must be unique.
      * @param username
