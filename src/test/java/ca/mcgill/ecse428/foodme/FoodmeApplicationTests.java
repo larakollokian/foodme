@@ -12,11 +12,19 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ca.mcgill.ecse428.foodme.controller.*;
 import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Preference;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import ca.mcgill.ecse428.foodme.security.Password;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,20 +33,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
 
-
-import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.security.Password;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)
@@ -470,168 +472,5 @@ public class FoodmeApplicationTests {
         //assert if removed;
     }
 
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////                                                                   /////////////////
-    /////////////////                      SEARCH CONTROLLER                            /////////////////
-    /////////////////                                                                   /////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    @Test
-    public void testSearchSortByDistance() throws Exception {
-
-        MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-        String response = mvcResult.getResponse().getContentAsString();
-        System.out.println("\n\nResponse:");
-        System.out.println(response);
-        //String response = ""; // TODO: need to be replaced with the http response
-        boolean failed = false;
-        Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
-        Matcher m = p.matcher(response);
-
-        double a = (double) 0.0;
-        // loop through all the distances, break if there is a failure
-        while (!failed && m.find()){
-            double b = Double.parseDouble(m.group(1));
-            if (a > b) {
-                failed = true;
-            }
-            a = b;
-        }
-        assertEquals(failed, false);
-
-    }
-
-    @Test
-    public void testRandomRestaurantRecommendation() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        assertNotEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/?location=montreal&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/?location=montreal&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceLongLatHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/?price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/?price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceLongLatHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/longitude/latitude/?latitude=45.474999&price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/longitude/latitude/?latitude=45.474999&price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/?location=montreal&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/?location=montreal&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineLongLatHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/?price=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/?price=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineLongLatHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
 }
 
