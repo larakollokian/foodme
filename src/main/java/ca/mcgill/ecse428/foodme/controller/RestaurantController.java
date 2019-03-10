@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -141,4 +144,18 @@ public class RestaurantController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restaurant.get(0));
     }
+
+    // @PostMapping("/post/deleteRestaurant/{id}/{restaurantName}")
+    // public ResponseEntity deleteRestaurant(@PathVariable("id") String id, @PathVariable("restaurantName") String restaurantName) {
+    //     try {
+    //         restaurantRepository.deleteRestaurant(id, restaurantName);
+    //     } catch (NullObjectException e) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+    //     }
+    //     return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "User account successfully deleted."));
+
+    // }
+
+
+    
 }
