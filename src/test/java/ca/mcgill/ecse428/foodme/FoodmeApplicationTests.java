@@ -155,6 +155,40 @@ public class FoodmeApplicationTests {
         }
     }
 
+    @Test
+    public void testChangePasswordFail() {
+        String error ="";
+        AppUser user = new AppUser();
+        String oldPass = PASSWORD;
+        String newPass = "HelloWorld1234";
+        String wrongOldPass = "hahahaha"; //old pass is HelloWorld123
+        String wrongNewPass = "Hello";
+        try {
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changePassword(user.getUsername(), wrongOldPass, newPass)).thenThrow(new AuthenticationException("Invalid old password"));
+            assertEquals(appUserRepository.changePassword(user.getUsername(), wrongOldPass, newPass),new AuthenticationException("Invalid old password"));
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), wrongOldPass, newPass);
+        }catch (AuthenticationException e) {
+            //Expected
+            error += e.getMessage();
+        }catch(Exception e){
+            //Do nothing
+        }
+        assertEquals(error, "Invalid old password");
+        error = "";
+        try {
+            when(appUserRepository.changePassword(user.getUsername(), oldPass, wrongNewPass)).thenThrow(new InvalidInputException("Your password should be longer than 6 characters"));
+            assertEquals(appUserRepository.changePassword(user.getUsername(), oldPass, wrongNewPass),new InvalidInputException("Your password should be longer than 6 characters"));
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), oldPass, wrongNewPass);
+        }catch (InvalidInputException e) {
+            //Expected
+            error += e.getMessage();
+        }catch(Exception e){
+            //Do nothing
+        }
+        assertEquals(error, "Your password should be longer than 6 characters");
+
+    }
 
     @Test
     public void testGenerateRandomPassword() {
