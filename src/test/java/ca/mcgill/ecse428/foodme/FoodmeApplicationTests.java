@@ -6,15 +6,25 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ca.mcgill.ecse428.foodme.controller.*;
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Preference;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import ca.mcgill.ecse428.foodme.security.Password;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,20 +33,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
 
-
-import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.security.Password;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)
@@ -130,7 +134,7 @@ public class FoodmeApplicationTests {
     public void testDeleteUser() {
 	    try{
             AppUser appUser = appUserRepository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
-            when(appUserRepository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD)).thenReturn(appUser);
+            when(appUserRepository.deleteUser(USERNAME)).thenReturn(appUser);
             assertEquals(appUserRepository.deleteUser(USERNAME),appUser);
             Mockito.verify(appUserRepository).deleteUser(USERNAME);
         } catch (Exception e) {
@@ -140,16 +144,53 @@ public class FoodmeApplicationTests {
 
     @Test
     public void testChangePasswordSuccess() {
+	    //If no exception caught, change pasword is successful
         String newPass = "Helloworld1234";
+        String oldPass = PASSWORD;
         try {
             AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            appUserRepository.changePassword(user.getUsername(), PASSWORD, newPass);
-            assertTrue(Password.check(newPass,user.getPassword()));
+            when(appUserRepository.changePassword(user.getUsername(), oldPass, newPass)).thenReturn(user);
+            assertEquals(appUserRepository.changePassword(user.getUsername(), oldPass, newPass),user);
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), oldPass, newPass);
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Test
+    public void testChangePasswordFail() {
+        String error ="";
+        AppUser user = new AppUser();
+        String oldPass = PASSWORD;
+        String newPass = "HelloWorld1234";
+        String wrongOldPass = "hahahaha"; //old pass is HelloWorld123
+        String wrongNewPass = "Hello";
+        try {
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changePassword(user.getUsername(), wrongOldPass, newPass)).thenThrow(new AuthenticationException("Invalid old password"));
+            assertEquals(appUserRepository.changePassword(user.getUsername(), wrongOldPass, newPass),new AuthenticationException("Invalid old password"));
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), wrongOldPass, newPass);
+        }catch (AuthenticationException e) {
+            //Expected
+            error += e.getMessage();
+        }catch(Exception e){
+            //Do nothing
+        }
+        assertEquals(error, "Invalid old password");
+        error = "";
+        try {
+            when(appUserRepository.changePassword(user.getUsername(), oldPass, wrongNewPass)).thenThrow(new InvalidInputException("Your password should be longer than 6 characters"));
+            assertEquals(appUserRepository.changePassword(user.getUsername(), oldPass, wrongNewPass),new InvalidInputException("Your password should be longer than 6 characters"));
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), oldPass, wrongNewPass);
+        }catch (InvalidInputException e) {
+            //Expected
+            error += e.getMessage();
+        }catch(Exception e){
+            //Do nothing
+        }
+        assertEquals(error, "Your password should be longer than 6 characters");
+
+    }
 
     @Test
     public void testGenerateRandomPassword() {
@@ -180,12 +221,12 @@ public class FoodmeApplicationTests {
 
             int pID = newPreference.getPID();
 
-            appUserRepository.setDefaultPreference(pID,USERNAME);
-
-            assertEquals(pID, appUserRepository.getDefaultPreference(USERNAME).get(0).getPID());
+            when(appUserRepository.setDefaultPreference(pID,USERNAME)).thenReturn(pID);
+            assertEquals(pID, appUserRepository.setDefaultPreference(pID,USERNAME));
+            Mockito.verify(appUserRepository).setDefaultPreference(pID,USERNAME);
 
             Preference dfPreference = preferenceRepository.getPreference(pID);
-            List<Preference> list = null;
+            List<Preference> list = new ArrayList<>();
             list.add(dfPreference);
 
             when(appUserRepository.getDefaultPreference(USERNAME)).thenReturn(list);
@@ -272,6 +313,7 @@ public class FoodmeApplicationTests {
             Preference newPreference = preferenceRepository.createPreference(USERNAME, "$$$", "Montreal", "Italian", "rating");
             when(preferenceRepository.createPreference(USERNAME, "$$$", "Montreal", "Italian", "rating")).thenReturn(newPreference);
             int pID = newPreference.getPID(); // Get PID of this new preference
+            when(preferenceRepository.deletePreference(USERNAME,pID)).thenReturn(newPreference);
             assertEquals(preferenceRepository.deletePreference(USERNAME, pID), newPreference);
             Mockito.verify(preferenceRepository).deletePreference(USERNAME, pID);
         }catch(Exception e){
@@ -285,6 +327,65 @@ public class FoodmeApplicationTests {
     /////////////////                      RESTAURANT CONTROLLER                        /////////////////
     /////////////////                                                                   /////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Test to create a restaurant
+     */
+    @Test
+    public void testCreateRestaurantSuccess(){
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        try{
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Test to create a restaurant
+     */
+    @Test
+    public void testCreateRestaurantFail(){
+        String error ="";
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant1 = new Restaurant();
+        restaurant1.setRestaurantID(restaurant_id);
+        restaurant1.setRestaurantName(restaurant_name);
+
+        try{
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant1);
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),restaurant1);
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenThrow(new InvalidInputException("Restaurant already exists"));
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),new InvalidInputException("Restaurant already exists"));
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+
+        }catch(InvalidInputException e){
+            error += e.getMessage();
+        }
+        assertEquals("Restaurant already exists",error);
+        error = "";
+        try{
+            when(restaurantRepository.createRestaurant("","")).thenThrow(new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            assertEquals(restaurantRepository.createRestaurant("",""),new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            Mockito.verify(restaurantRepository).createRestaurant("","");
+
+        }catch (InvalidInputException e){
+            error+=e.getMessage();
+        }
+        assertEquals("restaurantID and restaurantName must be at least 1 character",error);
+    }
+
 
     /**
      * Test UT for adding a restaurant to the liked list
@@ -371,168 +472,5 @@ public class FoodmeApplicationTests {
         //assert if removed;
     }
 
-
-
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////                                                                   /////////////////
-    /////////////////                      SEARCH CONTROLLER                            /////////////////
-    /////////////////                                                                   /////////////////
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    @Test
-    public void testSearchSortByDistance() throws Exception {
-
-        MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-        String response = mvcResult.getResponse().getContentAsString();
-        System.out.println("\n\nResponse:");
-        System.out.println(response);
-        //String response = ""; // TODO: need to be replaced with the http response
-        boolean failed = false;
-        Pattern p = Pattern.compile("distance\": (\\d+(\\.\\d+)?)");
-        Matcher m = p.matcher(response);
-
-        double a = (double) 0.0;
-        // loop through all the distances, break if there is a failure
-        while (!failed && m.find()){
-            double b = Double.parseDouble(m.group(1));
-            if (a > b) {
-                failed = true;
-            }
-            a = b;
-        }
-        assertEquals(failed, false);
-
-    }
-
-    @Test
-    public void testRandomRestaurantRecommendation() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/montreal/distance/1/"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        assertNotEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/?location=montreal&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/?location=montreal&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceLongLatHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/longitude/latitude/?longitude=-73.623419&latitude=45.474999&price=1"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/?price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/?price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByPriceLongLatHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/price/longitude/latitude/?latitude=45.474999&price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/price/longitude/latitude/?latitude=45.474999&price=1"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/?location=montreal&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/?location=montreal&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineLongLatHTTPOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?longitude=-73.623419&latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/?price=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/?price=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
-
-    @Test
-    public void testSearchByCuisineLongLatHTTPNotOk() throws Exception {
-
-        String response1 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        String response2 = this.mockMvc.perform(get("/search/cuisine/longitude/latitude/?latitude=45.474999&cuisine=afghan"))
-                .andExpect(status().is4xxClientError())
-                .andReturn().getResponse().getContentAsString();
-
-        assertEquals(response1, response2);
-    }
 }
 

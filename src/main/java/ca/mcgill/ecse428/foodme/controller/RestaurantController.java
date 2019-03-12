@@ -33,8 +33,8 @@ public class RestaurantController {
      * @param restaurantID
      * @param restaurantName
      */
-    @PostMapping("/{user}/addliked/{id}")
-    public ResponseEntity addLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @RequestParam String restaurantName) {
+    @PostMapping("/{user}/addliked/{id}/{restaurant}")
+    public ResponseEntity addLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @PathVariable("restaurant") String restaurantName) {
         try {
             restaurantRepository.addLiked(username, restaurantID,restaurantName);
         } catch (Exception e) {
@@ -89,8 +89,8 @@ public class RestaurantController {
      * @param restaurantName
      * @return ResponseEntity
      */
-    @PostMapping("/{user}/adddisliked/{id}")
-    public ResponseEntity addDisliked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @RequestParam String restaurantName) {
+    @PostMapping("/{user}/adddisliked/{id}/{restaurant}")
+    public ResponseEntity addDisliked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @PathVariable("restaurant") String restaurantName) {
         try {
             restaurantRepository.addDisliked(username, restaurantID,restaurantName);
         } catch (Exception e) {
