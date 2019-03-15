@@ -95,6 +95,36 @@
             return u;
         }
 
+        @Transactional
+        public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
+
+            AppUser u = getAppUser(username);
+            
+            if(newFName == u.getFirstName()) {
+                throw new InvalidInputException("New first name cannot be the same as current name");
+                }
+            else {
+            u.setFirstName(newFName);
+            entityManager.merge(u);
+            return u;
+            }
+        }
+
+        @Transactional
+        public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
+
+            AppUser u = getAppUser(username);
+            
+            if(newLName == u.getLastName()) {
+                throw new InvalidInputException("New last name cannot be the same as current name");
+                }
+            else {
+            u.setLastName(newLName);
+            entityManager.merge(u);
+            return u;
+            }
+        }
+
         /**
          * Method that allows to delete a user's account given its username
          * @param username
