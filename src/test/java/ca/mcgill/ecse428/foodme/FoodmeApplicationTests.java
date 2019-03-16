@@ -1,5 +1,18 @@
 package ca.mcgill.ecse428.foodme;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
 import ca.mcgill.ecse428.foodme.controller.AppUserController;
 import ca.mcgill.ecse428.foodme.controller.PreferenceController;
 import ca.mcgill.ecse428.foodme.controller.RestaurantController;
@@ -121,7 +134,7 @@ public class FoodmeApplicationTests {
     public void testDeleteUser() {
 	    try{
             AppUser appUser = appUserRepository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD);
-            when(appUserRepository.createAccount(USERNAME,FIRSTNAME,LASTNAME,EMAIL,PASSWORD)).thenReturn(appUser);
+            when(appUserRepository.deleteUser(USERNAME)).thenReturn(appUser);
             assertEquals(appUserRepository.deleteUser(USERNAME),appUser);
             Mockito.verify(appUserRepository).deleteUser(USERNAME);
         } catch (Exception e) {
@@ -131,16 +144,53 @@ public class FoodmeApplicationTests {
 
     @Test
     public void testChangePasswordSuccess() {
+	    //If no exception caught, change pasword is successful
         String newPass = "Helloworld1234";
+        String oldPass = PASSWORD;
         try {
             AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            appUserRepository.changePassword(user.getUsername(), PASSWORD, newPass);
-            assertTrue(Password.check(newPass,user.getPassword()));
+            when(appUserRepository.changePassword(user.getUsername(), oldPass, newPass)).thenReturn(user);
+            assertEquals(appUserRepository.changePassword(user.getUsername(), oldPass, newPass),user);
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), oldPass, newPass);
         }catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @Test
+    public void testChangePasswordFail() {
+        String error ="";
+        AppUser user = new AppUser();
+        String oldPass = PASSWORD;
+        String newPass = "HelloWorld1234";
+        String wrongOldPass = "hahahaha"; //old pass is HelloWorld123
+        String wrongNewPass = "Hello";
+        try {
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changePassword(user.getUsername(), wrongOldPass, newPass)).thenThrow(new AuthenticationException("Invalid old password"));
+            assertEquals(appUserRepository.changePassword(user.getUsername(), wrongOldPass, newPass),new AuthenticationException("Invalid old password"));
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), wrongOldPass, newPass);
+        }catch (AuthenticationException e) {
+            //Expected
+            error += e.getMessage();
+        }catch(Exception e){
+            //Do nothing
+        }
+        assertEquals(error, "Invalid old password");
+        error = "";
+        try {
+            when(appUserRepository.changePassword(user.getUsername(), oldPass, wrongNewPass)).thenThrow(new InvalidInputException("Your password should be longer than 6 characters"));
+            assertEquals(appUserRepository.changePassword(user.getUsername(), oldPass, wrongNewPass),new InvalidInputException("Your password should be longer than 6 characters"));
+            Mockito.verify(appUserRepository).changePassword(user.getUsername(), oldPass, wrongNewPass);
+        }catch (InvalidInputException e) {
+            //Expected
+            error += e.getMessage();
+        }catch(Exception e){
+            //Do nothing
+        }
+        assertEquals(error, "Your password should be longer than 6 characters");
+
+    }
 
     @Test
     public void testGenerateRandomPassword() {
@@ -171,12 +221,12 @@ public class FoodmeApplicationTests {
 
             int pID = newPreference.getPID();
 
-            appUserRepository.setDefaultPreference(pID,USERNAME);
-
-            assertEquals(pID, appUserRepository.getDefaultPreference(USERNAME).get(0).getPID());
+            when(appUserRepository.setDefaultPreference(pID,USERNAME)).thenReturn(pID);
+            assertEquals(pID, appUserRepository.setDefaultPreference(pID,USERNAME));
+            Mockito.verify(appUserRepository).setDefaultPreference(pID,USERNAME);
 
             Preference dfPreference = preferenceRepository.getPreference(pID);
-            List<Preference> list = null;
+            List<Preference> list = new ArrayList<>();
             list.add(dfPreference);
 
             when(appUserRepository.getDefaultPreference(USERNAME)).thenReturn(list);
@@ -263,6 +313,7 @@ public class FoodmeApplicationTests {
             Preference newPreference = preferenceRepository.createPreference(USERNAME, "$$$", "Montreal", "Italian", "rating");
             when(preferenceRepository.createPreference(USERNAME, "$$$", "Montreal", "Italian", "rating")).thenReturn(newPreference);
             int pID = newPreference.getPID(); // Get PID of this new preference
+            when(preferenceRepository.deletePreference(USERNAME,pID)).thenReturn(newPreference);
             assertEquals(preferenceRepository.deletePreference(USERNAME, pID), newPreference);
             Mockito.verify(preferenceRepository).deletePreference(USERNAME, pID);
         }catch(Exception e){
@@ -276,6 +327,65 @@ public class FoodmeApplicationTests {
     /////////////////                      RESTAURANT CONTROLLER                        /////////////////
     /////////////////                                                                   /////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Test to create a restaurant
+     */
+    @Test
+    public void testCreateRestaurantSuccess(){
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        try{
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Test to create a restaurant
+     */
+    @Test
+    public void testCreateRestaurantFail(){
+        String error ="";
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant1 = new Restaurant();
+        restaurant1.setRestaurantID(restaurant_id);
+        restaurant1.setRestaurantName(restaurant_name);
+
+        try{
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant1);
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),restaurant1);
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenThrow(new InvalidInputException("Restaurant already exists"));
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),new InvalidInputException("Restaurant already exists"));
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+
+        }catch(InvalidInputException e){
+            error += e.getMessage();
+        }
+        assertEquals("Restaurant already exists",error);
+        error = "";
+        try{
+            when(restaurantRepository.createRestaurant("","")).thenThrow(new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            assertEquals(restaurantRepository.createRestaurant("",""),new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            Mockito.verify(restaurantRepository).createRestaurant("","");
+
+        }catch (InvalidInputException e){
+            error+=e.getMessage();
+        }
+        assertEquals("restaurantID and restaurantName must be at least 1 character",error);
+    }
+
 
     /**
      * Test UT for adding a restaurant to the liked list

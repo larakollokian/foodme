@@ -208,7 +208,7 @@
          * @throws NullObjectException
          */
         @Transactional
-        public void setDefaultPreference(int pID, String username) throws NullObjectException{
+        public int setDefaultPreference(int pID, String username) throws NullObjectException{
 
             AppUser user = getAppUser(username);
 
@@ -219,6 +219,7 @@
             if(preferences.size() == 1) {
                 user.setDefaultPreferenceID(pID);
                 entityManager.merge(user);
+                return pID;
             }
             else{
                 //then pid is not a preference of the appUser
