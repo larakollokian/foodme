@@ -1,24 +1,22 @@
 package ca.mcgill.ecse428.foodme.repository;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.exception.NullObjectException;
-import ca.mcgill.ecse428.foodme.model.*;
-
-import org.omg.CORBA.DynAnyPackage.Invalid;
-import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.exception.NullObjectException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 
 @Repository
 public class RestaurantRepository {
-
+	
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -136,16 +134,17 @@ public class RestaurantRepository {
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 
-		//Check if restaurant is liked by user
-		if(appUser.getDislikedRestaurants().contains(restaurant)){
-			throw new InvalidInputException ("Restaurant is disliked by user!!!");
+		if(!appUser.getDislikedRestaurants().contains(restaurant) || !appUser.getlikedRestaurants().contains(restaurant)) {
+			appUser.addlikedRestaurants(restaurant);
+			restaurant.addLikedAppUsers(appUser);
+			entityManager.merge(appUser);
+			entityManager.merge(restaurant);
+			return restaurant;
 		}
-
-		appUser.addlikedRestaurants(restaurant);
-		restaurant.addLikedAppUsers(appUser);
-		entityManager.merge(appUser);
-		entityManager.merge(restaurant);
-		return restaurant;
+		else {
+			//nothing to do already exists or in disliked
+			return restaurant;
+		}
 	}
 
 	/**
@@ -183,17 +182,18 @@ public class RestaurantRepository {
 		catch(NullObjectException e){
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
-
-		//Check if restaurant is liked by user
-		if(appUser.getlikedRestaurants().contains(restaurant)){
-			throw new InvalidInputException ("Restaurant is liked by user!!!");
+		
+		if(!appUser.getDislikedRestaurants().contains(restaurant) || !appUser.getlikedRestaurants().contains(restaurant)) {
+			appUser.addlikedRestaurants(restaurant);
+			restaurant.addLikedAppUsers(appUser);
+			entityManager.merge(appUser);
+			entityManager.merge(restaurant);
+			return restaurant;
 		}
-
-		appUser.addDislikedRestaurants(restaurant);
-		restaurant.addLikedAppUsers(appUser);
-		entityManager.merge(appUser);
-		entityManager.merge(restaurant);
-		return restaurant;
+		else {
+			//nothing to do already exists or in disliked
+			return restaurant;
+		}
     }
 
     /**
