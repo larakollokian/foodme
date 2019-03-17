@@ -58,7 +58,7 @@ public class PreferenceRepository {
      */
     @Transactional
     public List<Preference> getPreferencesForUser(String username) throws NullObjectException {
-        Query q = entityManager.createNativeQuery("SELECT * FROM preference WHERE app_user_username =: username");
+        Query q = entityManager.createNativeQuery("SELECT * FROM preferences WHERE app_user_username=:username");
         q.setParameter("username", username);
         @SuppressWarnings("unchecked")
         List<Preference> preferences = q.getResultList();
