@@ -1,59 +1,35 @@
 package ca.mcgill.ecse428.foodme.model;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.persistence.Table;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="restaurant")
-public class Restaurant 
-{
-	//attributes
-	private int restaurantID;
-	private boolean liked;
-	private boolean disliked;
+@Table(name="Restaurants")
+public class Restaurant {
+	//Attributes
+	@Id private String restaurantID;
+
 	private String restaurantName;
 	
-	//associated to
-	private AppUser appUser;
+	//Associations
+	@ManyToMany(mappedBy = "likedRestaurants")
+	private Set<AppUser> appUser_likes;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	public int getRestaurantID() {
+	@ManyToMany(mappedBy = "dislikedRestaurants")
+	private Set<AppUser> appUser_dislikes;
+
+
+	public String getRestaurantID() {
 		return restaurantID;
 	}
 
-	public void setRestaurantID(int restaurantID) {
+	public void setRestaurantID(String restaurantID) {
 		this.restaurantID = restaurantID;
-	}
-
-	public boolean isLiked() {
-		return liked;
-	}
-
-	public void setLiked(boolean liked) {
-		if(liked)
-		{
-			this.disliked = false;
-		}
-		this.liked = liked;
-	}
-
-	public boolean isDisliked() {
-		return disliked;
-	}
-
-	public void setDisliked(boolean disliked) {
-		if(disliked)
-		{
-			this.liked = false;
-		}
-		this.disliked = disliked;
 	}
 
 	public String getRestaurantName() {
@@ -64,20 +40,56 @@ public class Restaurant
 		this.restaurantName = restaurantName;
 	}
 
-	@ManyToOne
-	@JsonIgnore
-	public AppUser getAppUser() {
-		return appUser;
+	public Set getAppUser_likes() {
+		return appUser_likes;
 	}
 
-	public void setAppUser(AppUser appUser) {
-		this.appUser = appUser;
+	public void setAppUser_likes(Set appUser_likes) {
+		this.appUser_likes = appUser_likes;
+	}
+
+	public Set getAppUser_dislikes() {
+		return appUser_dislikes;
+	}
+
+	public void setAppUser_dislikes(Set appUser_dislikes) {
+		this.appUser_dislikes = appUser_dislikes;
+	}
+
+	public void addLikedAppUsers(AppUser user){
+		if(this.appUser_likes == null){
+			this.appUser_likes = new HashSet();
+		}
+		this.appUser_likes.add(user);
+	}
+
+	public boolean removeLikedAppUsers(AppUser user) {
+		if(this.appUser_likes.contains(user)) {
+			this.appUser_likes.remove(user);
+			return true;
+		}
+		return false;
+	}
+
+	public void addDislikedAppUsers(AppUser user){
+		if(this.appUser_dislikes == null){
+			this.appUser_dislikes = new HashSet();
+		}
+		this.appUser_dislikes.add(user);
+	}
+
+	public boolean removeDislikedAppUsers(AppUser user) {
+		if(this.appUser_dislikes.contains(user)) {
+			this.appUser_dislikes.remove(user);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public String toString() {
-		return "Restaurant [restaurantID=" + restaurantID + ", liked=" + liked + ", disliked=" + disliked
-				+ ", restaurantName=" + restaurantName + ", appUser=" + appUser + "]";
+		return "Restaurant [restaurantID=" + restaurantID + ", liked="
+				+ ", restaurantName=" + restaurantName + "]";
 	}
 	
 	

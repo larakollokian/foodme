@@ -1,7 +1,9 @@
 package ca.mcgill.ecse428.foodme.service;
 
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.model.*;
-import ca.mcgill.ecse428.foodme.repository.FoodmeRepository;
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.security.*;
 import java.util.HashMap;
 
@@ -11,11 +13,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 
+
 @Service
 public class AuthenticationService {
 
 	@Autowired
-	private FoodmeRepository repository;
+	private AppUserRepository repository;
 
 	private static final HashMap<String, String> userBySession = new HashMap<>();
 	private static final HashMap<String, String> sessionByUser = new HashMap<>();
@@ -31,10 +34,10 @@ public class AuthenticationService {
 	 * @return AppUser
 	 * @throws Exception
 	 */
-	public AppUser getUserBySession(String sessionGuid) throws InvalidSessionException {
+	public AppUser getUserBySession(String sessionGuid) throws NullObjectException {
 		String name = userBySession.get(sessionGuid);
 		if (name == null) {
-			throw new InvalidSessionException("Session has expired or is invalid.");
+			throw new NullObjectException("Session has expired or is invalid.");
 		}
 		AppUser user = findUserByUsername(name);
 		return user;
@@ -45,15 +48,16 @@ public class AuthenticationService {
 	 * @return AppUser
 	 * @throws Exception
 	 */
-	private AppUser findUserByUsername(String username) throws InvalidSessionException  {
+	private AppUser findUserByUsername(String username) throws NullObjectException  {
+        AppUser user = null;
+        try {
+            user = repository.getAppUser(username);
+        } catch (NullObjectException e) {
+            throw new NullObjectException("User does not exist");
+        }
+        return user;
 
-		AppUser user = repository.getAppUser(username);
-		if (user == null){
-			//User no longer/do not exist
-			throw new InvalidSessionException("User does not exist");
-		}
-		return user;
-	}
+    }
 	/**
 	 * allows to login: validate username and password
 	 * @param username
@@ -63,36 +67,40 @@ public class AuthenticationService {
 	 */
 	public String login(String username, String password) throws Exception{
 		AppUser user = null;
-		try{
-			user = findUserByUsername(username);
-			Password.check(password, user.getPassword());
+
+		try {
+            user = findUserByUsername(username);
+            Password.check(password, user.getPassword());
 		}
-		catch(InvalidSessionException e){
-			throw new InvalidSessionException("User does not exist");
-		}
+        catch(NullObjectException e){
+            throw new NullObjectException(e.getMessage());
+        }
 		catch(AuthenticationException e){
-			throw new AuthenticationException("Invalid login password!!!",e);
+			throw new AuthenticationException("Invalid login password!!!");
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			throw new Exception(e.getMessage());
 		}
 
 		if (sessionByUser.containsKey(user.getUsername())) {
-			// Invalidate old session
-			logout(user.getUsername());
+		    // Invalidate old session
+            logout(user.getUsername());
 		}
-		String sessionGuid = UUID.randomUUID().toString();
-		userBySession.put(sessionGuid, user.getUsername());
-		sessionByUser.put(user.getUsername(), sessionGuid);
-		return sessionGuid;
 
+        String sessionGuid = UUID.randomUUID().toString();
+        userBySession.put(sessionGuid, user.getUsername());
+        sessionByUser.put(user.getUsername(), sessionGuid);
+        return sessionGuid;
 
-	}
+    }
 	/**
 	 * allows to logout having the username
 	 * @param username
 	 */
-	public void logout(String username) {
+	public void logout(String username) throws AuthenticationException {
+		if(sessionByUser.get(username)==null){
+			throw new AuthenticationException("This user is not logged in");
+		}
 		userBySession.remove(sessionByUser.remove(username));
 
 	}
