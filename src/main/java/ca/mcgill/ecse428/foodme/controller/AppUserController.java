@@ -184,7 +184,7 @@ public class AppUserController {
         } catch (NullObjectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(preference.get(0));
+        return ResponseEntity.status(HttpStatus.OK).body(preference);
     }
 
     /**

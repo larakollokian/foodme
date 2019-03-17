@@ -215,13 +215,16 @@
             q.setParameter("pID", pID);
             @SuppressWarnings("unchecked")
             List<Preference> preferences = q.getResultList();
-            if (preferences.size() == 1) {
+            if (preferences.size() > 0) {
                 return preferences;
             }
             else{
                 throw new NullObjectException("User does not have a default preference");
             }
+            
         }
+        
+        
 
     }
 
