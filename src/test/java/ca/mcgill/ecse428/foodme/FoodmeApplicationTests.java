@@ -1,30 +1,14 @@
 package ca.mcgill.ecse428.foodme;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
-import ca.mcgill.ecse428.foodme.controller.AppUserController;
-import ca.mcgill.ecse428.foodme.controller.PreferenceController;
-import ca.mcgill.ecse428.foodme.controller.RestaurantController;
-import ca.mcgill.ecse428.foodme.controller.SearchController;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.model.AppUser;
-import ca.mcgill.ecse428.foodme.model.Preference;
-import ca.mcgill.ecse428.foodme.model.Restaurant;
-import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
-import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
-import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
-import ca.mcgill.ecse428.foodme.security.Password;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,11 +21,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Preference;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
+import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import ca.mcgill.ecse428.foodme.security.Password;
 
 
 @RunWith(SpringRunner.class)

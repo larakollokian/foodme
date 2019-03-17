@@ -1,28 +1,21 @@
 package ca.mcgill.ecse428.foodme.repository;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.exception.NullObjectException;
-import ca.mcgill.ecse428.foodme.model.*;
-
-import org.apache.logging.log4j.LogManager;
-import org.omg.CORBA.DynAnyPackage.Invalid;
-import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
-import java.util.*;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.exception.NullObjectException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 
 @Repository
 public class RestaurantRepository {
-
-	//final static Logger log = LogManager.getLogger(MyFileWriter.class.getName());
 	
 	@PersistenceContext
 	private EntityManager entityManager;
