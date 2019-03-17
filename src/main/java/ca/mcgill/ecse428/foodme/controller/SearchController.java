@@ -51,9 +51,9 @@ public class SearchController {
      * @return Restaurant and all its information associated with it
      * @throws Exception
      */
-    @GetMapping("/businesses/{id}")
+    @GetMapping("/businesses/")
     public ResponseEntity<String> lookUpRestaurantByID (
-            @RequestParam("id") String id) throws Exception{
+    		@RequestParam("id") String id) throws Exception{
 
         // Set up url
         String url = "https://api.yelp.com/v3/businesses/" + id;
