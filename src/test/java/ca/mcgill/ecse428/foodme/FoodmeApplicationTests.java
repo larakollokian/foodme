@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
@@ -409,6 +410,61 @@ public class FoodmeApplicationTests {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Test that if we like a liked restaurants, that it cannot be added twice since already liked
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testAddLikedAlreadyLiked() throws InvalidInputException{
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+        InvalidInputException exception = new InvalidInputException("Restaurant is already liked by user!!!");
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        
+        try {
+        	AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+			when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenThrow(exception);
+			assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+			Mockito.verify(restaurantRepository).addLiked(user.getUsername(),restaurant_id,restaurant_name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
+    /**
+     * Test that if we dislike a disliked restaurants, that it cannot be added twice since already disliked
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testAddDislikedAlreadyDisliked() {
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+        AppUser user ;
+        InvalidInputException exception = new InvalidInputException("Restaurant is already disliked by user!!!");
+        
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        try {
+			user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+			restaurantRepository.createRestaurant(restaurant_id,restaurant_name);
+			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+			when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenThrow(exception);
+			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        
     }
     
     /**

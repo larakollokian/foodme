@@ -136,9 +136,13 @@ public class RestaurantRepository {
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 
-		//Check if restaurant is liked by user
+		//Check if restaurant is disliked by user
 		if(appUser.getDislikedRestaurants().contains(restaurant)){
 			throw new InvalidInputException ("Restaurant is disliked by user!!!");
+		}
+		//Check if restaurant is already liked by user
+		if(appUser.getlikedRestaurants().contains(restaurant)) {
+			throw new InvalidInputException ("Restaurant is alreadyliked by user!!!");
 		}
 
 		appUser.addlikedRestaurants(restaurant);
@@ -187,6 +191,10 @@ public class RestaurantRepository {
 		//Check if restaurant is liked by user
 		if(appUser.getlikedRestaurants().contains(restaurant)){
 			throw new InvalidInputException ("Restaurant is liked by user!!!");
+		}
+		//Check if restaurant is already disliked by user
+		if(appUser.getDislikedRestaurants().contains(restaurant)){
+			throw new InvalidInputException ("Restaurant is already disliked by user!!!");
 		}
 
 		appUser.addDislikedRestaurants(restaurant);
