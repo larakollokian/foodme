@@ -410,6 +410,66 @@ public class FoodmeApplicationTests {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Test UT to add a disliked restaurant to the list of liked restaurant
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testAddDislikedToLiked() throws InvalidInputException {
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        InvalidInputException exception = new InvalidInputException("Restaurant is disliked by user!!!");
+        
+        //add disliked restaurant
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //try to add that disliked restaurant to the liked list
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenThrow(exception);
+            assertFalse(restaurantRepository.listAllLiked(USERNAME).contains(restaurant_id));            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Test UT for adding a restaurant to the dislied list
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testAddDisliked () throws InvalidInputException {
+        String restaurant_id = "/gR9DTbKCvezQlqvD7_FzPw";
+        String restaurant_name = "north-india-restaurant";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Test UT for listing all the restaurants liked
@@ -417,7 +477,7 @@ public class FoodmeApplicationTests {
      */
     @Ignore
     //@Test
-    public void testListAll () throws InvalidInputException {
+    public void testListAllLiked () throws InvalidInputException {
         String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
         String restaurant_name = "Tacos Et Tortas";
         try {
