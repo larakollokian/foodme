@@ -126,5 +126,15 @@ public class ControllerTests {
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
+    
+    @Test
+    public void testSignUp() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/userJS/john/smith/john.smith@gmail.com/helloworld1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"User account successfully created.\"}";
+        System.out.println(response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
 }
 
