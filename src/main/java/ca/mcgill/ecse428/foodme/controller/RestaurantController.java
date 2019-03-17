@@ -78,7 +78,12 @@ public class RestaurantController {
      */
     @GetMapping("/{user}/get/all/disliked")
     public ResponseEntity allDisliked(@PathVariable("user") String username){
-        List<String> disliked = null;
+        List<String> disliked;
+        try{
+            disliked = restaurantRepository.listAllDisliked(username);
+        }catch(NullObjectException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
     }
 

@@ -189,7 +189,7 @@ public class RestaurantRepository {
 			throw new InvalidInputException ("Restaurant is liked by user!!!");
 		}
 
-		appUser.addlikedRestaurants(restaurant);
+		appUser.addDislikedRestaurants(restaurant);
 		restaurant.addLikedAppUsers(appUser);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
