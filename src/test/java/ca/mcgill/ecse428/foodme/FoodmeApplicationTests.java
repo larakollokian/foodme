@@ -436,7 +436,7 @@ public class FoodmeApplicationTests {
             e.printStackTrace();
         }
         
-        //try to add that disliked restaurant to the liked list
+        //try to add that disliked restaurant to the liked list 
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
             when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
