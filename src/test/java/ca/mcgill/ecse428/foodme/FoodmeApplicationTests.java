@@ -393,7 +393,7 @@ public class FoodmeApplicationTests {
      * @throws InvalidInputException
      */
     @Test
-    public void testAddLiked () throws InvalidInputException {
+    public void testAddLiked () {
         String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
         String restaurant_name = "Tacos Et Tortas";
 
@@ -414,13 +414,11 @@ public class FoodmeApplicationTests {
 
     /**
      * Test that if we like a liked restaurants, that it cannot be added twice since already liked
-     * @throws InvalidInputException
      */
     @Test
-    public void testAddLikedAlreadyLiked() throws InvalidInputException{
+    public void testAddLikedAlreadyLiked(){
         String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
         String restaurant_name = "Tacos Et Tortas";
-        InvalidInputException exception = new InvalidInputException("Restaurant is already liked by user!!!");
 
         Restaurant restaurant = new Restaurant();
         restaurant.setRestaurantID(restaurant_id);
@@ -430,9 +428,9 @@ public class FoodmeApplicationTests {
         	AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
 			when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
 			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
-			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenThrow(exception);
 			assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
-			Mockito.verify(restaurantRepository).addLiked(user.getUsername(),restaurant_id,restaurant_name);
+			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+			assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -440,14 +438,12 @@ public class FoodmeApplicationTests {
     
     /**
      * Test that if we dislike a disliked restaurants, that it cannot be added twice since already disliked
-     * @throws InvalidInputException
      */
     @Test
     public void testAddDislikedAlreadyDisliked() {
         String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
         String restaurant_name = "Tacos Et Tortas";
         AppUser user ;
-        InvalidInputException exception = new InvalidInputException("Restaurant is already disliked by user!!!");
         
         Restaurant restaurant = new Restaurant();
         restaurant.setRestaurantID(restaurant_id);
@@ -457,29 +453,25 @@ public class FoodmeApplicationTests {
 			restaurantRepository.createRestaurant(restaurant_id,restaurant_name);
 			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
 			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
-			when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenThrow(exception);
+			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
 			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-        
     }
     
     /**
      * Test UT to add a disliked restaurant to the list of liked restaurant
-     * @throws InvalidInputException
      */
     @Test
-    public void testAddDislikedToLiked() throws InvalidInputException {
+    public void testAddDislikedToLiked(){
         String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
         String restaurant_name = "Tacos Et Tortas";
 
         Restaurant restaurant = new Restaurant();
         restaurant.setRestaurantID(restaurant_id);
         restaurant.setRestaurantName(restaurant_name);
-        InvalidInputException exception = new InvalidInputException("Restaurant is disliked by user!!!");
         
         //add disliked restaurant
         try {
@@ -496,7 +488,6 @@ public class FoodmeApplicationTests {
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
             when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
-            when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenThrow(exception);
             assertFalse(restaurantRepository.listAllLiked(USERNAME).contains(restaurant_id));            
         } catch (Exception e) {
             e.printStackTrace();
