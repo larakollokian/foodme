@@ -7,8 +7,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Random;
 
-import static org.springframework.web.client.HttpClientErrorException.*;
-
 @RestController
 @RequestMapping("/search")
 public class SearchController {
