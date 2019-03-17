@@ -142,7 +142,7 @@ public class RestaurantRepository {
 		}
 		//Check if restaurant is already liked by user
 		if(appUser.getlikedRestaurants().contains(restaurant)) {
-			throw new InvalidInputException ("Restaurant is alreadyliked by user!!!");
+			throw new InvalidInputException ("Restaurant is already liked by user!!!");
 		}
 
 		appUser.addlikedRestaurants(restaurant);

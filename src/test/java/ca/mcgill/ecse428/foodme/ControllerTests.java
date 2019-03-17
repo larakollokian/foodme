@@ -95,12 +95,16 @@ public class ControllerTests {
         Assert.assertTrue(response.toString().contains("User does not have liked restaurants"));
     }
     
+    /**
+     * Because we are using the same user and restaurant for test, already in the list
+     * @throws Exception
+     */
     @Test
-    public void testAddLiked() throws Exception {
+    public void testAddAlreadyLiked() throws Exception {
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johndoe/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
-    	String expected = "{\"response\":true,\"message\":\"User successfully liked Restaurant\"}";
+    	String expected = "{\"response\":false,\"message\":\"Restaurant is already liked by user!!!\"}";
     	Assert.assertEquals(expected, response.getBody());
     }
     
