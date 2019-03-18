@@ -105,6 +105,16 @@ public class ControllerTests {
     }
     
     @Test
+    public void testAddDisliked() throws Exception {
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johndoe/adddisliked/gR9DTbKCvezQlqvD7_FzP/north-africa-restaurant"), HttpMethod.POST, entity, String.class);
+    	String expected = "{\"response\":true,\"message\":\"User successfully disliked Restaurant\"}";
+    	Assert.assertEquals(expected, response.getBody());
+    }
+    
+    
+    @Test
     public void testRemoveLiked() throws Exception {
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(

@@ -64,7 +64,7 @@ public class RestaurantController {
     /**
      * Controller Method that lists all liked restaurant of a user
      * @param username
-     * @return ResponseEntity
+     * @return ResponseEntitygit 
      */
     @GetMapping("/{user}/get/all/liked")
     public ResponseEntity allLiked(@PathVariable("user") String username){
