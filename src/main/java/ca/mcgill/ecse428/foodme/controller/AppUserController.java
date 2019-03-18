@@ -11,7 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import java.util.*;
+import javax.mail.*;
+import javax.mail.internet.*;
+
 
 @RestController
 @RequestMapping("/users")
@@ -88,6 +92,8 @@ public class AppUserController {
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
+
+        sendConfirmationEmail(email, firstName, username);
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "User account successfully created."));
     }
 
@@ -203,5 +209,39 @@ public class AppUserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully set to default"));
     }
 
-
+    private void sendConfirmationEmail(String recipient, String firstName, String username) {
+        String host = "smtp.gmail.com";  
+        String wmail = "foodmeapplication@gmail.com";//change accordingly  
+        String pw = "FoodMeApp428";//change accordingly
+        String to = recipient;
+        Properties props = new Properties();
+        props.setProperty("mail.transport.protocol", "smtp");
+        props.setProperty("mail.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.debug", "true");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false"); 
+        
+        javax.mail.Session session2 = javax.mail.Session.getDefaultInstance(props, new javax.mail.Authenticator() {  
+       
+             protected PasswordAuthentication getPasswordAuthentication() {
+                 return new PasswordAuthentication(wmail,pw);
+              }
+         });
+         
+         //Compose the message
+         try {
+             MimeMessage message = new MimeMessage(session2);
+             message.setFrom(new InternetAddress("FoodMe Application <foodmeapplication@gmail.com>"));
+             message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
+             message.setSubject("Welcome to FoodMe!");
+             message.setText("Hi "+firstName+", \n\nThank you for creating a profile under the username "+username+". \n\nYour account has been successfully activated!\n\n" +
+             "The FoodMe team");
+             
+             //send the message
+             Transport.send(message);
+         } catch (MessagingException e) {e.printStackTrace();} 
+    }
 }
