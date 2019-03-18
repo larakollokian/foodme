@@ -162,8 +162,8 @@ public class SearchController {
      */
     @GetMapping("/{sortby}/{recommend}/")
     public ResponseEntity<String> searchByLongLat(
-            @RequestParam("long") String longitude,
-            @RequestParam("lat") String latitude,
+            @RequestParam("longitude") String longitude,
+            @RequestParam("latitude") String latitude,
             @PathVariable("sortby") String sortby,
             @PathVariable("recommend") int recommend) throws Exception {
         // Set up url
