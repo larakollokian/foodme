@@ -132,9 +132,25 @@ public class ControllerTests {
     	String expected = "{\"response\":true,\"message\":\"User successfully removed liked Restaurant\"}";
     	Assert.assertEquals(expected, response.getBody());
     }
-
+    
+    @Test
+    public void testSignUp() throws Exception {
+    	// sign up and then delete the user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/testUserJS/john/smith/john.smith@gmail.com/helloworld1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"User account successfully created.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+        
+        response = restTemplate.exchange(
+                createURLWithPort("/users/delete/testUserJS"), HttpMethod.GET, entity, String.class);
+        expected = "{\"response\":true,\"message\":\"User account successfully deleted.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+    
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
+    
 }
 
