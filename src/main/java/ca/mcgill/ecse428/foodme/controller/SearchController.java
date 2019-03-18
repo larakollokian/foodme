@@ -7,8 +7,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Random;
 
-import static org.springframework.web.client.HttpClientErrorException.*;
-
 @RestController
 @RequestMapping("/search")
 public class SearchController {
@@ -51,9 +49,9 @@ public class SearchController {
      * @return Restaurant and all its information associated with it
      * @throws Exception
      */
-    @GetMapping("/businesses/{id}")
+    @GetMapping("/businesses/")
     public ResponseEntity<String> lookUpRestaurantByID (
-            @RequestParam("id") String id) throws Exception{
+    		@RequestParam("id") String id) throws Exception{
 
         // Set up url
         String url = "https://api.yelp.com/v3/businesses/" + id;
@@ -164,8 +162,8 @@ public class SearchController {
      */
     @GetMapping("/{sortby}/{recommend}/")
     public ResponseEntity<String> searchByLongLat(
-            @RequestParam("long") String longitude,
-            @RequestParam("lat") String latitude,
+            @RequestParam("longitude") String longitude,
+            @RequestParam("latitude") String latitude,
             @PathVariable("sortby") String sortby,
             @PathVariable("recommend") int recommend) throws Exception {
         // Set up url

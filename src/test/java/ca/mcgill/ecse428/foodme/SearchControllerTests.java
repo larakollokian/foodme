@@ -89,11 +89,47 @@ public class SearchControllerTests {
     /////////////////                                                                   /////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+    
     // ===================== DISTANCE ===================== //
 
     @Test
-    public void testSearchSortByDistance() throws Exception {
+    public void testSearchSortByDistanceLocation() throws Exception {
+        String r = searchController.searchSortByDistance("Montreal", "distance", 0).getBody();
+        String response = this.mockMvc.perform(get("/search/Montreal/distance/0/"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(r, response);
+    }
+
+    @Test
+    public void testSearchSortByDistanceLongLat() throws Exception {
+        String r = searchController.searchByLongLat("-73.623419", "45.474999", "distance", 0).getBody();
+        String response = this.mockMvc.perform(get("/search/distance/0/?longitude=-73.623419&latitude=45.474999"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(r, response);
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchSortByDistanceErrorLocation() {
+        try {
+            searchController.searchSortByDistance("", "distance", 1);
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test //(expected = Exception.class)
+    public void testSearchSortByDistanceErrorSortBy() {
+        try {
+            searchController.searchSortByDistance("Montreal", "", 1);
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testHTTPSearchSortByDistance() throws Exception {
 
         MvcResult mvcResult = this.mockMvc.perform(get("/search/montreal/distance/0/"))
                 .andDo(print()).andExpect(status().isOk()).andReturn();
@@ -115,6 +151,13 @@ public class SearchControllerTests {
         }
         assertEquals(failed, false);
     }
+    
+    @Test
+    public void testHTTPSearchSortByDistanceFailure() throws Exception {
+    	this.mockMvc.perform(get("/search/montreal/distance/"))
+                .andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+    }
 
     // ============== RESTAURANT RECOMMENDATION ============== //
 
@@ -129,6 +172,16 @@ public class SearchControllerTests {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertNotEquals(response1, response2);
+    }
+    
+    @Test
+    public void testRandomRestaurantRecommendationFailure() {
+
+        try {
+            searchController.searchSortByDistance("abc", "123", 1);
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
     }
 
     // ===================== PRICE RANGE ===================== //
@@ -372,5 +425,38 @@ public class SearchControllerTests {
 
         assertEquals(response1, response2);
     }
+
+    // ===================== REASTAURANT INFO ===================== //
+    
+    @Test
+    public void tesListRestaurantInfo() throws Exception {
+       	
+    	String id = "WavvLdfdP6g8aZTtbBQHTw";
+    	String request_url = "/search/businesses/?id=" + id;
+        String response1 = searchController.lookUpRestaurantByID(id).getBody();
+        
+        String response2 = this.mockMvc.perform(get(request_url))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertEquals(response1, response2);
+    }
+    
+    @Test
+    public void tesListRestaurantInfoFailure() throws Exception {
+        String response1 = this.mockMvc.perform(get("/search/businesses/"))
+                .andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+
+        String response2 = this.mockMvc.perform(get("/search/businesses/"))
+                .andExpect(status().is4xxClientError())
+                .andReturn().getResponse().getContentAsString();
+
+        assertEquals(response1, response2);
+    	
+    }
+    
 }
+
+
+
 
