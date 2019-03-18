@@ -1,13 +1,23 @@
 package ca.mcgill.ecse428.foodme;
 
-import ca.mcgill.ecse428.foodme.controller.AppUserController;
-import ca.mcgill.ecse428.foodme.controller.PreferenceController;
-import ca.mcgill.ecse428.foodme.controller.RestaurantController;
-import ca.mcgill.ecse428.foodme.controller.SearchController;
-import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
-import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
-import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,14 +29,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
+import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -419,6 +428,115 @@ public class SearchControllerTests {
     	
     }
     
+    
+    //copying to make the test
+    //TODO Marine
+    //TODO tdd will move to controller method either Search or Restaurant
+    //maybe subdivide into methods too...
+    //@Test
+    @Ignore
+    public void testClosingInOneHour() throws Exception {
+       	
+    	String id = "WavvLdfdP6g8aZTtbBQHTw";
+    	String request_url = "/search/businesses/?id=" + id;
+        String response1 = searchController.lookUpRestaurantByID(id).getBody();
+        
+        
+        String endTime = "";
+//        String response2 = this.mockMvc.perform(get(request_url))
+//                .andDo(print()).andExpect(status().isOk())
+//                .andReturn().getResponse().getContentAsString();
+        
+        //getCurrentDate //TODO check for day {Monday0, Tuesday1,...}
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+    	LocalDateTime now = LocalDateTime.now();
+    	String timeNow = dtf.format(now);
+    	LocalDate date = LocalDate.now();
+    	LocalTime time = LocalTime.now();
+    	
+    	DayOfWeek dayOfWeek = date.getDayOfWeek();
+    	int dayOfWeekInInteger = 0;
+    	
+    	//convert to the day
+    	switch(dayOfWeek) {
+    	case MONDAY: dayOfWeekInInteger = 0;
+    	break;
+    	case TUESDAY: dayOfWeekInInteger = 1;
+    	break;
+    	case WEDNESDAY: dayOfWeekInInteger = 2;
+    	break;
+    	case THURSDAY: dayOfWeekInInteger = 3;
+    	break;
+    	case FRIDAY: dayOfWeekInInteger = 4;
+    	break;
+    	case SATURDAY: dayOfWeekInInteger = 5;
+    	break;
+    	case SUNDAY: dayOfWeekInInteger = 6;
+    	break;
+    	default: dayOfWeekInInteger = 0;
+    	break;
+    	}
+    	System.out.println("date and time:" + date + " "+time +"day in int: "+dayOfWeekInInteger);
+    	
+
+        MvcResult resp = this.mockMvc.perform(get(request_url))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn();
+        System.out.println("------------json get hours--------");
+        String contentAsString = resp.getResponse().getContentAsString();
+        JSONObject json = new JSONObject(contentAsString);
+        JSONArray hours = json.getJSONArray("hours");
+        int length = hours.length();
+        
+
+        for(int i =0 ; i<length; i++){
+        	JSONObject allOpeningHours = hours.getJSONObject(i);
+        	JSONArray open = allOpeningHours.getJSONArray("open");
+        	int days = open.length();
+        	System.out.println("day: "+days);
+        	  for(int j=0; j<days; j++) {
+        	    JSONObject json3 = open.getJSONObject(j);
+                System.out.println("------------json in loop by day--------");
+        	    System.out.println(json3.toString());
+        	    int day = json3.getInt("day");
+        	    System.out.println(day);
+        	    
+        	    //check if the same DAY in int
+        	    if(dayOfWeekInInteger==day) {
+        	    	endTime = json3.getString("end");
+        	    	//TODO calculate 1 hour before using the LocalTime time 23:32:09
+        	    }
+        	    //open_days.add(json3.getString("name").toString());
+        	  }
+        	
+        }
+        
+        
+ 
+        
+//        MvcResult res = mockMvc.perform(get(request_url)
+//        		.param(id))
+//        		.andDo(print())
+//        		.andExpect(status().isOk())
+//        		.andReturn();
+        
+        //System.out.println("sysout: "+ res.getResponse().getContentAsString());
+
+//        Response resp = (Response)
+//        		given().
+//        		header().
+//        		param("id", id).
+//        		log().all().
+//        		when().
+//        		get(request_url).
+//        		then().
+//        		contentType(ContentType.JSON).extract().response();
+        
+        
+       // assertEquals(response1, response2);
+    }
+    
+ 
 }
 
 

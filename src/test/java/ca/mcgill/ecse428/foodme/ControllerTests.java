@@ -148,6 +148,21 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
     
+    //TODO Marine
+    //@Test
+    @Ignore
+    public void testRestaurantClosingInOneHour() {
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/search/businesses/vNB5fqSQXv3g/closing"), HttpMethod.GET, entity, String.class);
+        
+		System.out.println(response.getBody().toString());
+		System.out.println(response.toString());
+		
+    	String expected = "{\"response\":true,\"message\":\"The restaurant is closing in less than 1 hour.\"}";
+    	Assert.assertEquals(expected, response.getBody());
+    }
+    
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }

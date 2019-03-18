@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import ca.mcgill.ecse428.foodme.model.Response;
+
 import java.util.Random;
 
 import static org.springframework.web.client.HttpClientErrorException.*;
@@ -16,6 +18,7 @@ public class SearchController {
     String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
     String googleApiKey = "AIzaSyAbDiuDSRG-3oyFUzlS0SOy1g5b0n49dus";
 
+    
     /**
      * Greeting
      * @return Search connected
@@ -224,5 +227,28 @@ public class SearchController {
         String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
 
         return getMapping(url);
+    }
+    
+    //TODO Marine
+    @GetMapping("/businesses/{id}/closing")
+    public ResponseEntity<String> isRestaurantClosingInOneHour(@RequestParam("id")String id){
+        // Set up url
+        String url = "https://api.yelp.com/v3/businesses/" + id;
+        try {
+			ResponseEntity<String> answer = getMapping(url);
+			answer.getBody();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return new ResponseEntity<String>("The restaurant is closing in less than 1 hour.", HttpStatus.OK);
+
+    	//want this type of answer with true or false
+    	//{\"response\":true,\"message\":\"User account successfully deleted.\"}
+    	
+    			//ResponseEntity.ok(gson.ToJson(""));
+    			//ResponseEntity.status(HttpStatus.OK).body(new Response(true, "The restaurant is closing in less than 1 hour."));
     }
 }
