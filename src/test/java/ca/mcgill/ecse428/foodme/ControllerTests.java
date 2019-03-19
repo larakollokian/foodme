@@ -165,7 +165,6 @@ public class ControllerTests {
         //TO-DO
     }
 
-
     @Ignore
     //Controller method is not implemented yet!!!
     public void r_testRemoveDisliked() throws Exception {
