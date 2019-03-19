@@ -1,5 +1,6 @@
 package ca.mcgill.ecse428.foodme.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -223,11 +224,11 @@ public class RestaurantRepository {
 	 * @return list of liked restaurants
 	 * @throws NullObjectException
 	 */
-	public List<String> listAllLiked(String username) throws NullObjectException {
-		Query q = entityManager.createNativeQuery("SELECT restaurantid FROM liked_Restaurants WHERE username =:username");
+	public List<Restaurant> listAllLiked(String username) throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM liked_Restaurants WHERE username =:username)");
 		q.setParameter("username", username);
 		@SuppressWarnings("unchecked")
-		List<String>likedRestaurants = q.getResultList();
+		List<Restaurant>likedRestaurants = q.getResultList();
 		if (likedRestaurants.size() == 0){
 			throw new NullObjectException ("User does not have liked restaurants");
 		}
@@ -294,11 +295,11 @@ public class RestaurantRepository {
      * Method to list all the disliked restaurants of a user
      * @return The list of all the disliked restaurants
      */
-    public List<String> listAllDisliked(String username)throws NullObjectException {
-        Query q = entityManager.createNativeQuery("SELECT restaurantid FROM disliked_Restaurants WHERE username =:username");
+    public List<Restaurant> listAllDisliked(String username)throws NullObjectException {
+        Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM disliked_Restaurants WHERE username =:username)");
 		q.setParameter("username", username);
         @SuppressWarnings("unchecked")
-        List<String> dislikedRestaurants = q.getResultList();
+        List<Restaurant> dislikedRestaurants = q.getResultList();
 		if (dislikedRestaurants.size() == 0){
 			throw new NullObjectException ("User does not have liked restaurants");
 		}
@@ -369,17 +370,17 @@ public class RestaurantRepository {
 	 * Method to list all the visited restaurants of a user
 	 * @return The list of all the visited restaurants
 	 */
-	public List<String> listAllVisited(String username)throws NullObjectException {
-		Query q = entityManager.createNativeQuery("SELECT restaurantid FROM visited_Restaurants WHERE username =:username");
+	public List<Restaurant> listAllVisited(String username)throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM visited_Restaurants WHERE username =:username)");
 		q.setParameter("username", username);
 		@SuppressWarnings("unchecked")
-		List<String> visitedRestaurants = q.getResultList();
+		List<Restaurant> visitedRestaurants = q.getResultList();
 		if (visitedRestaurants.size() == 0){
 			throw new NullObjectException ("User hasn't visited a restaurant");
 		}
+
 		return visitedRestaurants;
 	}
-
 
 
 	/**

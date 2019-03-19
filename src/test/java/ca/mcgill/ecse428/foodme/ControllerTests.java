@@ -125,7 +125,7 @@ public class ControllerTests {
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
-        String expected = "[\"vNB5fXTa2bH07lgqSQXv3g\"]";
+        String expected = "[[\"vNB5fXTa2bH07lgqSQXv3g\",\"Rotisserie Portugalia\"]]";
 //        String expected = "[\r\n" + "\"vNB5fXTa2bH07lgqSQXv3g\"\r\n" + "]";
         Assert.assertEquals(expected, response.getBody());
 //        JSONAssert.assertEquals(result, response.getBody(), JSONCompareMode.LENIENT);
@@ -208,7 +208,8 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/visited"), HttpMethod.GET, entity, String.class);
-        String expected = "[\"RIIOjIdlzRyESw1BkmQHtw\"]";
+//        String expected = "[\"RIIOjIdlzRyESw1BkmQHtw\"]";
+        String expected = "[[\"RIIOjIdlzRyESw1BkmQHtw\",\"Tacos Et Tortas\"]]";
         Assert.assertEquals(expected, response.getBody());
     }
 
