@@ -72,7 +72,7 @@ public class SearchController {
             @RequestParam("cuisine") String cuisine) throws Exception{
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine;
+        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&categories=" + cuisine;
         return getMapping(url);
     }
 
@@ -92,7 +92,7 @@ public class SearchController {
             @RequestParam("cuisine") String cuisine) throws Exception{
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&cuisine=" + cuisine;
+        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&categories=" + cuisine;
         return getMapping(url);
     }
 

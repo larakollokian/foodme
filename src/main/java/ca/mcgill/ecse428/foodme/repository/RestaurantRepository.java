@@ -98,13 +98,14 @@ public class RestaurantRepository {
 	 * @param restaurantName
 	 * @return Restaurant
 	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
 	 */
-	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException{
+	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException,IllegalArgumentException{
 		if(restaurantID.length() == 0 || restaurantName.length() == 0){
 			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
 		}
 		if(entityManager.find(Restaurant.class,restaurantID) != null){
-			throw new InvalidInputException("Restaurant already exists");
+			throw new IllegalArgumentException("Restaurant already exists");
 		}
 		Restaurant restaurant = new Restaurant();
 		restaurant.setRestaurantID(restaurantID);
@@ -119,37 +120,43 @@ public class RestaurantRepository {
 	 * @param restaurantID
 	 * @param restaurantName
 	 * @return Restaurant
-	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
 	 * @throws NullObjectException
+	 * @throws InvalidInputException
 	 */
 	@Transactional
-	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws InvalidInputException,NullObjectException {
+	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws  NullObjectException,IllegalArgumentException,InvalidInputException {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
 		try {
 			restaurant = getRestaurant(restaurantID);
 		}
-		catch(NullObjectException e){
+		catch(NullObjectException e1){
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 
-		if(!appUser.getDislikedRestaurants().contains(restaurant) || !appUser.getlikedRestaurants().contains(restaurant)) {
-			appUser.addlikedRestaurants(restaurant);
-			restaurant.addLikedAppUsers(appUser);
-			entityManager.merge(appUser);
-			entityManager.merge(restaurant);
-			return restaurant;
+		//Check if restaurant is disliked by user
+		if(appUser.getDislikedRestaurants().contains(restaurant)){
+			throw new IllegalArgumentException ("Restaurant is disliked by user!!!");
 		}
-		else {
-			//nothing to do already exists or in disliked
-			return restaurant;
+
+		//Check if restaurant is liked by user
+		if(appUser.getlikedRestaurants().contains(restaurant)){
+			throw new IllegalArgumentException ("Restaurant is already liked by user!!!");
 		}
+
+		appUser.addlikedRestaurants(restaurant);
+		restaurant.addLikedAppUsers(appUser);
+		entityManager.merge(appUser);
+		entityManager.merge(restaurant);
+		return restaurant;
 	}
 
 	/**
 	 * Method that lists all the liked restaurants of a user
 	 * @return list of liked restaurants
+	 * @throws NullObjectException
 	 */
 	public List<String> listAllLiked(String username) throws NullObjectException {
 		Query q = entityManager.createNativeQuery("SELECT restaurantid FROM liked_Restaurants WHERE username =:username");
@@ -168,33 +175,37 @@ public class RestaurantRepository {
 	 * @param restaurantID
 	 * @param restaurantName
 	 * @return Restaurant
-	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
 	 * @throws NullObjectException
 	 */
-    @Transactional
-    public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws InvalidInputException,NullObjectException {
+	@Transactional
+	public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws NullObjectException,IllegalArgumentException,InvalidInputException {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
 		try {
 			restaurant = getRestaurant(restaurantID);
 		}
-		catch(NullObjectException e){
+		catch(NullObjectException e1){
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
-		
-		if(!appUser.getDislikedRestaurants().contains(restaurant) || !appUser.getlikedRestaurants().contains(restaurant)) {
-			appUser.addlikedRestaurants(restaurant);
-			restaurant.addLikedAppUsers(appUser);
-			entityManager.merge(appUser);
-			entityManager.merge(restaurant);
-			return restaurant;
+
+		//Check if restaurant is liked by user
+		if(appUser.getlikedRestaurants().contains(restaurant)){
+			throw new IllegalArgumentException ("Restaurant is liked by user!!!");
 		}
-		else {
-			//nothing to do already exists or in disliked
-			return restaurant;
+
+		//Check if restaurant is disliked by user
+		if(appUser.getDislikedRestaurants().contains(restaurant)){
+			throw new IllegalArgumentException ("Restaurant is already disliked by user!!!");
 		}
-    }
+
+		appUser.addDislikedRestaurants(restaurant);
+		restaurant.addDislikedAppUsers(appUser);
+		entityManager.merge(appUser);
+		entityManager.merge(restaurant);
+		return restaurant;
+	}
 
     /**
      * Method to list all the disliked restaurants of a user
