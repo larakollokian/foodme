@@ -155,6 +155,40 @@ public class RestaurantRepository {
 	}
 
 	/**
+	 * Method that remove a restaurant and a user of the likedRestaurant list in the database
+	 * @param username
+	 * @param restaurantID
+	 * @return Restaurant
+	 * @throws IllegalArgumentException
+	 * @throws NullObjectException
+	 * @throws InvalidInputException
+	 */
+	@Transactional
+	public Restaurant removeLiked(String username, String restaurantID) throws  Exception {
+		AppUser appUser = getAppUser(username);
+		Restaurant restaurant = new Restaurant();
+
+		try {
+			restaurant = getRestaurant(restaurantID);
+		}
+		catch(NullObjectException e1){
+			throw new NullObjectException("Restaurant doesn't exist");
+		}
+
+		//Check if restaurant is liked by user
+		if(appUser.getlikedRestaurants().contains(restaurant) && restaurant.getAppUser_likes().contains(appUser)){
+			appUser.removelikedRestaurants(restaurant);
+			restaurant.removeLikedAppUsers(appUser);
+			entityManager.merge(appUser);
+			entityManager.merge(restaurant);
+			return restaurant;
+		}
+		else{
+			throw new IllegalArgumentException ("Restaurant is not liked by user!!!");
+		}
+	}
+
+	/**
 	 * Method that lists all the liked restaurants of a user
 	 * @return list of liked restaurants
 	 * @throws NullObjectException

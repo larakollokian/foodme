@@ -57,7 +57,11 @@ public class RestaurantController {
      */
     @PostMapping("/{user}/removeliked/{id}")
     public ResponseEntity removeLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID) {
-       //TO-DO
+        try{
+            restaurantRepository.removeLiked(username,restaurantID);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "User successfully removed liked Restaurant"));
     }
 
