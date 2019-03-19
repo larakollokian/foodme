@@ -239,5 +239,4 @@ public class RestaurantController {
          return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));
 
      }
-
 }
