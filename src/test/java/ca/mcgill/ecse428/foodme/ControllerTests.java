@@ -135,10 +135,7 @@ public class ControllerTests {
     public void l_testRemoveLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         
-        ResponseEntity<String> likedResponse = restTemplate.exchange(
-            createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
-    String likedExpected = "{\"response\":true,\"message\":\"User successfully liked Restaurant\"}";
-    Assert.assertEquals(likedExpected, likedResponse.getBody());
+        restTemplate.exchange(createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
@@ -174,11 +171,8 @@ public class ControllerTests {
     public void r_testRemoveDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
 
-        ResponseEntity<String> dislikeResponse = restTemplate.exchange(
-                createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
-    	String dislikeExpected = "{\"response\":true,\"message\":\"User successfully disliked Restaurant\"}";
-        Assert.assertEquals(dislikeExpected, dislikeResponse.getBody());
-        
+        restTemplate.exchange(createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
+    	
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
     	String expected = "{\"response\":true,\"message\":\"User successfully removed disliked Restaurant\"}";
