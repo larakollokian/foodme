@@ -132,9 +132,11 @@ public class ControllerTests {
     }
 
     @Test
-    //Controller method is not implemented yet!!!
     public void l_testRemoveLiked() throws Exception {
-    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        
+        restTemplate.exchange(createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
+
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
     	String expected = "{\"response\":true,\"message\":\"User successfully removed liked Restaurant\"}";
@@ -165,15 +167,25 @@ public class ControllerTests {
         //TO-DO
     }
 
-    @Ignore
-    //Controller method is not implemented yet!!!
+    @Test
     public void r_testRemoveDisliked() throws Exception {
-        //TO-DO
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+
+        restTemplate.exchange(createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
+    	
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
+    	String expected = "{\"response\":true,\"message\":\"User successfully removed disliked Restaurant\"}";
+    	Assert.assertEquals(expected, response.getBody());
     }
 
-    @Ignore
+    @Test
     public void s_testRemoveDislikedNotInDisliked() throws Exception {
-        //TO-DO
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
+    	String expected = "{\"response\":false,\"message\":\"Restaurant is not on disliked list!!!\"}";
+    	Assert.assertEquals(expected, response.getBody());
     }
 
     @Test
