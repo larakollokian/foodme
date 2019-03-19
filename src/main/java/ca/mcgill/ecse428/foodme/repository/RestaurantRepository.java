@@ -1,6 +1,7 @@
 package ca.mcgill.ecse428.foodme.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -125,7 +126,7 @@ public class RestaurantRepository {
 	 * @throws InvalidInputException
 	 */
 	@Transactional
-	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws  NullObjectException,IllegalArgumentException,InvalidInputException {
+	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws  Exception {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
@@ -179,7 +180,7 @@ public class RestaurantRepository {
 	 * @throws NullObjectException
 	 */
 	@Transactional
-	public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws NullObjectException,IllegalArgumentException,InvalidInputException {
+	public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws Exception {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
@@ -221,6 +222,83 @@ public class RestaurantRepository {
 		}
         return dislikedRestaurants;
     }
+
+	/**
+	 * Method that adds a restaurant and a user to the visitedRestaurant list in the database
+	 * @param username
+	 * @param restaurantID
+	 * @param restaurantName
+	 * @return Restaurant
+	 * @throws IllegalArgumentException
+	 * @throws NullObjectException
+	 */
+	@Transactional
+	public Restaurant addVisited(String username, String restaurantID, String restaurantName) throws Exception {
+
+		AppUser appUser = getAppUser(username);
+		Restaurant restaurant = new Restaurant();
+
+		try {
+			restaurant = getRestaurant(restaurantID);
+		}
+		catch(NullObjectException e1){
+			restaurant = createRestaurant(restaurantID,restaurantName);
+		}
+
+		//Remove it to put it at top of the list
+		if(appUser.getVisitedRestaurants().contains(restaurant)){
+			//Do nothing already in list
+			return restaurant;
+		}
+
+		appUser.addVisitedRestaurants(restaurant);
+		restaurant.addVisitedAppUsers(appUser);
+		entityManager.merge(appUser);
+		entityManager.merge(restaurant);
+		return restaurant;
+	}
+
+	/**
+	 * Method that clears the
+	 * @param username
+	 * @return Restaurant
+	 * @throws IllegalArgumentException
+	 * @throws NullObjectException
+	 */
+	@Transactional
+	public Boolean clearVisited(String username) throws NullObjectException {
+		AppUser appUser = getAppUser(username);
+		if(appUser.getVisitedRestaurants().size()>0){
+			for(Restaurant r : (Set<Restaurant>)appUser.getVisitedRestaurants()){
+				r.removeVisitedAppUsers(appUser);
+				entityManager.merge(r);
+			}
+			appUser.getVisitedRestaurants().clear();
+			entityManager.merge(appUser);
+			return true;
+		}
+		else{
+			throw new NullObjectException ("Visited list is empty");
+		}
+	}
+
+
+	/**
+	 * Method to list all the visited restaurants of a user
+	 * @return The list of all the visited restaurants
+	 */
+	public List<String> listAllVisited(String username)throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT restaurantid FROM visited_Restaurants WHERE username =:username");
+		q.setParameter("username", username);
+		@SuppressWarnings("unchecked")
+		List<String> visitedRestaurants = q.getResultList();
+		if (visitedRestaurants.size() == 0){
+			throw new NullObjectException ("User hasn't visited a restaurant");
+		}
+		return visitedRestaurants;
+	}
+
+
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time
