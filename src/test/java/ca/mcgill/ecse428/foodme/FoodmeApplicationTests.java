@@ -533,6 +533,54 @@ public class FoodmeApplicationTests {
     }
 
     /**
+     * Test UT for removing a restaurant from the liked list
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testRemoveLiked () {
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.removeLiked(user.getUsername(),restaurant_id)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.removeLiked(user.getUsername(),restaurant_id),restaurant);
+            Mockito.verify(restaurantRepository).removeLiked(user.getUsername(),restaurant_id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Test UT for removing a restaurant from the disliked list
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testRemoveDisliked () {
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.removeDisliked(user.getUsername(),restaurant_id)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.removeDisliked(user.getUsername(),restaurant_id),restaurant);
+            Mockito.verify(restaurantRepository).removeDisliked(user.getUsername(),restaurant_id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Test UT for adding a restaurant to the visited list
      * @throws InvalidInputException
      */
