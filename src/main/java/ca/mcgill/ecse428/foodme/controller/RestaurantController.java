@@ -1,17 +1,21 @@
 package ca.mcgill.ecse428.foodme.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.model.Response;
 import ca.mcgill.ecse428.foodme.model.Restaurant;
 import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -95,11 +99,11 @@ public class RestaurantController {
      * @return ResponseEntity
      */
     @GetMapping("/{user}/get/all/disliked")
-    public ResponseEntity allDisliked(@PathVariable("user") String username) {
+    public ResponseEntity allDisliked(@PathVariable("user") String username){
         List<String> disliked;
-        try {
+        try{
             disliked = restaurantRepository.listAllDisliked(username);
-        } catch (NullObjectException e) {
+        }catch(NullObjectException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(disliked);

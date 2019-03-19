@@ -30,7 +30,9 @@
          * @param email The user's email address
          * @param password The user's password
          * @return  appUser
-         * @throws Exception (InvalidInputException, IllegalStateException)
+         * @throws IllegalArgumentException
+         * @throws InvalidInputException
+         * @throws IllegalStateException
          */
         @Transactional
         public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
@@ -45,8 +47,8 @@
             if(username.length() == 0 || firstName.length() == 0 || lastName.length() == 0 ){
                 throw new InvalidInputException("Username, firstName and lastName must be at least 1 character");
             }
-            if(entityManager.find(AppUser.class,username)!=null){
-                throw new InvalidInputException("User already exists");
+            if(entityManager.find(AppUser.class,username) != null){
+                throw new IllegalArgumentException("User already exists");
             }
             try {
                 passwordHash = Password.getSaltedHash(password);
@@ -72,7 +74,10 @@
          * @param oldPassword
          * @param newPassword
          * @return AppUser
-         * @throws Exception (AuthenticationException, IllegalStateException, NullObjectException,InvalidInputException)
+         * @throws AuthenticationException
+         * @throws IllegalStateException
+         * @throws NullObjectException
+         * @throws InvalidInputException
          */
         @Transactional
         public AppUser changePassword(String username,String oldPassword, String newPassword) throws Exception {
@@ -245,13 +250,16 @@
             q.setParameter("pID", pID);
             @SuppressWarnings("unchecked")
             List<Preference> preferences = q.getResultList();
-            if (preferences.size() == 1) {
+            if (preferences.size() > 0) {
                 return preferences;
             }
             else{
                 throw new NullObjectException("User does not have a default preference");
             }
+            
         }
+        
+        
 
     }
 

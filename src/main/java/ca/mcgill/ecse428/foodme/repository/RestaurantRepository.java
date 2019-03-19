@@ -1,24 +1,22 @@
 package ca.mcgill.ecse428.foodme.repository;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.exception.NullObjectException;
-import ca.mcgill.ecse428.foodme.model.*;
-
-import org.omg.CORBA.DynAnyPackage.Invalid;
-import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.exception.NullObjectException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 
 @Repository
 public class RestaurantRepository {
-
+	
 	@PersistenceContext
 	private EntityManager entityManager;
 
@@ -111,13 +109,14 @@ public class RestaurantRepository {
 	 * @param restaurantName
 	 * @return Restaurant
 	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
 	 */
-	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException{
+	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException,IllegalArgumentException{
 		if(restaurantID.length() == 0 || restaurantName.length() == 0){
 			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
 		}
 		if(entityManager.find(Restaurant.class,restaurantID) != null){
-			throw new InvalidInputException("Restaurant already exists");
+			throw new IllegalArgumentException("Restaurant already exists");
 		}
 		Restaurant restaurant = new Restaurant();
 		restaurant.setRestaurantID(restaurantID);
@@ -151,24 +150,30 @@ public class RestaurantRepository {
 	 * @param restaurantID
 	 * @param restaurantName
 	 * @return Restaurant
-	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
 	 * @throws NullObjectException
+	 * @throws InvalidInputException
 	 */
 	@Transactional
-	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws InvalidInputException,NullObjectException {
+	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws  NullObjectException,IllegalArgumentException,InvalidInputException {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
 		try {
 			restaurant = getRestaurant(restaurantID);
 		}
-		catch(NullObjectException e){
+		catch(NullObjectException e1){
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 
-		//Check if restaurant is liked by user
+		//Check if restaurant is disliked by user
 		if(appUser.getDislikedRestaurants().contains(restaurant)){
-			throw new InvalidInputException ("Restaurant is disliked by user!!!");
+			throw new IllegalArgumentException ("Restaurant is disliked by user!!!");
+		}
+
+		//Check if restaurant is liked by user
+		if(appUser.getlikedRestaurants().contains(restaurant)){
+			throw new IllegalArgumentException ("Restaurant is already liked by user!!!");
 		}
 
 		appUser.addlikedRestaurants(restaurant);
@@ -181,6 +186,7 @@ public class RestaurantRepository {
 	/**
 	 * Method that lists all the liked restaurants of a user
 	 * @return list of liked restaurants
+	 * @throws NullObjectException
 	 */
 	public List<String> listAllLiked(String username) throws NullObjectException {
 		Query q = entityManager.createNativeQuery("SELECT restaurantid FROM liked_Restaurants WHERE username =:username");
@@ -199,28 +205,33 @@ public class RestaurantRepository {
 	 * @param restaurantID
 	 * @param restaurantName
 	 * @return Restaurant
-	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
 	 * @throws NullObjectException
 	 */
-    @Transactional
-    public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws InvalidInputException,NullObjectException {
+	@Transactional
+	public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws NullObjectException,IllegalArgumentException,InvalidInputException {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
 		try {
 			restaurant = getRestaurant(restaurantID);
 		}
-		catch(NullObjectException e){
+		catch(NullObjectException e1){
 			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 
 		//Check if restaurant is liked by user
 		if(appUser.getlikedRestaurants().contains(restaurant)){
-			throw new InvalidInputException ("Restaurant is liked by user!!!");
+			throw new IllegalArgumentException ("Restaurant is liked by user!!!");
 		}
 
-		appUser.addlikedRestaurants(restaurant);
-		restaurant.addLikedAppUsers(appUser);
+		//Check if restaurant is disliked by user
+		if(appUser.getDislikedRestaurants().contains(restaurant)){
+			throw new IllegalArgumentException ("Restaurant is already disliked by user!!!");
+		}
+
+		appUser.addDislikedRestaurants(restaurant);
+		restaurant.addDislikedAppUsers(appUser);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
 		return restaurant;

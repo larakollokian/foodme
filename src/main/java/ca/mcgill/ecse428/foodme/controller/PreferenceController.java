@@ -1,10 +1,8 @@
 package ca.mcgill.ecse428.foodme.controller;
 
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
-import ca.mcgill.ecse428.foodme.model.AppUser;
 import ca.mcgill.ecse428.foodme.model.Preference;
 import ca.mcgill.ecse428.foodme.model.Response;
-import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,14 +65,14 @@ public class PreferenceController {
      * @param cuisine
      * @param price
      * @param sortBy
-     * @return ResponseEntity
+     * @return Preference
      */
     @PostMapping("/{user}/add")
     public ResponseEntity addPreference(
             @PathVariable("user") String username, @RequestParam String location, @RequestParam String cuisine,
             @RequestParam String price, @RequestParam String sortBy) {
         try {
-            Preference preference = preferenceRepository.createPreference(username, location, cuisine, price, sortBy);
+            preferenceRepository.createPreference(username, location, cuisine, price, sortBy);
         } catch(NullObjectException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
@@ -89,7 +87,7 @@ public class PreferenceController {
      * @param cuisine
      * @param price
      * @param sortBy
-     * @return ResponseEntity
+     * @return Preference
      */
     @PostMapping("/{user}/edit/{pID}")
     public ResponseEntity editPreference(

@@ -7,8 +7,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Random;
 
-import static org.springframework.web.client.HttpClientErrorException.*;
-
 @RestController
 @RequestMapping("/search")
 public class SearchController {
@@ -51,9 +49,9 @@ public class SearchController {
      * @return Restaurant and all its information associated with it
      * @throws Exception
      */
-    @GetMapping("/businesses/{id}")
+    @GetMapping("/businesses/")
     public ResponseEntity<String> lookUpRestaurantByID (
-            @RequestParam("id") String id) throws Exception{
+    		@RequestParam("id") String id) throws Exception{
 
         // Set up url
         String url = "https://api.yelp.com/v3/businesses/" + id;
@@ -74,7 +72,7 @@ public class SearchController {
             @RequestParam("cuisine") String cuisine) throws Exception{
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&cuisine=" + cuisine;
+        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&categories=" + cuisine;
         return getMapping(url);
     }
 
@@ -94,7 +92,7 @@ public class SearchController {
             @RequestParam("cuisine") String cuisine) throws Exception{
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&cuisine=" + cuisine;
+        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&categories=" + cuisine;
         return getMapping(url);
     }
 
@@ -148,7 +146,7 @@ public class SearchController {
             extraParam = extraParam + "&offset=" + offset + "&limit=1";
         }
 
-        url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
+        url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location + "&sort_by=" + sortby + extraParam;
 
         return getMapping(url);
     }
@@ -164,8 +162,8 @@ public class SearchController {
      */
     @GetMapping("/{sortby}/{recommend}/")
     public ResponseEntity<String> searchByLongLat(
-            @RequestParam("long") String longitude,
-            @RequestParam("lat") String latitude,
+            @RequestParam("longitude") String longitude,
+            @RequestParam("latitude") String latitude,
             @PathVariable("sortby") String sortby,
             @PathVariable("recommend") int recommend) throws Exception {
         // Set up url
@@ -179,7 +177,7 @@ public class SearchController {
             extraParam = extraParam + "&offset=" + offset + "&limit=1";
         }
 
-        url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude
+        url = "https://api.yelp.com/v3/businesses/search?term=restaurants&longitude=" + longitude
                     + "&latitude=" + latitude
                     + "&sort_by=" + sortby + extraParam;
 
@@ -200,7 +198,7 @@ public class SearchController {
             @RequestParam("price") String price) throws Exception {
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
+        String url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location + "&price=" + price;
 
         return getMapping(url);
     }
@@ -221,7 +219,7 @@ public class SearchController {
             @RequestParam("price") String price) throws Exception {
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
+        String url = "https://api.yelp.com/v3/businesses/search?term=restaurants&longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
 
         return getMapping(url);
     }

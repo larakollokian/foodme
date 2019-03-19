@@ -1,30 +1,14 @@
 package ca.mcgill.ecse428.foodme;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
-import ca.mcgill.ecse428.foodme.controller.AppUserController;
-import ca.mcgill.ecse428.foodme.controller.PreferenceController;
-import ca.mcgill.ecse428.foodme.controller.RestaurantController;
-import ca.mcgill.ecse428.foodme.controller.SearchController;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
-import ca.mcgill.ecse428.foodme.model.AppUser;
-import ca.mcgill.ecse428.foodme.model.Preference;
-import ca.mcgill.ecse428.foodme.model.Restaurant;
-import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
-import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
-import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
-import ca.mcgill.ecse428.foodme.security.Password;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,10 +21,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
+import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
+import ca.mcgill.ecse428.foodme.model.AppUser;
+import ca.mcgill.ecse428.foodme.model.Preference;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
+import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import ca.mcgill.ecse428.foodme.security.Password;
 
 
 @RunWith(SpringRunner.class)
@@ -392,7 +385,7 @@ public class FoodmeApplicationTests {
      * @throws InvalidInputException
      */
     @Test
-    public void testAddLiked () throws InvalidInputException {
+    public void testAddLiked () {
         String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
         String restaurant_name = "Tacos Et Tortas";
 
@@ -412,12 +405,118 @@ public class FoodmeApplicationTests {
     }
 
     /**
+     * Test that if we like a liked restaurants, that it cannot be added twice since already liked
+     */
+    @Test
+    public void testAddLikedAlreadyLiked(){
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        
+        try {
+        	AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+			when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+			assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+			assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
+    /**
+     * Test that if we dislike a disliked restaurants, that it cannot be added twice since already disliked
+     */
+    @Test
+    public void testAddDislikedAlreadyDisliked() {
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+        AppUser user ;
+        
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        try {
+			user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+			restaurantRepository.createRestaurant(restaurant_id,restaurant_name);
+			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    /**
+     * Test UT to add a disliked restaurant to the list of liked restaurant
+     */
+    @Test
+    public void testAddDislikedToLiked(){
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        
+        //add disliked restaurant
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        //try to add that disliked restaurant to the liked list 
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertFalse(restaurantRepository.listAllLiked(USERNAME).contains(restaurant_id));            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Test UT for adding a restaurant to the dislied list
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testAddDisliked () throws InvalidInputException {
+        String restaurant_id = "/gR9DTbKCvezQlqvD7_FzPw";
+        String restaurant_name = "north-india-restaurant";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Test UT for listing all the restaurants liked
      * @throws InvalidInputException
      */
     @Ignore
     //@Test
-    public void testListAll () throws InvalidInputException {
+    public void testListAllLiked () throws InvalidInputException {
         String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
         String restaurant_name = "Tacos Et Tortas";
         try {
