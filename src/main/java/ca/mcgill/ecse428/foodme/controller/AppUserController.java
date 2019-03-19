@@ -4,7 +4,9 @@ import ca.mcgill.ecse428.foodme.exception.*;
 import ca.mcgill.ecse428.foodme.model.AppUser;
 import ca.mcgill.ecse428.foodme.model.Preference;
 import ca.mcgill.ecse428.foodme.model.Response;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
 import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +27,14 @@ public class AppUserController {
     AppUserRepository userRepository;
 
     @Autowired
+    RestaurantRepository restaurantRepository;
+
+    @Autowired
     AuthenticationService authentication;
 
     /**
      * Greeting
+     * 
      * @return AppUser connected
      */
     @RequestMapping("/")
@@ -36,18 +42,20 @@ public class AppUserController {
         return "AppUser connected!";
     }
 
-    /** Controller method that attempts to login
+    /**
+     * Controller method that attempts to login
+     * 
      * @param username
      * @param password
      * @return ResponseEntity
      */
     @GetMapping("/auth/{username}/{password}")
-    public ResponseEntity login(@PathVariable("username")String username, @PathVariable("password")String password) throws Exception {
-        //No exception thrown means the authentication succeeded
+    public ResponseEntity login(@PathVariable("username") String username, @PathVariable("password") String password)
+            throws Exception {
+        // No exception thrown means the authentication succeeded
         try {
             authentication.login(username, password);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Login successful"));
@@ -71,6 +79,7 @@ public class AppUserController {
 
     /**
      * Method that creates a new account for a user. Username must be unique.
+     * 
      * @param username
      * @param firstName
      * @param lastName
@@ -79,17 +88,13 @@ public class AppUserController {
      * @return ResponseEntity
      */
     @PostMapping("/create/{username}/{firstName}/{lastName}/{email}/{password}")
-    public ResponseEntity createAccount(
-            @PathVariable("username") String username,
-            @PathVariable("firstName") String firstName,
-            @PathVariable("lastName") String lastName,
-            @PathVariable("email") String email,
-            @PathVariable("password") String password) {
+    public ResponseEntity createAccount(@PathVariable("username") String username,
+            @PathVariable("firstName") String firstName, @PathVariable("lastName") String lastName,
+            @PathVariable("email") String email, @PathVariable("password") String password) {
 
         try {
             AppUser user = userRepository.createAccount(username, firstName, lastName, email, password);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
 
@@ -99,14 +104,15 @@ public class AppUserController {
 
     /**
      * Controller method that gets a AppUser
+     * 
      * @param username
      * @return ResponseEntity
      */
     @GetMapping("/get/{username}")
-    public ResponseEntity getAppUser(@PathVariable("username")String username) {
+    public ResponseEntity getAppUser(@PathVariable("username") String username) {
         List<AppUser> user;
         try {
-             user = userRepository.getAppUserQuery(username);
+            user = userRepository.getAppUserQuery(username);
         } catch (NullObjectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
@@ -116,6 +122,7 @@ public class AppUserController {
 
     /**
      * Controller method that gets all users in the database
+     * 
      * @return ResponseEntity
      */
     @GetMapping("/get/all")
@@ -123,7 +130,7 @@ public class AppUserController {
         List<AppUser> allUsers;
         try {
             allUsers = userRepository.getAllUsers();
-        } catch (NullObjectException e){
+        } catch (NullObjectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(allUsers);
@@ -131,11 +138,12 @@ public class AppUserController {
 
     /**
      * Controller method that deletes user from the database given a username
+     * 
      * @param username
      * @return ResponseEntity
      */
     @GetMapping("/delete/{username}")
-    public ResponseEntity deleteUser(@PathVariable("username")String username) {
+    public ResponseEntity deleteUser(@PathVariable("username") String username) {
         try {
             userRepository.deleteUser(username);
         } catch (NullObjectException e) {
@@ -147,20 +155,50 @@ public class AppUserController {
 
     /**
      * Controller method that changes a user's password
+     * 
      * @param username
      * @param oldPass
      * @param newPass
      * @return ResponseEntity
      */
     @PostMapping("/changePassword/{username}/{oldPass}/{newPass}")
-    public ResponseEntity changePassword(@PathVariable("username")String username,@PathVariable("oldPass")String oldPass, @PathVariable("newPass")String newPass) {
-        AppUser u = new AppUser();
+    public ResponseEntity changePassword(@PathVariable("username") String username,
+            @PathVariable("oldPass") String oldPass, @PathVariable("newPass") String newPass) {
         try {
-            userRepository.changePassword(username,oldPass,newPass);
-        } catch (Exception e) { //NullObjectException , IllegalStateException, NullObjectException
+            userRepository.changePassword(username, oldPass, newPass);
+        } catch (Exception e) { // NullObjectException , IllegalStateException, NullObjectException
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Password successfully changed"));
+    }
+
+    @PostMapping("/changeFirstName/{username}/{oldFName}/{newFName}")
+    public ResponseEntity changeFirstName(@PathVariable("username") String username,
+            @PathVariable("oldFName") String oldFName, @PathVariable("newFName") String newFName) {
+        try {
+            userRepository.changeFirstName(username, oldFName, newFName);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "First Name successfully changed"));
+
+    }
+
+    /**
+    * 
+    */
+    @PostMapping("/changeFirstName/{username}/{oldLName}/{newLName}")
+    public ResponseEntity changeLastName(@PathVariable("username") String username,
+            @PathVariable("oldLName") String oldLName, @PathVariable("newLName") String newLName) {
+        try {
+            userRepository.changeLastName(username, oldLName, newLName);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "First Name successfully changed"));
+
     }
 
     /**
@@ -244,4 +282,22 @@ public class AppUserController {
              Transport.send(message);
          } catch (MessagingException e) {e.printStackTrace();} 
     }
+    
+    // @PostMapping("/add/dislike/resraurant/{username}/{restaurant}")
+    // public ResponseEntity addDislikedRestaurant(@PathVariable("username") String username, @PathVariable("restaurant") String restaurant) {
+    //     try{
+    //     //AppUser u = userRepository.getAppUser(username);
+    //     Restaurant r = restaurantRepository.getRestaurantByName(restaurant);
+    //     //userRepository.getAppUser(username).addDislikedRestaurants(r);
+
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        
+    // }
+
+    //     return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant added successfully to your disliked list."));
+
+    //    }
+
+
 }

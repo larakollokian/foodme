@@ -34,6 +34,13 @@ public class AppUser {
 			inverseJoinColumns = @JoinColumn(name = "restaurantID"))
 	private Set<Restaurant> dislikedRestaurants;
 
+	@ManyToMany
+	@JoinTable(
+			name = "visitedRestaurants",
+			joinColumns = @JoinColumn(name = "username"),
+			inverseJoinColumns = @JoinColumn(name = "restaurantID"))
+	private Set<Restaurant> visitedRestaurants;
+
 	public boolean setUsername(String aUsername) {
 		boolean wasSet = false;
 		this.username = aUsername;
@@ -144,6 +151,29 @@ public class AppUser {
 	public boolean removeDislikedRestaurants(Restaurant dislikedRestaurants) {
 		if(this.dislikedRestaurants.contains(dislikedRestaurants)) {
 			this.dislikedRestaurants.remove(dislikedRestaurants);
+			return true;
+		}
+		return false;
+	}
+
+	public Set getVisitedRestaurants() {
+		return visitedRestaurants;
+	}
+
+	public void setVisitedRestaurants(Set visitedRestaurants) {
+		this.visitedRestaurants = visitedRestaurants;
+	}
+
+	public void addVisitedRestaurants(Restaurant visitedRestaurants){
+		if(this.visitedRestaurants == null){
+			this.visitedRestaurants = new HashSet();
+		}
+		this.visitedRestaurants.add(visitedRestaurants);
+	}
+
+	public boolean removedVisitedRestaurants(Restaurant visitedRestaurants) {
+		if(this.visitedRestaurants.contains(visitedRestaurants)) {
+			this.visitedRestaurants.remove(visitedRestaurants);
 			return true;
 		}
 		return false;

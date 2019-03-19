@@ -30,7 +30,9 @@
          * @param email The user's email address
          * @param password The user's password
          * @return  appUser
-         * @throws Exception (InvalidInputException, IllegalStateException)
+         * @throws IllegalArgumentException
+         * @throws InvalidInputException
+         * @throws IllegalStateException
          */
         @Transactional
         public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
@@ -45,8 +47,8 @@
             if(username.length() == 0 || firstName.length() == 0 || lastName.length() == 0 ){
                 throw new InvalidInputException("Username, firstName and lastName must be at least 1 character");
             }
-            if(entityManager.find(AppUser.class,username)!=null){
-                throw new InvalidInputException("User already exists");
+            if(entityManager.find(AppUser.class,username) != null){
+                throw new IllegalArgumentException("User already exists");
             }
             try {
                 passwordHash = Password.getSaltedHash(password);
@@ -72,7 +74,10 @@
          * @param oldPassword
          * @param newPassword
          * @return AppUser
-         * @throws Exception (AuthenticationException, IllegalStateException, NullObjectException,InvalidInputException)
+         * @throws AuthenticationException
+         * @throws IllegalStateException
+         * @throws NullObjectException
+         * @throws InvalidInputException
          */
         @Transactional
         public AppUser changePassword(String username,String oldPassword, String newPassword) throws Exception {
@@ -93,6 +98,36 @@
             u.setPassword(Password.getSaltedHash(newPassword));
             entityManager.merge(u);
             return u;
+        }
+
+        @Transactional
+        public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
+
+            AppUser u = getAppUser(username);
+            
+            if(newFName == u.getFirstName()) {
+                throw new InvalidInputException("New first name cannot be the same as current name");
+                }
+            else {
+            u.setFirstName(newFName);
+            entityManager.merge(u);
+            return u;
+            }
+        }
+
+        @Transactional
+        public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
+
+            AppUser u = getAppUser(username);
+            
+            if(newLName == u.getLastName()) {
+                throw new InvalidInputException("New last name cannot be the same as current name");
+                }
+            else {
+            u.setLastName(newLName);
+            entityManager.merge(u);
+            return u;
+            }
         }
 
         /**

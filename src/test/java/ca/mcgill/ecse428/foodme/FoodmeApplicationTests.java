@@ -531,6 +531,36 @@ public class FoodmeApplicationTests {
         }
 
     }
+
+    /**
+     * Test UT for adding a restaurant to the visited list
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testAddVisited () {
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addVisited(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addVisited(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addVisited(user.getUsername(),restaurant_id,restaurant_name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void testClearVisited() {}
+
+    public void testAllVisited(){}
+
+
 //    @Test
 //    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
 //        ResponseEntity<String> allRestaurant= restaurantRepository.getAllRestaurants("montreal");
