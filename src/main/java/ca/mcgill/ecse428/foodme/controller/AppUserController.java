@@ -4,7 +4,9 @@ import ca.mcgill.ecse428.foodme.exception.*;
 import ca.mcgill.ecse428.foodme.model.AppUser;
 import ca.mcgill.ecse428.foodme.model.Preference;
 import ca.mcgill.ecse428.foodme.model.Response;
+import ca.mcgill.ecse428.foodme.model.Restaurant;
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
 import ca.mcgill.ecse428.foodme.security.Password;
 import ca.mcgill.ecse428.foodme.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class AppUserController {
 
     @Autowired
     AppUserRepository userRepository;
+
+    @Autowired
+    RestaurantRepository restaurantRepository;
 
     @Autowired
     AuthenticationService authentication;
@@ -153,7 +158,6 @@ public class AppUserController {
     @PostMapping("/changePassword/{username}/{oldPass}/{newPass}")
     public ResponseEntity changePassword(@PathVariable("username") String username,
             @PathVariable("oldPass") String oldPass, @PathVariable("newPass") String newPass) {
-        AppUser u = new AppUser();
         try {
             userRepository.changePassword(username, oldPass, newPass);
         } catch (Exception e) { // NullObjectException , IllegalStateException, NullObjectException
@@ -165,7 +169,6 @@ public class AppUserController {
     @PostMapping("/changeFirstName/{username}/{oldFName}/{newFName}")
     public ResponseEntity changeFirstName(@PathVariable("username") String username,
             @PathVariable("oldFName") String oldFName, @PathVariable("newFName") String newFName) {
-        AppUser u = new AppUser();
         try {
             userRepository.changeFirstName(username, oldFName, newFName);
         } catch (Exception e) {
@@ -182,7 +185,6 @@ public class AppUserController {
     @PostMapping("/changeFirstName/{username}/{oldLName}/{newLName}")
     public ResponseEntity changeLastName(@PathVariable("username") String username,
             @PathVariable("oldLName") String oldLName, @PathVariable("newLName") String newLName) {
-        AppUser u = new AppUser();
         try {
             userRepository.changeLastName(username, oldLName, newLName);
         } catch (Exception e) {
@@ -238,6 +240,23 @@ public class AppUserController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully set to default"));
     }
+
+    
+    // @PostMapping("/add/dislike/resraurant/{username}/{restaurant}")
+    // public ResponseEntity addDislikedRestaurant(@PathVariable("username") String username, @PathVariable("restaurant") String restaurant) {
+    //     try{
+    //     //AppUser u = userRepository.getAppUser(username);
+    //     Restaurant r = restaurantRepository.getRestaurantByName(restaurant);
+    //     //userRepository.getAppUser(username).addDislikedRestaurants(r);
+
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        
+    // }
+
+    //     return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant added successfully to your disliked list."));
+
+    //    }
 
 
 }

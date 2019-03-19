@@ -58,6 +58,17 @@ public class RestaurantRepository {
 		}
 	}
 
+	@Transactional
+	public Restaurant getRestaurantByName(String restaurantName) throws NullObjectException {
+		if(entityManager.find(Restaurant.class, restaurantName) == null) {
+			throw new NullObjectException("Restaurant does not exist");
+		}
+		else {
+			Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
+			return restaurant;
+		}
+	}
+
 	/**
 	 * Method that allows get a restaurant given its restaurantID
 	 * @param restaurantID
@@ -213,7 +224,43 @@ public class RestaurantRepository {
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
 		return restaurant;
-    }
+	}
+	
+	@Transactional
+    public Restaurant removeDisliked(String username, String restaurantID) throws NullObjectException, InvalidInputException  {
+		AppUser appUser = getAppUser(username);
+		Restaurant restaurant = new Restaurant();
+		
+		restaurant = getRestaurant(restaurantID);
+		
+		if(!appUser.getDislikedRestaurants().contains(restaurant)){
+			throw new InvalidInputException ("Restaurant is not on disliked list!!!");
+		}
+
+		appUser.removeDislikedRestaurants(restaurant);
+		restaurant.removeDislikedAppUsers(appUser);
+		entityManager.merge(appUser);
+		entityManager.merge(restaurant);
+		return restaurant;
+	}
+
+	@Transactional
+    public Restaurant removeliked(String username, String restaurantID) throws NullObjectException, InvalidInputException  {
+		AppUser appUser = getAppUser(username);
+		Restaurant restaurant = new Restaurant();
+		
+		restaurant = getRestaurant(restaurantID);
+		
+		if(!appUser.getlikedRestaurants().contains(restaurant)){
+			throw new InvalidInputException ("Restaurant is not on liked list!!!");
+		}
+
+		appUser.removelikedRestaurants(restaurant);
+		restaurant.addLikedAppUsers(appUser);
+		entityManager.merge(appUser);
+		entityManager.merge(restaurant);
+		return restaurant;
+	}
 
     /**
      * Method to list all the disliked restaurants of a user

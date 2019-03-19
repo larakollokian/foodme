@@ -59,7 +59,14 @@ public class RestaurantController {
      */
     @PostMapping("/{user}/removeliked/{id}")
     public ResponseEntity removeLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID) {
-        // TO-DO
+       
+        try {
+            restaurantRepository.removeliked(username, restaurantID);
+        } catch (Exception e) {
+            
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, "User successfully removed liked Restaurant"));
     }
@@ -89,7 +96,12 @@ public class RestaurantController {
      */
     @GetMapping("/{user}/get/all/disliked")
     public ResponseEntity allDisliked(@PathVariable("user") String username) {
-        List<String> disliked = null;
+        List<String> disliked;
+        try {
+            disliked = restaurantRepository.listAllDisliked(username);
+        } catch (NullObjectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
     }
 
@@ -121,10 +133,15 @@ public class RestaurantController {
      * @param restaurantID
      * @return ResponseEntity
      */
-    @PostMapping("/{user}/removedisliked/{id}")
+    @PostMapping("/{user}/removedisliked/{restaurantID}")
     public ResponseEntity removeDisliked(@PathVariable("user") String username,
-            @PathVariable("id") String restaurantID) {
-        // TO-DO
+            @PathVariable("restaurantID") String restaurantID) {
+        try {
+                restaurantRepository.removeDisliked(username, restaurantID);
+            } catch (Exception e) {
+                
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+            }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new Response(true, "User successfully removed disliked Restaurant"));
     }
