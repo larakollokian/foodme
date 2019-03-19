@@ -146,7 +146,7 @@ public class SearchController {
             extraParam = extraParam + "&offset=" + offset + "&limit=1";
         }
 
-        url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&sort_by=" + sortby + extraParam;
+        url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location + "&sort_by=" + sortby + extraParam;
 
         return getMapping(url);
     }
@@ -177,7 +177,7 @@ public class SearchController {
             extraParam = extraParam + "&offset=" + offset + "&limit=1";
         }
 
-        url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude
+        url = "https://api.yelp.com/v3/businesses/search?term=restaurants&longitude=" + longitude
                     + "&latitude=" + latitude
                     + "&sort_by=" + sortby + extraParam;
 
@@ -198,7 +198,7 @@ public class SearchController {
             @RequestParam("price") String price) throws Exception {
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?location=" + location + "&price=" + price;
+        String url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location + "&price=" + price;
 
         return getMapping(url);
     }
@@ -219,7 +219,7 @@ public class SearchController {
             @RequestParam("price") String price) throws Exception {
 
         // Set up url
-        String url = "https://api.yelp.com/v3/businesses/search?longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
+        String url = "https://api.yelp.com/v3/businesses/search?term=restaurants&longitude=" + longitude + "&latitude=" + latitude + "&price=" + price;
 
         return getMapping(url);
     }
