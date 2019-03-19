@@ -426,10 +426,10 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
-    // ===================== REASTAURANT INFO ===================== //
+    // ===================== RESTAURANT INFO ===================== //
     
     @Test
-    public void tesListRestaurantInfo() throws Exception {
+    public void testListRestaurantInfoSuccess() throws Exception {
        	
     	String id = "WavvLdfdP6g8aZTtbBQHTw";
     	String request_url = "/search/businesses/?id=" + id;
@@ -440,9 +440,31 @@ public class SearchControllerTests {
                 .andReturn().getResponse().getContentAsString();
         assertEquals(response1, response2);
     }
+
+    @Test
+    public void testListRestaurantInfoFailure() throws Exception {
+        try {
+            searchController.lookUpRestaurantByID("");
+        } catch (Exception e) {
+            assertEquals("Something went wrong! Please make sure you've put in the right information!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testListRestaurantInfoHTTPSuccess() throws Exception {
+        String response1 = this.mockMvc.perform(get("/search/businesses/?id=WavvLdfdP6g8aZTtbBQHTw"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        String response2 = this.mockMvc.perform(get("/search/businesses/?id=WavvLdfdP6g8aZTtbBQHTw"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertEquals(response1, response2);
+    }
     
     @Test
-    public void tesListRestaurantInfoFailure() throws Exception {
+    public void testListRestaurantInfoHTTPFailure() throws Exception {
         String response1 = this.mockMvc.perform(get("/search/businesses/"))
                 .andExpect(status().is4xxClientError())
                 .andReturn().getResponse().getContentAsString();
@@ -452,7 +474,6 @@ public class SearchControllerTests {
                 .andReturn().getResponse().getContentAsString();
 
         assertEquals(response1, response2);
-    	
     }
     
 }
