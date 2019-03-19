@@ -23,6 +23,8 @@ public class Restaurant {
 	@ManyToMany(mappedBy = "dislikedRestaurants")
 	private Set<AppUser> appUser_dislikes;
 
+	@ManyToMany(mappedBy = "visitedRestaurants")
+	private Set<AppUser> appUser_visited;
 
 	public String getRestaurantID() {
 		return restaurantID;
@@ -81,6 +83,21 @@ public class Restaurant {
 	public boolean removeDislikedAppUsers(AppUser user) {
 		if(this.appUser_dislikes.contains(user)) {
 			this.appUser_dislikes.remove(user);
+			return true;
+		}
+		return false;
+	}
+
+	public void addVisitedAppUsers(AppUser user){
+		if(this.appUser_visited == null){
+			this.appUser_visited = new HashSet();
+		}
+		this.appUser_visited.add(user);
+	}
+
+	public boolean removeVisitedAppUsers(AppUser user) {
+		if(this.appUser_visited.contains(user)) {
+			this.appUser_visited.remove(user);
 			return true;
 		}
 		return false;
