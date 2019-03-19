@@ -13,7 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import java.util.*;
+import javax.mail.*;
+import javax.mail.internet.*;
+
 
 @RestController
 @RequestMapping("/users")
@@ -93,6 +97,8 @@ public class AppUserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
+
+        sendRegistrationConfirmationEmail(email, firstName, username);
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "User account successfully created."));
     }
 
@@ -104,13 +110,15 @@ public class AppUserController {
      */
     @GetMapping("/get/{username}")
     public ResponseEntity getAppUser(@PathVariable("username") String username) {
-        List<AppUser> user;
+        //List<AppUser> user;
+        AppUser user = new AppUser();
         try {
-            user = userRepository.getAppUserQuery(username);
+            user = userRepository.getAppUser(username);
+            // user = userRepository.getAppUserQuery(username);
         } catch (NullObjectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(user.get(0));
+        return ResponseEntity.status(HttpStatus.OK).body(user);//user.get(0));
 
     }
 
@@ -197,15 +205,31 @@ public class AppUserController {
 
     /**
      * Controller method that generates a random password given a length n
+     * 
      * @param length
      * @return ResponseEntity
+     * @throws Exception
      */
-    @GetMapping("/password/random/{n}")
-    public ResponseEntity getRandomPassword(@PathVariable("n") int length) {
+    @PostMapping("{username}/resetPassword/{n}")
+    public ResponseEntity resetPassword(@PathVariable("username") String username, @PathVariable("n") int length)
+            throws Exception {
+        
+        AppUser u = userRepository.getAppUser(username); 
+        String uUsername = username;
+        String uEmail = u.getEmail();
+        String uFName = u.getFirstName();
+        String uPassword = u.getPassword();
+
         if(length <= 6){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, "Password should be longer than 6 characters"));
         }
+
         String randPassword = Password.generateRandomPassword(length);
+
+        userRepository.changePassword(uUsername, uPassword, randPassword);
+
+
+        sendResetPasswordConfirmationEmail(uEmail,uFName, uUsername, randPassword);
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true,randPassword));
     }
 
@@ -241,22 +265,76 @@ public class AppUserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully set to default"));
     }
 
-    
-    // @PostMapping("/add/dislike/resraurant/{username}/{restaurant}")
-    // public ResponseEntity addDislikedRestaurant(@PathVariable("username") String username, @PathVariable("restaurant") String restaurant) {
-    //     try{
-    //     //AppUser u = userRepository.getAppUser(username);
-    //     Restaurant r = restaurantRepository.getRestaurantByName(restaurant);
-    //     //userRepository.getAppUser(username).addDislikedRestaurants(r);
-
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+    private void sendResetPasswordConfirmationEmail(String recipient, String firstName, String username, String newPassword) {
+        String host = "smtp.gmail.com";  
+        String wmail = "foodmeapplication@gmail.com";//change accordingly  
+        String pw = "FoodMeApp428";//change accordingly
+        String to = recipient;
+        String generatedPW = newPassword;
+        Properties props = new Properties();
+        props.setProperty("mail.transport.protocol", "smtp");
+        props.setProperty("mail.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.debug", "true");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false"); 
         
-    // }
+        javax.mail.Session session2 = javax.mail.Session.getDefaultInstance(props, new javax.mail.Authenticator() {  
+       
+             protected PasswordAuthentication getPasswordAuthentication() {
+                 return new PasswordAuthentication(wmail,pw);
+              }
+         });
+         
+         //Compose the message
+         try {
+             MimeMessage message = new MimeMessage(session2);
+             message.setFrom(new InternetAddress("FoodMe Application <foodmeapplication@gmail.com>"));
+             message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
+             message.setSubject("Your New Foodme Account Password");
+             message.setText("Hi "+firstName+", \n\nLooks like you forgot the password associated with the username "+username+". \n\nWe have generated a new password for you\n\n" + generatedPW +
+             "The FoodMe team");
+             
+             //send the message
+             Transport.send(message);
+         } catch (MessagingException e) {e.printStackTrace();} 
+    }
 
-    //     return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant added successfully to your disliked list."));
-
-    //    }
-
-
+    private void sendRegistrationConfirmationEmail(String recipient, String firstName, String username) {
+        String host = "smtp.gmail.com";  
+        String wmail = "foodmeapplication@gmail.com";//change accordingly  
+        String pw = "FoodMeApp428";//change accordingly
+        String to = recipient;
+        Properties props = new Properties();
+        props.setProperty("mail.transport.protocol", "smtp");
+        props.setProperty("mail.host", "smtp.gmail.com");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.debug", "true");
+        props.put("mail.smtp.socketFactory.port", "465");
+        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.fallback", "false"); 
+        
+        javax.mail.Session session2 = javax.mail.Session.getDefaultInstance(props, new javax.mail.Authenticator() {  
+       
+             protected PasswordAuthentication getPasswordAuthentication() {
+                 return new PasswordAuthentication(wmail,pw);
+              }
+         });
+         
+         //Compose the message
+         try {
+             MimeMessage message = new MimeMessage(session2);
+             message.setFrom(new InternetAddress("FoodMe Application <foodmeapplication@gmail.com>"));
+             message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
+             message.setSubject("Welcome to FoodMe!");
+             message.setText("Hi "+firstName+", \n\nThank you for creating a profile under the username "+username+". \n\nYour account has been successfully activated!\n\n" +
+             "The FoodMe team");
+             
+             //send the message
+             Transport.send(message);
+         } catch (MessagingException e) {e.printStackTrace();} 
+    }
 }
