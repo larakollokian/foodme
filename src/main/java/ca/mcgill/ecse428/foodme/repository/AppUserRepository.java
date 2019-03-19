@@ -38,7 +38,7 @@
         public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
             String passwordHash="";
 
-            if (!email.contains("@") && !email.contains(".")) {
+            if (!email.contains("@") || !email.contains(".com")) {
                 throw new InvalidInputException("This is not a valid email address!");
             }
             if (password.length() <= 6) {

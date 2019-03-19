@@ -139,6 +139,88 @@ public class ControllerTests {
         expected = "{\"response\":true,\"message\":\"User account successfully deleted.\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+
+    @Test
+    public void testSignUpInvalidPassword() throws Exception {
+    	// sign up and then delete the user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/testUserJS/john/smith/john.smith@gmail.com/pass"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Your password must be longer than 6 characters!\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+        
+    }
+
+    @Test
+    public void testSignUpInvalidEmail() throws Exception {
+    	// sign up and then delete the user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/testUserJS/john/smith/john.smithgmail.com/password1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"This is not a valid email address!\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+        
+    }
+
+    /*
+    @Test
+    public void testSignUpInvalidFirstName() throws Exception {
+    	// sign up and then delete the user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/testUserJS/ /smith/john.smith@gmail.com/password1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Username, firstName and lastName must be at least 1 character\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+        
+    }
+
+    @Test
+    public void testSignUpInvalidLastName() throws Exception {
+    	// sign up and then delete the user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/testUserJS/john//john.smith@gmail.com/password1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Username, firstName and lastName must be at least 1 character\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+        
+    }
+
+    @Test
+    public void testSignUpInvalidUsername() throws Exception {
+    	// sign up and then delete the user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create//john/smith/john.smith@gmail.com/password1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Username, firstName and lastName must be at least 1 character\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+        
+    }
+*/
+
+
+
+    @Test
+    public void testSignUpExistingUser() throws Exception {
+    	// sign up and then create duplicate user, then delete user 
+    	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/create/testUser/Test/User/test.user@gmail.com/helloworld1234"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"User account successfully created.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+
+        response = restTemplate.exchange(
+            createURLWithPort("/users/create/testUser/Test/User/test.user@gmail.com/helloworld1234"), HttpMethod.POST, entity, String.class);
+        expected = "{\"response\":false,\"message\":\"User already exists\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+
+        
+        response = restTemplate.exchange(
+                createURLWithPort("/users/delete/testUser"), HttpMethod.GET, entity, String.class);
+        expected = "{\"response\":true,\"message\":\"User account successfully deleted.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    
+    }
+
     
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
