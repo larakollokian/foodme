@@ -280,7 +280,7 @@ public class RestaurantRepository {
 		
 		restaurant = getRestaurant(restaurantID);
 		
-		if(!appUser.getDislikedRestaurants().contains(restaurant)){
+		if(!appUser.getDislikedRestaurants().contains(restaurant) || !restaurant.getAppUser_dislikes().contains(appUser)){
 			throw new InvalidInputException ("Restaurant is not on disliked list!!!");
 		}
 
@@ -301,7 +301,7 @@ public class RestaurantRepository {
         @SuppressWarnings("unchecked")
         List<Restaurant> dislikedRestaurants = q.getResultList();
 		if (dislikedRestaurants.size() == 0){
-			throw new NullObjectException ("User does not have liked restaurants");
+			throw new NullObjectException ("User does not have disliked restaurants");
 		}
         return dislikedRestaurants;
     }
