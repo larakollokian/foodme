@@ -1,5 +1,7 @@
 package ca.mcgill.ecse428.foodme;
 
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import org.junit.*;
 import org.junit.After;
 import org.junit.Assert;
@@ -9,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -17,11 +20,22 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import ca.mcgill.ecse428.foodme.model.*;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ControllerTests {
+
+    private int pid;
+
+    @Autowired
+    private PreferenceRepository p;
 
     @LocalServerPort
     private int port;
@@ -37,6 +51,7 @@ public class ControllerTests {
      * c - liked restaurants
      * d - disliked restaurants
      * e - visited restaurants
+     * f - preferences
      * */
 
     @Test
@@ -158,7 +173,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
         String expected ="{\"response\":false,\"message\":\"User does not have liked restaurants\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -167,7 +182,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":true,\"message\":\"User successfully liked Restaurant\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -176,7 +191,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"Restaurant is liked by user!!!\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -194,7 +209,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
     	String expected = "{\"response\":true,\"message\":\"User successfully removed liked Restaurant\"}";
-    	Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -203,7 +218,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
     	String expected = "{\"response\":false,\"message\":\"Restaurant is not liked by user!!!\"}";
-    	Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -211,16 +226,16 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/disliked"), HttpMethod.GET, entity, String.class);
-        String expected ="{\"response\":false,\"message\":\"User does not have disliked restaurants\"}";
-        Assert.assertEquals(expected, response.getBody());    }
-
+        String expected = "{\"response\":false,\"message\":\"User does not have disliked restaurants\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
     @Test
     public void d2_testAddDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":true,\"message\":\"User successfully disliked Restaurant\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -229,7 +244,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"Restaurant is disliked by user!!!\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -247,7 +262,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
     	String expected = "{\"response\":true,\"message\":\"User successfully removed disliked Restaurant\"}";
-    	Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -256,7 +271,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
     	String expected = "{\"response\":false,\"message\":\"Restaurant is not on disliked list!!!\"}";
-    	Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -265,7 +280,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/clearvisited"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"Visited list is empty\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -274,7 +289,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/visited"), HttpMethod.GET, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"User hasn't visited a restaurant\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -283,7 +298,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/addvisited/RIIOjIdlzRyESw1BkmQHtw/Tacos Et Tortas"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":true,\"message\":\"User successfully added to visited list\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
     @Test
@@ -301,10 +316,63 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/clearvisited"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":true,\"message\":\"User successfully cleared visited list\"}";
-        Assert.assertEquals(expected, response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
-    
+    @Test
+    public void f1_testAddPreference() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/preferences/johnsmith/add?location=Montreal&cuisine=chinese&price=$&sortBy=rating"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"Preference successfully created.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+
+
+    @Test
+    public void f2_testGetPreferencesForUser() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/preferences/johnsmith"), HttpMethod.GET, entity, String.class);
+        String expected = "\"chinese\",\"Montreal\",\"$\",\"rating\",\"johnsmith\"";
+        Assert.assertTrue(response.getBody().contains(expected));
+    }
+
+    @Test
+    public void f3_testEditPreferenceSuccess() throws Exception {
+        pid = p.getPreferenceIDs("johnsmith");
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/preferences/johnsmith/edit/"+pid+"?location=Montreal&cuisine=french&price=$$&sortBy=rating"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"Preference successfully modified.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+    @Test
+    public void f4_testEditPreferenceFail() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/preferences/johnsmith/edit/1?location=Montreal&cuisine=french&price=$$&sortBy=rating"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+    @Test
+    public void f5_testDeletePreferenceSuccess() throws Exception{
+        pid = p.getPreferenceIDs("johnsmith");
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/preferences/johnsmith/delete/"+pid), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"Preference successfully deleted.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+    @Test
+    public void f6_testDeletePreferenceFail() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/preferences/johnsmith/delete/1"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
     }
