@@ -372,6 +372,42 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
+    
+    @Test
+    public void f7_testGetDefaultPreferenceSuccess() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/yeffo/getdefault"), HttpMethod.GET, entity, String.class);
+        String expected = "77";
+        Assert.assertTrue(response.getBody().contains(expected));
+    }
+    
+    @Test
+    public void f8_testGetDefaultPreferenceFail() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/alaye/getdefault"), HttpMethod.GET, entity, String.class);
+        String expected = "77";
+        Assert.assertEquals(response.getBody().contains(expected),false);
+    }
+    
+    @Test
+    public void f9_testSetDefaultPreferenceSuccess() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/yeffo/setdefault/77"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"Preference successfully set to default\"}";
+        Assert.assertTrue(response.getBody().contains(expected));
+    }
+    
+    @Test
+    public void f10_testSetDefaultPreferenceFail() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/yeffo/setdefault/75"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"Preference successfully set to default\"}";
+        Assert.assertEquals(response.getBody().contains(expected),false);
+    }
 
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
