@@ -58,15 +58,11 @@ public class Password {
      * @throws Exception when the password is not equal to the storedHash
 	 */
     public static boolean check(String password, String storedHash) throws Exception {
-//        System.out.println(password);
-//        System.out.println(storedHash);
         String[] saltAndPass = storedHash.split("\\$");
         if (saltAndPass.length != 2) {
             throw new IllegalStateException("The stored password hash is formatted incorrectly.");
         }
         String hashOfInput = hash(password, base64Decoder.decode(saltAndPass[0]));
-//        System.out.println(hashOfInput);
-//        System.out.println(saltAndPass[1]);
         if(!hashOfInput.equals(saltAndPass[1])){
             throw new AuthenticationException("Invalid password");
         }

@@ -521,7 +521,7 @@ public class FoodmeApplicationTests {
         String restaurant_name = "Tacos Et Tortas";
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            List<String> liked = restaurantRepository.listAllLiked(USERNAME);
+            List<Restaurant> liked = restaurantRepository.listAllLiked(USERNAME);
             assertTrue(liked.isEmpty());
             restaurantRepository.addLiked(USERNAME, restaurant_id, restaurant_name);
             restaurantRepository.listAllLiked(USERNAME);

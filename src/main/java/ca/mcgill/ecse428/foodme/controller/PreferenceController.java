@@ -42,6 +42,7 @@ public class PreferenceController {
         return ResponseEntity.status(HttpStatus.OK).body(allPs);
     }
 
+
     /**
      * Controller method that gets the list of preferences of a user
      * @param username
@@ -72,7 +73,7 @@ public class PreferenceController {
             @PathVariable("user") String username, @RequestParam String location, @RequestParam String cuisine,
             @RequestParam String price, @RequestParam String sortBy) {
         try {
-            preferenceRepository.createPreference(username, location, cuisine, price, sortBy);
+           preferenceRepository.createPreference(username, location, cuisine, price, sortBy);
         } catch(NullObjectException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }

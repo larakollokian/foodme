@@ -79,7 +79,7 @@ public class RestaurantController {
      */
     @GetMapping("/{user}/all/liked")
     public ResponseEntity allLiked(@PathVariable("user") String username){
-        List<String> liked;
+        List<Restaurant> liked;
         try {
             liked = restaurantRepository.listAllLiked(username);
         } catch (NullObjectException e) {
@@ -96,7 +96,7 @@ public class RestaurantController {
      */
     @GetMapping("/{user}/all/disliked")
     public ResponseEntity allDisliked(@PathVariable("user") String username){
-        List<String> disliked;
+        List<Restaurant> disliked;
         try{
             disliked = restaurantRepository.listAllDisliked(username);
         }catch(NullObjectException e){
@@ -218,7 +218,7 @@ public class RestaurantController {
      */
     @GetMapping("/{user}/all/visited")
     public ResponseEntity allVisited(@PathVariable("user") String username){
-        List<String> visited;
+        List<Restaurant> visited;
         try{
             visited = restaurantRepository.listAllVisited(username);
         }catch(NullObjectException e){
@@ -239,5 +239,4 @@ public class RestaurantController {
          return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));
 
      }
-
 }
