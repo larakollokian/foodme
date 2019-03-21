@@ -224,4 +224,31 @@ public class SearchController {
 
         return getMapping(url);
     }
+
+    /**
+     * Method that searches restaurant and sort them by best_match, rating, review_count or distance
+     *
+     * @param location
+     * @param price
+     * @param cuisine
+     * @param sortBy:    best_match, rating, review_count or distance
+     * @return ResponseEntity
+     * @throws Exception
+     */
+    @GetMapping("/filter/")
+    public ResponseEntity<String> filterByPreference(
+            @RequestParam("location") String location, 
+            @RequestParam("price") String price, 
+            @RequestParam("cuisine") String cuisine, 
+            @RequestParam("sortBy") String sortBy) throws Exception {
+        // Set up url
+        String url = null;
+
+
+        url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location
+                    + "&price=" + price + "&cuisine=" + cuisine 
+                    + "&sort_by=" + sortBy;
+
+        return getMapping(url);
+    }
 }
