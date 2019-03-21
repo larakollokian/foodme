@@ -142,7 +142,15 @@ public class AppUserController {
      * @return ResponseEntity
      */
     @GetMapping("/delete/{username}")
-    
+    public ResponseEntity deleteUser(@PathVariable("username") String username) {
+        try {
+            userRepository.deleteUser(username);
+        } catch (NullObjectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "User account successfully deleted."));
+
+    }
 
     /**
      * Controller method that changes a user's password
