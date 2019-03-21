@@ -231,7 +231,7 @@ public class SearchController {
      * @param location
      * @param price
      * @param cuisine
-     * @param sortBy:    best_match, rating, review_count or distance
+     * @param sortby:    best_match, rating, review_count or distance
      * @return ResponseEntity
      * @throws Exception
      */
@@ -240,14 +240,14 @@ public class SearchController {
             @RequestParam("location") String location, 
             @RequestParam("price") String price, 
             @RequestParam("cuisine") String cuisine, 
-            @RequestParam("sortBy") String sortBy) throws Exception {
+            @RequestParam("sortby") String sortby) throws Exception {
         // Set up url
         String url = null;
 
 
         url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location
-                    + "&price=" + price + "&cuisine=" + cuisine 
-                    + "&sort_by=" + sortBy;
+                    + "&price=" + price + "&categories=" + cuisine 
+                    + "&sort_by=" + sortby;
 
         return getMapping(url);
     }
