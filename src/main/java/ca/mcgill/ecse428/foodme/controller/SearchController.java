@@ -290,7 +290,7 @@ public class SearchController {
 		String contentAsString = response.getBody();
 
 		String endTime = "";
-		ZoneId easternZone = ZoneId.of("EST5EDT");
+		ZoneId easternZone = ZoneId.of("Canada/Eastern");
 		LocalDate date = LocalDate.now(easternZone);
 		LocalTime time = LocalTime.now(easternZone);
 		System.out.println("the time is "+ time.toString());
