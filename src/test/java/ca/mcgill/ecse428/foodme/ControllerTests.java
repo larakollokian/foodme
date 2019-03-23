@@ -327,8 +327,6 @@ public class ControllerTests {
         String expected = "{\"response\":true,\"message\":\"Preference successfully created.\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
-
-
     @Test
     public void f2_testGetPreferencesForUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
