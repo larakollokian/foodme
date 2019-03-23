@@ -1,9 +1,27 @@
 package ca.mcgill.ecse428.foodme.controller;
 
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Random;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import ca.mcgill.ecse428.foodme.model.Response;
 
 import java.util.Random;
 
@@ -253,4 +271,76 @@ public class SearchController {
 
         return getMapping(url);
     }
+
+	/**
+	 * Method that searches a restaurant closing hours and checks if the restaurant will be closing within one hour from now
+	 * @param id id of the restaurant
+	 * @return true when it is closing within one hour
+	 * @return false when it is not closing within one hour
+	 * @throws Exception
+	 */
+	@GetMapping("/get/closing")
+	public ResponseEntity searchRestaurantClosingInOneHour(
+			@RequestParam("id") String id) throws Exception {
+
+		// Set up url
+		String url = "https://api.yelp.com/v3/businesses/" + id;
+		ResponseEntity<String> response = getMapping(url);
+		String contentAsString = response.getBody();
+
+		String endTime = "";
+		LocalDate date = LocalDate.now();
+		LocalTime time = LocalTime.now();
+
+		DayOfWeek dayOfWeek = date.getDayOfWeek();
+		int dayOfWeekInInteger = 0;
+
+		//convert to the day
+		switch(dayOfWeek) {
+		case MONDAY: dayOfWeekInInteger = 0;
+		break;
+		case TUESDAY: dayOfWeekInInteger = 1;
+		break;
+		case WEDNESDAY: dayOfWeekInInteger = 2;
+		break;
+		case THURSDAY: dayOfWeekInInteger = 3;
+		break;
+		case FRIDAY: dayOfWeekInInteger = 4;
+		break;
+		case SATURDAY: dayOfWeekInInteger = 5;
+		break;
+		case SUNDAY: dayOfWeekInInteger = 6;
+		break;
+		default: dayOfWeekInInteger = 0;
+		break;
+		}
+
+		JSONObject json = new JSONObject(contentAsString);
+		JSONArray hours = json.getJSONArray("hours");
+		int length = hours.length();
+
+		for(int i =0 ; i<length; i++){
+			JSONObject allOpeningHours = hours.getJSONObject(i);
+			JSONArray open = allOpeningHours.getJSONArray("open");
+			int days = open.length();
+			for(int j=0; j<days; j++) {
+				JSONObject json3 = open.getJSONObject(j);
+				int day = json3.getInt("day");
+
+				//check if the same DAY in int
+				if(dayOfWeekInInteger==day) {
+					endTime = json3.getString("end");
+					String hour = endTime.toString().substring(0, 2);
+					String minute = endTime.toString().substring(2, 4);
+					LocalTime restaurantTime = LocalTime.of(Integer.parseInt(hour), Integer.parseInt(minute));
+
+					restaurantTime.minusHours(1);
+					if(time.isAfter(restaurantTime)) {
+						return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "The restaurant is closing in less than 1 hour."));
+					}
+				}
+			}
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(new Response(false, "The restaurant is still open."));
+	}
 }

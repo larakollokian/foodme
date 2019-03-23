@@ -241,6 +241,7 @@ public class ControllerTests {
      * */
     @Test
     public void c4_testListAllLiked() throws Exception{
+
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
