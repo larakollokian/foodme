@@ -28,6 +28,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * This class serves to test controller methods related to search (calling the Yelp API)
+ * SearchController.java
+ * */
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SearchControllerTests {

@@ -1,16 +1,12 @@
 package ca.mcgill.ecse428.foodme.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.model.AppUser;
@@ -21,8 +17,6 @@ public class RestaurantRepository {
 	
 	@PersistenceContext
 	private EntityManager entityManager;
-
-	String APIKey = "F5ByVWSif5NWb6w3YYAQjRGOI9Xcg8WKqzBDkPnEl4YDneNpsaKn35YcFEqJyvyV_kUTStuTG2n9-Pi9R7-u9GIkmBQY8LjfNJSrAVEs_K5pGJLCAsWc4N3oxGRgXHYx";
 
 	/**
 	 * Method that allows get a user given its username
@@ -58,17 +52,6 @@ public class RestaurantRepository {
 		}
 	}
 
-	@Transactional
-	public Restaurant getRestaurantByName(String restaurantName) throws NullObjectException {
-		if(entityManager.find(Restaurant.class, restaurantName) == null) {
-			throw new NullObjectException("Restaurant does not exist");
-		}
-		else {
-			Restaurant restaurant = entityManager.find(Restaurant.class, restaurantName);
-			return restaurant;
-		}
-	}
-
 	/**
 	 * Method that allows get a restaurant given its restaurantID
 	 * @param restaurantID
@@ -87,7 +70,6 @@ public class RestaurantRepository {
 		return restaurants;
 	}
 
-
 	/**
 	 * Method that gets all restaurants in the database
 	 * @return list of Restaurant
@@ -103,7 +85,6 @@ public class RestaurantRepository {
 		}
 		return restaurants;
 	}
-
 
 	/**
 	 * Method that creates a new restaurant
@@ -127,23 +108,24 @@ public class RestaurantRepository {
 		return restaurant;
 	}
 
-
-	public Restaurant deleteRestaurant(String restaurantName) throws InvalidInputException {
+	/**
+	 * Method that deletes a restaurant
+	 * @param restaurantID
+	 * @return Restaurant
+	 * @throws InvalidInputException
+	 * @throws IllegalArgumentException
+	 */
+	public Restaurant deleteRestaurant(String restaurantID) throws InvalidInputException,IllegalArgumentException {
 		
-		if(restaurantName.length() == 0){
+		if(restaurantID.length() == 0){
 			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
 		}
-		
-		else if (entityManager.find(Restaurant.class, restaurantName) == null) {
-			throw new InvalidInputException("Restaurant does not exists");
+		if (entityManager.find(Restaurant.class, restaurantID) == null) {
+			throw new IllegalArgumentException("Restaurant does not exist");
 		}
-		else {
-			Restaurant restaurant =  entityManager.find(Restaurant.class, restaurantName);
-			entityManager.remove(restaurant);
-			return restaurant;
-
-		}
-		
+		Restaurant restaurant =  entityManager.find(Restaurant.class, restaurantID);
+		entityManager.remove(restaurant);
+		return restaurant;
 	}
 
 	/**
@@ -178,7 +160,7 @@ public class RestaurantRepository {
 			throw new IllegalArgumentException ("Restaurant is already liked by user!!!");
 		}
 
-		appUser.addlikedRestaurants(restaurant);
+		appUser.addLikedRestaurants(restaurant);
 		restaurant.addLikedAppUsers(appUser);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
@@ -208,7 +190,7 @@ public class RestaurantRepository {
 
 		//Check if restaurant is liked by user
 		if(appUser.getlikedRestaurants().contains(restaurant) && restaurant.getAppUser_likes().contains(appUser)){
-			appUser.removelikedRestaurants(restaurant);
+			appUser.removeLikedRestaurants(restaurant);
 			restaurant.removeLikedAppUsers(appUser);
 			entityManager.merge(appUser);
 			entityManager.merge(restaurant);
@@ -272,7 +254,15 @@ public class RestaurantRepository {
 		entityManager.merge(restaurant);
 		return restaurant;
 	}
-	
+
+	/**
+	 * Method that remove a restaurant and a user of the dislikedRestaurant list in the database
+	 * @param username
+	 * @param restaurantID
+	 * @return Restaurant
+	 * @throws NullObjectException
+	 * @throws InvalidInputException
+	 */
 	@Transactional
     public Restaurant removeDisliked(String username, String restaurantID) throws NullObjectException, InvalidInputException  {
 		AppUser appUser = getAppUser(username);
@@ -283,7 +273,6 @@ public class RestaurantRepository {
 		if(!appUser.getDislikedRestaurants().contains(restaurant) || !restaurant.getAppUser_dislikes().contains(appUser)){
 			throw new InvalidInputException ("Restaurant is not on disliked list!!!");
 		}
-
 		appUser.removeDislikedRestaurants(restaurant);
 		restaurant.removeDislikedAppUsers(appUser);
 		entityManager.merge(appUser);
@@ -342,7 +331,7 @@ public class RestaurantRepository {
 	}
 
 	/**
-	 * Method that clears the
+	 * Method that clears the visited list
 	 * @param username
 	 * @return Restaurant
 	 * @throws IllegalArgumentException
@@ -365,10 +354,10 @@ public class RestaurantRepository {
 		}
 	}
 
-
 	/**
 	 * Method to list all the visited restaurants of a user
 	 * @return The list of all the visited restaurants
+	 * @throws NullObjectException
 	 */
 	public List<Restaurant> listAllVisited(String username)throws NullObjectException {
 		Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM visited_Restaurants WHERE username =:username)");
@@ -381,31 +370,5 @@ public class RestaurantRepository {
 
 		return visitedRestaurants;
 	}
-
-
-	/**
-	 * Method that checks to see if a restaurant is open at the current time
-	 * @param
-	 * @return
-	 */
-	// public boolean isRestaurantOpen(Restaurant aRestaurant) {
-
-	// 	Date date = new Date();
-	// 	Date time = new Date();
-
-	// 	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-	// 	Date dateInput = sdf.parse(departureDate);
-	// 	String date1 = sdf.format(dateInput);
-	// 	String date2 = sdf.format(date);
-
-	// 	SimpleDateFormat sdf2 = new SimpleDateFormat("HHmm");
-	// 	Date timeInput = sdf2.parse(departureTime);
-	// 	String time1 = sdf2.format(timeInput);
-	// 	String time2 = sdf2.format(time);
-
-	// 	return true;
-	// }
-
-
 }
 

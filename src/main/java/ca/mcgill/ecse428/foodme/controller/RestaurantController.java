@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.model.Response;
@@ -26,7 +25,6 @@ public class RestaurantController {
 
     /**
      * Greeting
-     * 
      * @return Restaurant connected
      */
     @RequestMapping("/")
@@ -35,16 +33,45 @@ public class RestaurantController {
     }
 
     /**
-     * Controller method that adds a restaurant and a user to the likedRestaurant
-     * list in the database
-     * 
-     * @param username       (of user)
+     * Controller method to get a restaurant's data based on its id
+     * @param id
+     * @return ResponseEntity
+     */
+    @GetMapping("/get/{id}")
+    public ResponseEntity getRestaurant(@PathVariable("id") String id) {
+        List<Restaurant> restaurant = null;
+        try {
+            restaurant = restaurantRepository.getRestaurantQuery(id);
+        } catch (NullObjectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restaurant.get(0));
+    }
+
+    /**
+     * Controller Method that delete a restaurant
+     * @param restaurantID
+     * @return ResponseEntity
+     */
+    @PostMapping("/deleteRestaurant/{restaurantID}")
+    public ResponseEntity deleteRestaurant(@PathVariable("restaurantID") String restaurantID) {
+        try {
+            restaurantRepository.deleteRestaurant(restaurantID);
+        } catch (InvalidInputException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));
+
+    }
+    /**
+     * Controller method that adds a restaurant and a user to the likedRestaurant list in the database
+     * @param username
      * @param restaurantID
      * @param restaurantName
+     * @return ResponseEntity
      */
     @PostMapping("/{user}/addliked/{id}/{restaurant}")
-    public ResponseEntity addLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID,
-            @PathVariable("restaurant") String restaurantName) {
+    public ResponseEntity addLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @PathVariable("restaurant") String restaurantName) {
         try {
             restaurantRepository.addLiked(username, restaurantID, restaurantName);
         } catch (Exception e) {
@@ -55,11 +82,10 @@ public class RestaurantController {
     }
 
     /**
-     * Controller method that removes a restaurant and a user from the
-     * likedRestaurant list in the database
-     * 
-     * @param username     (of user)
+     * Controller method that removes a restaurant and a user from the likedRestaurant list in the database
+     * @param username
      * @param restaurantID
+     * @return ResponseEntity
      */
     @PostMapping("/{user}/removeliked/{id}")
     public ResponseEntity removeLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID) {
@@ -73,7 +99,6 @@ public class RestaurantController {
 
     /**
      * Controller Method that lists all liked restaurant of a user
-     * 
      * @param username
      * @return ResponseEntity
      */
@@ -90,7 +115,6 @@ public class RestaurantController {
 
     /**
      * Controller Method that lists all disliked restaurant of a user
-     * 
      * @param username
      * @return ResponseEntity
      */
@@ -125,10 +149,8 @@ public class RestaurantController {
     }
 
     /**
-     * Controller method that removes a restaurant and a user from the
-     * dislikedRestaurant list in the database
-     * 
-     * @param username     (of user)
+     * Controller method that removes a restaurant and a user from the dislikedRestaurant list in the database
+     * @param username
      * @param restaurantID
      * @return ResponseEntity
      */
@@ -148,7 +170,6 @@ public class RestaurantController {
 
     /**
      * Controller method to get all restaurants in the database
-     * 
      * @return ResponseEntity
      */
     @GetMapping("/get/all")
@@ -160,23 +181,6 @@ public class RestaurantController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(restaurants);
-    }
-
-    /**
-     * Controller method to get a restaurant's data based on its id
-     * 
-     * @param id
-     * @return ResponseEntity
-     */
-    @GetMapping("/get/{id}")
-    public ResponseEntity getRestaurant(@PathVariable("id") String id) {
-        List<Restaurant> restaurant = null;
-        try {
-            restaurant = restaurantRepository.getRestaurantQuery(id);
-        } catch (NullObjectException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restaurant.get(0));
     }
 
     /**
@@ -227,16 +231,4 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).body(visited);
     }
 
-    @PostMapping("/deleteRestaurant/{restaurantName}")
-    public ResponseEntity deleteRestaurant(//@PathVariable("id") String id
-    @PathVariable("restaurantName") String restaurantName) {
-        //Restaurant resto = new Restaurant();
-        try {
-            restaurantRepository.deleteRestaurant(restaurantName);
-        } catch (InvalidInputException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));
-
-     }
 }

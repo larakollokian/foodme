@@ -3,13 +3,10 @@ package ca.mcgill.ecse428.foodme.repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-
 import ca.mcgill.ecse428.foodme.exception.*;
 import ca.mcgill.ecse428.foodme.model.*;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 @Repository
@@ -67,6 +64,7 @@ public class PreferenceRepository {
 		}
         return preferences;
     }
+
 	/**
 	 * Method that gets the pid of a preference (for controller testing)
 	 * @param username
@@ -80,6 +78,7 @@ public class PreferenceRepository {
 		}
 		return 0;
 	}
+
 	/**
 	 * Method that gets a preference from a pID
 	 * @param pID
@@ -94,6 +93,7 @@ public class PreferenceRepository {
         Preference preference = entityManager.find(Preference.class, pID);
         return preference;
     }
+
 	/**
 	 * Method that creates a preference
 	 * @param username

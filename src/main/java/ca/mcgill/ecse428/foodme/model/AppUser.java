@@ -3,7 +3,6 @@ package ca.mcgill.ecse428.foodme.model;
 import java.util.*;
 import javax.persistence.*;
 
-
 @Entity
 @Table(name="AppUsers")
 public class AppUser {
@@ -44,7 +43,7 @@ public class AppUser {
 	public void setEmail(String email) { this.email = email; }
 	public void setPassword(String password) { this.password = password; }
 	public void setDefaultPreferenceID(int defaultPreferenceID) { this.defaultPreferenceID = defaultPreferenceID; }
-	public void setlikedRestaurants(Set likedRestaurants) {
+	public void setLikedRestaurants(Set likedRestaurants) {
 		this.likedRestaurants = likedRestaurants;
 	}
 	public void setDislikedRestaurants(Set dislikedRestaurants) {
@@ -85,14 +84,14 @@ public class AppUser {
 	public Set getVisitedRestaurants() { return visitedRestaurants; }
 
 	//Liked list
-	public void addlikedRestaurants(Restaurant likedRestaurants){
+	public void addLikedRestaurants(Restaurant likedRestaurants){
 		if(this.likedRestaurants == null){
 			this.likedRestaurants = new HashSet();
 		}
 		this.likedRestaurants.add(likedRestaurants);
 	}
 	
-	public boolean removelikedRestaurants(Restaurant likedRestaurants) {
+	public boolean removeLikedRestaurants(Restaurant likedRestaurants) {
 		if(this.likedRestaurants.contains(likedRestaurants)) {
 			this.likedRestaurants.remove(likedRestaurants);
 			return true;

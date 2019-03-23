@@ -1,19 +1,15 @@
     package ca.mcgill.ecse428.foodme.repository;
 
-
     import javax.persistence.EntityManager;
     import javax.persistence.PersistenceContext;
     import javax.persistence.Query;
-
     import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
     import ca.mcgill.ecse428.foodme.exception.NullObjectException;
     import ca.mcgill.ecse428.foodme.model.*;
-
     import ca.mcgill.ecse428.foodme.security.Password;
     import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
     import org.springframework.stereotype.Repository;
     import org.springframework.transaction.annotation.Transactional;
-
     import java.util.*;
 
     @Repository
@@ -23,13 +19,13 @@
         private EntityManager entityManager;
 
         /**
-         * Method to create an new account
-         * @param username The user's chosen username
-         * @param firstName The user's first name
-         * @param lastName The user's last name
-         * @param email The user's email address
-         * @param password The user's password
-         * @return  appUser
+         * Method that allows a user to create an account (add appUser to database)
+         * @param username (minimum 4 characters)
+         * @param firstName
+         * @param lastName
+         * @param email
+         * @param password (minimum 6 characters)
+         * @return  AppUser
          * @throws IllegalArgumentException
          * @throws InvalidInputException
          * @throws IllegalStateException
@@ -65,7 +61,6 @@
             entityManager.persist(u);
 
             return u;
-
         }
 
         /**
@@ -100,14 +95,22 @@
             return u;
         }
 
+        /**
+         * Method that allows users to update their first name
+         * @param username
+         * @param oldFName
+         * @param newFName
+         * @return AppUser
+         * @throws NullObjectException
+         * @throws InvalidInputException
+         */
         @Transactional
         public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
 
             AppUser u = getAppUser(username);
-            
             if(newFName == u.getFirstName()) {
                 throw new InvalidInputException("New first name cannot be the same as current name");
-                }
+            }
             else {
             u.setFirstName(newFName);
             entityManager.merge(u);
@@ -115,6 +118,15 @@
             }
         }
 
+        /**
+         * Method that allows users to update their last name
+         * @param username
+         * @param oldLName
+         * @param newLName
+         * @return AppUser
+         * @throws NullObjectException
+         * @throws InvalidInputException
+         */
         @Transactional
         public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
 
@@ -158,6 +170,7 @@
                 return appUser;
             }
         }
+
         /**
          * Method that allows get a user given its username using query
          * @param username
@@ -256,10 +269,6 @@
             else{
                 throw new NullObjectException("User does not have a default preference");
             }
-            
         }
-        
-        
-
     }
 

@@ -94,7 +94,6 @@ public class PreferenceController {
     public ResponseEntity editPreference(
             @PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String location,
             @RequestParam String cuisine, @RequestParam String price, @RequestParam String sortBy){
-
         try {
             preferenceRepository.editPreference(username, pID, location, cuisine, price, sortBy);
         }catch(NullObjectException e){
@@ -120,6 +119,5 @@ public class PreferenceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully deleted."));
     }
-
 
 }
