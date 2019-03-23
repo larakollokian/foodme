@@ -3,13 +3,10 @@ package ca.mcgill.ecse428.foodme.repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-
 import ca.mcgill.ecse428.foodme.exception.*;
 import ca.mcgill.ecse428.foodme.model.*;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 @Repository
@@ -67,6 +64,21 @@ public class PreferenceRepository {
 		}
         return preferences;
     }
+
+	/**
+	 * Method that gets the pid of a preference (for controller testing)
+	 * @param username
+	 * @return pid
+	 */
+    @Transactional
+	public int getPreferenceIDs(String username){
+		Query q = entityManager.createNativeQuery("SELECT pid FROM preferences WHERE app_user_username ='johnsmith'");
+		if(q.getResultList().size() == 1) {
+			return (int) q.getResultList().get(0);
+		}
+		return 0;
+	}
+
 	/**
 	 * Method that gets a preference from a pID
 	 * @param pID
@@ -81,6 +93,7 @@ public class PreferenceRepository {
         Preference preference = entityManager.find(Preference.class, pID);
         return preference;
     }
+
 	/**
 	 * Method that creates a preference
 	 * @param username
@@ -118,7 +131,7 @@ public class PreferenceRepository {
 	public Preference editPreference(String username, int pID, String location, String cuisine, String price, String sortBy) throws NullObjectException {
 		Preference editPreference = getPreference(pID);
 		if(!editPreference.getUser().getUsername().equals(username)){
-			throw new NullObjectException("Preference "+pID+ " is not related to user "+username);
+			throw new NullObjectException("Preference is not related to user");
 		}
 		editPreference.setLocation(location);
 		editPreference.setCuisine(cuisine);
@@ -137,7 +150,7 @@ public class PreferenceRepository {
 	public Preference deletePreference(String username,int pID) throws NullObjectException {
 		Preference p = getPreference(pID);
 		if(!p.getUser().getUsername().equals(username)){
-			throw new NullObjectException("Preference "+pID+ " is not related to user "+username);
+			throw new NullObjectException("Preference is not related to user");
 		}
 		entityManager.remove(p);
 		return p;

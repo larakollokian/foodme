@@ -1,19 +1,15 @@
     package ca.mcgill.ecse428.foodme.repository;
 
-
     import javax.persistence.EntityManager;
     import javax.persistence.PersistenceContext;
     import javax.persistence.Query;
-
     import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
     import ca.mcgill.ecse428.foodme.exception.NullObjectException;
     import ca.mcgill.ecse428.foodme.model.*;
-
     import ca.mcgill.ecse428.foodme.security.Password;
     import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
     import org.springframework.stereotype.Repository;
     import org.springframework.transaction.annotation.Transactional;
-
     import java.util.*;
 
     @Repository
@@ -23,30 +19,32 @@
         private EntityManager entityManager;
 
         /**
-         * Method to create an new account
-         * @param username The user's chosen username
-         * @param firstName The user's first name
-         * @param lastName The user's last name
-         * @param email The user's email address
-         * @param password The user's password
-         * @return  appUser
-         * @throws Exception (InvalidInputException, IllegalStateException)
+         * Method that allows a user to create an account (add appUser to database)
+         * @param username (minimum 4 characters)
+         * @param firstName
+         * @param lastName
+         * @param email
+         * @param password (minimum 6 characters)
+         * @return  AppUser
+         * @throws IllegalArgumentException
+         * @throws InvalidInputException
+         * @throws IllegalStateException
          */
         @Transactional
         public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
             String passwordHash="";
 
-            if (!email.contains("@") && !email.contains(".")) {
+            if (!email.contains("@") || !email.contains(".")) {
                 throw new InvalidInputException("This is not a valid email address!");
             }
             if (password.length() <= 6) {
                 throw new InvalidInputException("Your password must be longer than 6 characters!");
             }
-            if(username.length() == 0 || firstName.length() == 0 || lastName.length() == 0 ){
-                throw new InvalidInputException("Username, firstName and lastName must be at least 1 character");
+            if(username.length() <= 3){
+                throw new InvalidInputException("Username should be longer than 3 characters");
             }
-            if(entityManager.find(AppUser.class,username)!=null){
-                throw new InvalidInputException("User already exists");
+            if(entityManager.find(AppUser.class,username) != null){
+                throw new IllegalArgumentException("User already exists");
             }
             try {
                 passwordHash = Password.getSaltedHash(password);
@@ -63,7 +61,6 @@
             entityManager.persist(u);
 
             return u;
-
         }
 
         /**
@@ -72,7 +69,10 @@
          * @param oldPassword
          * @param newPassword
          * @return AppUser
-         * @throws Exception (AuthenticationException, IllegalStateException, NullObjectException,InvalidInputException)
+         * @throws AuthenticationException
+         * @throws IllegalStateException
+         * @throws NullObjectException
+         * @throws InvalidInputException
          */
         @Transactional
         public AppUser changePassword(String username,String oldPassword, String newPassword) throws Exception {
@@ -93,6 +93,53 @@
             u.setPassword(Password.getSaltedHash(newPassword));
             entityManager.merge(u);
             return u;
+        }
+
+        /**
+         * Method that allows users to update their first name
+         * @param username
+         * @param oldFName
+         * @param newFName
+         * @return AppUser
+         * @throws NullObjectException
+         * @throws InvalidInputException
+         */
+        @Transactional
+        public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
+
+            AppUser u = getAppUser(username);
+            if(newFName == u.getFirstName()) {
+                throw new InvalidInputException("New first name cannot be the same as current name");
+            }
+            else {
+            u.setFirstName(newFName);
+            entityManager.merge(u);
+            return u;
+            }
+        }
+
+        /**
+         * Method that allows users to update their last name
+         * @param username
+         * @param oldLName
+         * @param newLName
+         * @return AppUser
+         * @throws NullObjectException
+         * @throws InvalidInputException
+         */
+        @Transactional
+        public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
+
+            AppUser u = getAppUser(username);
+            
+            if(newLName == u.getLastName()) {
+                throw new InvalidInputException("New last name cannot be the same as current name");
+                }
+            else {
+            u.setLastName(newLName);
+            entityManager.merge(u);
+            return u;
+            }
         }
 
         /**
@@ -123,6 +170,7 @@
                 return appUser;
             }
         }
+
         /**
          * Method that allows get a user given its username using query
          * @param username
@@ -221,10 +269,6 @@
             else{
                 throw new NullObjectException("User does not have a default preference");
             }
-            
         }
-        
-        
-
     }
 

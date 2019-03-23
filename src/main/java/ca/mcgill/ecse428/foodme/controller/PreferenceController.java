@@ -42,6 +42,7 @@ public class PreferenceController {
         return ResponseEntity.status(HttpStatus.OK).body(allPs);
     }
 
+
     /**
      * Controller method that gets the list of preferences of a user
      * @param username
@@ -68,16 +69,15 @@ public class PreferenceController {
      * @return Preference
      */
     @PostMapping("/{user}/add")
-    public Preference addPreference(
+    public ResponseEntity addPreference(
             @PathVariable("user") String username, @RequestParam String location, @RequestParam String cuisine,
             @RequestParam String price, @RequestParam String sortBy) {
-        Preference preference;
         try {
-            preference = preferenceRepository.createPreference(username, location, cuisine, price, sortBy);
+           preferenceRepository.createPreference(username, location, cuisine, price, sortBy);
         } catch(NullObjectException e){
-            return null;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
-        return preference;
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully created."));
     }
 
     /**
@@ -91,16 +91,15 @@ public class PreferenceController {
      * @return Preference
      */
     @PostMapping("/{user}/edit/{pID}")
-    public Preference editPreference(
+    public ResponseEntity editPreference(
             @PathVariable("user") String username, @PathVariable("pID") int pID, @RequestParam String location,
             @RequestParam String cuisine, @RequestParam String price, @RequestParam String sortBy){
-        Preference preference;
         try {
-            preference = preferenceRepository.editPreference(username, pID, location, cuisine, price, sortBy);
+            preferenceRepository.editPreference(username, pID, location, cuisine, price, sortBy);
         }catch(NullObjectException e){
-            return null;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
-        return preference;
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully modified."));
     }
 
     /**
@@ -120,6 +119,5 @@ public class PreferenceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully deleted."));
     }
-
 
 }
