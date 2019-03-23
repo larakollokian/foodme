@@ -333,9 +333,9 @@ public class FoodmeApplicationTests {
         restaurant.setRestaurantID(restaurant_id);
         restaurant.setRestaurantName(restaurant_name);
         try{
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
-            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),restaurant);
-            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0),restaurant);
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name,0,0);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -355,13 +355,13 @@ public class FoodmeApplicationTests {
         restaurant1.setRestaurantName(restaurant_name);
 
         try{
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant1);
-            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),restaurant1);
-            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant1);
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0),restaurant1);
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name,0,0);
 
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenThrow(new InvalidInputException("Restaurant already exists"));
-            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name),new InvalidInputException("Restaurant already exists"));
-            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenThrow(new InvalidInputException("Restaurant already exists"));
+            assertEquals(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0),new InvalidInputException("Restaurant already exists"));
+            Mockito.verify(restaurantRepository).createRestaurant(restaurant_id,restaurant_name,0,0);
 
         }catch(InvalidInputException e){
             error += e.getMessage();
@@ -369,9 +369,9 @@ public class FoodmeApplicationTests {
         assertEquals("Restaurant already exists",error);
         error = "";
         try{
-            when(restaurantRepository.createRestaurant("","")).thenThrow(new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
-            assertEquals(restaurantRepository.createRestaurant("",""),new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
-            Mockito.verify(restaurantRepository).createRestaurant("","");
+            when(restaurantRepository.createRestaurant("","",0,0)).thenThrow(new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            assertEquals(restaurantRepository.createRestaurant("","",0,0),new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            Mockito.verify(restaurantRepository).createRestaurant("","",0,0);
 
         }catch (InvalidInputException e){
             error+=e.getMessage();
@@ -395,7 +395,7 @@ public class FoodmeApplicationTests {
 
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
             when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
             assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
             Mockito.verify(restaurantRepository).addLiked(user.getUsername(),restaurant_id,restaurant_name);
@@ -418,7 +418,7 @@ public class FoodmeApplicationTests {
         
         try {
         	AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-			when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+			when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
 			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
 			assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
 			when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
@@ -442,7 +442,7 @@ public class FoodmeApplicationTests {
         restaurant.setRestaurantName(restaurant_name);
         try {
 			user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-			restaurantRepository.createRestaurant(restaurant_id,restaurant_name);
+			restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0);
 			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
 			assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
 			restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name);
@@ -468,7 +468,7 @@ public class FoodmeApplicationTests {
         //add disliked restaurant
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
             when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
             assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
             Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
@@ -479,7 +479,7 @@ public class FoodmeApplicationTests {
         //try to add that disliked restaurant to the liked list 
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
             assertFalse(restaurantRepository.listAllLiked(USERNAME).contains(restaurant_id));            
         } catch (Exception e) {
             e.printStackTrace();
@@ -501,7 +501,7 @@ public class FoodmeApplicationTests {
 
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
             when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
             assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
             Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
@@ -547,7 +547,7 @@ public class FoodmeApplicationTests {
 
         try {
             AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name,0,0)).thenReturn(restaurant);
             when(restaurantRepository.addVisited(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
             assertEquals(restaurantRepository.addVisited(user.getUsername(),restaurant_id,restaurant_name),restaurant);
             Mockito.verify(restaurantRepository).addVisited(user.getUsername(),restaurant_id,restaurant_name);

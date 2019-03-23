@@ -109,12 +109,14 @@ public class RestaurantRepository {
 	 * Method that creates a new restaurant
 	 * @param restaurantID
 	 * @param restaurantName
+     * @param likes
+     * @param dislikes
 	 * @return Restaurant
 	 * @throws InvalidInputException
 	 * @throws IllegalArgumentException
 	 */
-	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException,IllegalArgumentException{
-		if(restaurantID.length() == 0 || restaurantName.length() == 0){
+	public Restaurant createRestaurant(String restaurantID, String restaurantName, int likes, int dislikes) throws InvalidInputException,IllegalArgumentException{
+	    if(restaurantID.length() == 0 || restaurantName.length() == 0){
 			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
 		}
 		if(entityManager.find(Restaurant.class,restaurantID) != null){
@@ -123,6 +125,8 @@ public class RestaurantRepository {
 		Restaurant restaurant = new Restaurant();
 		restaurant.setRestaurantID(restaurantID);
 		restaurant.setRestaurantName(restaurantName);
+		restaurant.setRestaurantLikes(0);
+		restaurant.setRestaurantDislikes(0);
 		entityManager.persist(restaurant);
 		return restaurant;
 	}
@@ -163,9 +167,10 @@ public class RestaurantRepository {
 
 		try {
 			restaurant = getRestaurant(restaurantID);
+			restaurant.setRestaurantLikes(restaurant.getRestaurantLikes() + 1);
 		}
 		catch(NullObjectException e1){
-			restaurant = createRestaurant(restaurantID,restaurantName);
+			restaurant = createRestaurant(restaurantID,restaurantName,0,0);
 		}
 
 		//Check if restaurant is disliked by user
@@ -180,6 +185,7 @@ public class RestaurantRepository {
 
 		appUser.addlikedRestaurants(restaurant);
 		restaurant.addLikedAppUsers(appUser);
+		restaurant.setRestaurantLikes(restaurant.getRestaurantLikes() + 1);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
 		return restaurant;
@@ -210,6 +216,7 @@ public class RestaurantRepository {
 		if(appUser.getlikedRestaurants().contains(restaurant) && restaurant.getAppUser_likes().contains(appUser)){
 			appUser.removelikedRestaurants(restaurant);
 			restaurant.removeLikedAppUsers(appUser);
+			restaurant.setRestaurantLikes(restaurant.getRestaurantLikes() - 1);
 			entityManager.merge(appUser);
 			entityManager.merge(restaurant);
 			return restaurant;
@@ -253,7 +260,7 @@ public class RestaurantRepository {
 			restaurant = getRestaurant(restaurantID);
 		}
 		catch(NullObjectException e1){
-			restaurant = createRestaurant(restaurantID,restaurantName);
+			restaurant = createRestaurant(restaurantID,restaurantName,0,0);
 		}
 
 		//Check if restaurant is liked by user
@@ -267,6 +274,7 @@ public class RestaurantRepository {
 		}
 
 		appUser.addDislikedRestaurants(restaurant);
+        restaurant.setRestaurantDislikes(restaurant.getRestaurantDislikes() + 1);
 		restaurant.addDislikedAppUsers(appUser);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
@@ -286,6 +294,7 @@ public class RestaurantRepository {
 
 		appUser.removeDislikedRestaurants(restaurant);
 		restaurant.removeDislikedAppUsers(appUser);
+		restaurant.setRestaurantDislikes(restaurant.getRestaurantDislikes() - 1);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
 		return restaurant;
@@ -325,7 +334,7 @@ public class RestaurantRepository {
 			restaurant = getRestaurant(restaurantID);
 		}
 		catch(NullObjectException e1){
-			restaurant = createRestaurant(restaurantID,restaurantName);
+			restaurant = createRestaurant(restaurantID,restaurantName,0,0);
 		}
 
 		//Remove it to put it at top of the list

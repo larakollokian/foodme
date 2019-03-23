@@ -10,6 +10,8 @@ public class Restaurant {
 	@Id private String restaurantID;
 
 	private String restaurantName;
+	private int likes;
+	private int dislikes;
 	
 	//Associations
 	@ManyToMany(mappedBy = "likedRestaurants")
@@ -28,6 +30,8 @@ public class Restaurant {
 	public void setRestaurantName(String restaurantName) {
 		this.restaurantName = restaurantName;
 	}
+	public void setRestaurantLikes(int likes) { this.likes = likes; }
+    public void setRestaurantDislikes(int dislikes) { this.dislikes = dislikes; }
 	public void setAppUser_likes(Set appUser_likes) {
 		this.appUser_likes = appUser_likes;
 	}
@@ -45,6 +49,12 @@ public class Restaurant {
 	public String getRestaurantName() {
 		return restaurantName;
 	}
+    public int getRestaurantLikes() {
+        return likes;
+    }
+    public int getRestaurantDislikes() {
+        return dislikes;
+    }
 	public Set getAppUser_likes() {
 		return appUser_likes;
 	}
@@ -105,8 +115,8 @@ public class Restaurant {
 
 	@Override
 	public String toString() {
-		return "Restaurant [restaurantID=" + restaurantID + ", liked="
-				+ ", restaurantName=" + restaurantName + "]";
+		return "Restaurant [restaurantID=" + restaurantID + ", likes="
+				+ likes + ", dislikes=" + dislikes +", restaurantName=" + restaurantName + "]";
 	}
 	
 	

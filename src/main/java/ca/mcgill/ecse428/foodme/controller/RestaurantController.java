@@ -47,6 +47,7 @@ public class RestaurantController {
             @PathVariable("restaurant") String restaurantName) {
         try {
             restaurantRepository.addLiked(username, restaurantID, restaurantName);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
@@ -160,6 +161,7 @@ public class RestaurantController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(restaurants);
+
     }
 
     /**
