@@ -601,7 +601,3 @@ public class SearchControllerTests {
 			assertEquals(expected,response);
         }
 }
-
-
-
-
