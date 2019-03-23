@@ -106,6 +106,30 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
     }
 
+    @GetMapping("/{id}/liked")
+    public ResponseEntity restolikes(@PathVariable("id") String Id){
+        int liked;
+        try {
+            liked = restaurantRepository.restaurantLikes(Id);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(liked);
+    }
+
+    @GetMapping("/{id}/disliked")
+    public ResponseEntity restodislikes(@PathVariable("id") String Id){
+        int disliked;
+        try {
+            disliked = restaurantRepository.restaurantDislikes(Id);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(disliked);
+    }
+
     /**
      * Controller method that adds a restaurant and a user to the dislikedRestaurant
      * list in the database
