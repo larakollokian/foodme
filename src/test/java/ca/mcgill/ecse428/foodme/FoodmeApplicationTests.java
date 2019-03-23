@@ -379,6 +379,59 @@ public class FoodmeApplicationTests {
         assertEquals("restaurantID and restaurantName must be at least 1 character",error);
     }
 
+    /**
+     * Test to delete a restaurant
+     */
+    @Test
+    public void testDeleteRestaurantSuccess(){
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+        try {
+            when(restaurantRepository.deleteRestaurant(restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.deleteRestaurant(restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).deleteRestaurant(restaurant_name);
+        } catch (InvalidInputException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     * Test to delete a restaurant unsuccesfully
+     */
+    @Test
+    public void testDeleteRestaurantFail(){
+        String error ="";
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try{
+            when(restaurantRepository.deleteRestaurant("")).thenThrow(new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+            assertEquals(restaurantRepository.deleteRestaurant(""), new InvalidInputException("restaurantID and restaurantName must be at least 1 character"));
+        } catch (InvalidInputException e){
+            error += e.getMessage();
+        }
+        assertEquals("restaurantID and restaurantName must be at least 1 character", error);
+        error = "";
+
+        try{
+            when(restaurantRepository.deleteRestaurant(restaurant_name)).thenThrow(new InvalidInputException("Restaurant does not exists"));
+            assertEquals(restaurantRepository.deleteRestaurant(restaurant_name), new InvalidInputException("Restaurant does not exists"));
+        } catch (InvalidInputException e){
+            error += e.getMessage();
+        }
+        assertEquals("Restaurant does not exists", error);
+    }
+
 
     /**
      * Test UT for adding a restaurant to the liked list
@@ -485,22 +538,22 @@ public class FoodmeApplicationTests {
             e.printStackTrace();
         }
     }
-    
+
     /**
-     * Test UT for adding a restaurant to the dislied list
-     * @throws InvalidInputException
+     * Test to add a restaurant to disliked list
      */
     @Test
-    public void testAddDisliked () throws InvalidInputException {
-        String restaurant_id = "/gR9DTbKCvezQlqvD7_FzPw";
-        String restaurant_name = "north-india-restaurant";
+    public void testDisliked(){
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+        AppUser user ;
 
         Restaurant restaurant = new Restaurant();
         restaurant.setRestaurantID(restaurant_id);
         restaurant.setRestaurantName(restaurant_name);
 
         try {
-            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
             when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
             when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
             assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
@@ -511,26 +564,146 @@ public class FoodmeApplicationTests {
     }
 
     /**
-     * Test UT for listing all the restaurants liked
-     * @throws InvalidInputException
+     * add a liked restaurant by a user to the dislike list
      */
-    @Ignore
-    //@Test
-    public void testListAllLiked () throws InvalidInputException {
-        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+    @Test
+    public void testAddLikedToDisliked(){
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
         String restaurant_name = "Tacos Et Tortas";
+        AppUser user;
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try{
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addLiked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addLiked(user.getUsername(),restaurant_id,restaurant_name);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         try {
-            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
-            List<Restaurant> liked = restaurantRepository.listAllLiked(USERNAME);
-            assertTrue(liked.isEmpty());
-            restaurantRepository.addLiked(USERNAME, restaurant_id, restaurant_name);
-            restaurantRepository.listAllLiked(USERNAME);
-            assertEquals(1, liked.size());
+            assertFalse(restaurantRepository.listAllDisliked(USERNAME).contains(restaurant_id));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
+    /**
+     * Test to remove restaurant from dislike list
+     */
+    @Test
+    public void testRemoveFromDislikeList(){
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+        AppUser user;
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+
+
+        //add restaurant to dislike list
+        try{
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.addDisliked(user.getUsername(),restaurant_id,restaurant_name),restaurant);
+            Mockito.verify(restaurantRepository).addDisliked(user.getUsername(),restaurant_id,restaurant_name);
+            when(restaurantRepository.listAllDisliked(USERNAME).contains(restaurant)).thenReturn(true);
+            assertEquals(restaurantRepository.listAllDisliked(USERNAME).contains(restaurant), true);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //remove restaurant from dislike list
+        try{
+            when(restaurantRepository.removeDisliked(USERNAME, restaurant_id)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.removeDisliked(USERNAME, restaurant_id), restaurant);
+            when(restaurantRepository.listAllDisliked(USERNAME).contains(restaurant)).thenReturn(false);
+            assertFalse(restaurantRepository.listAllDisliked(USERNAME).contains(restaurant));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This test tries to remove a restaurant from the liked list when the restaurant in question has not been liked previously
+     * @throws Exception
+     */
+    @Test
+    public void testRemoveLikedWhenNotLiked() throws Exception {
+        String restaurant_id = "L8MXAFY14EiC_mzFCgmR_g";
+        String restaurant_name = "Tacos Et Tortas";
+        String error = "";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try{
+            when(restaurantRepository.removeLiked(USERNAME,restaurant_id)).thenThrow(new InvalidInputException("Restaurant is not on liked list!!!"));
+            assertEquals(restaurantRepository.removeLiked(USERNAME,restaurant_id),new InvalidInputException("Restaurant is not on liked list!!!"));
+        } catch (Exception e){
+            error += e.getMessage();
+        }
+
+        assertEquals("Restaurant is not on liked list!!!", error);
+    }
+
+
+
+
+    /**
+     * Test to list all liked restaurants of a user
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testListAllLiked () throws InvalidInputException {
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            restaurantRepository.addLiked(user.getUsername(), restaurant_id, restaurant_name);
+            when(restaurantRepository.listAllLiked(user.getUsername()).size()).thenReturn(1);
+            assertEquals(1, restaurantRepository.listAllLiked(user.getUsername()).size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /**
+     * Test UT for removing a restaurant from the liked list
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testRemoveLiked () {
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setRestaurantID(restaurant_id);
+        restaurant.setRestaurantName(restaurant_name);
+
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(restaurantRepository.createRestaurant(restaurant_id,restaurant_name)).thenReturn(restaurant);
+            when(restaurantRepository.removeLiked(user.getUsername(),restaurant_id)).thenReturn(restaurant);
+            assertEquals(restaurantRepository.removeLiked(user.getUsername(),restaurant_id),restaurant);
+            Mockito.verify(restaurantRepository).removeLiked(user.getUsername(),restaurant_id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Test UT for adding a restaurant to the visited list
@@ -589,17 +762,7 @@ public class FoodmeApplicationTests {
         //assert if removed
     }
 
-    @Test
-    public void testRemoveDislike() {
-        //       AppUser user;
-//	    user = repository.createAccount("Test", "Test", "Test", "Test@Test.com", "69");
-//
-//    	TODO
-//    	Create restaurant
-//      add a dislike for the restaurant for user
-        // remove dislike
-        //assert if removed;
-    }
+
 
 }
 
