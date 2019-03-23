@@ -244,8 +244,8 @@ public class ControllerTests {
 
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
-        String expected = "[[\"Z2NF_xBF-7RqAfu_4EO9ow\",\"Dim Sum Montréal\"]]";
+                createURLWithPort("/restaurants/Mar1/all/liked"), HttpMethod.GET, entity, String.class);
+        String expected = "[[\"vNB5fXTa2bH07lgqSQXv3g\",\"Rotisserie Portugalia\"]]";
         Assert.assertEquals(expected, response.getBody());
     }
 
