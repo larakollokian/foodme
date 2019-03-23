@@ -3,6 +3,7 @@ package ca.mcgill.ecse428.foodme.controller;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Random;
 
 import org.json.JSONArray;
@@ -289,8 +290,10 @@ public class SearchController {
 		String contentAsString = response.getBody();
 
 		String endTime = "";
-		LocalDate date = LocalDate.now();
-		LocalTime time = LocalTime.now();
+		ZoneId easternZone = ZoneId.of("Canada/Eastern");
+		LocalDate date = LocalDate.now(easternZone);
+		LocalTime time = LocalTime.now(easternZone);
+		System.out.println("the time is "+ time.toString());
 
 		DayOfWeek dayOfWeek = date.getDayOfWeek();
 		int dayOfWeekInInteger = 0;
