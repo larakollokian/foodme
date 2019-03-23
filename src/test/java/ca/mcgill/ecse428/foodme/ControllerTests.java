@@ -1,16 +1,12 @@
 package ca.mcgill.ecse428.foodme;
 
-import ca.mcgill.ecse428.foodme.controller.PreferenceController;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import org.junit.*;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -20,12 +16,25 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import ca.mcgill.ecse428.foodme.model.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-
+/**
+ * This class serves to test controllers methods
+ * AppUserController.java, RestaurantController.java, PreferenceController.java
+ *
+ * Note:
+ * Letter is added to assure that tests are executing in alphabetic order
+ * The reason why I should be executed in this order is because some tests depend on others
+ * Ex. You cannot log out if you haven't sign in
+ * a - signup/delete
+ * b - authentication/logout
+ * c - liked restaurants
+ * d - disliked restaurants
+ * e - visited restaurants
+ * f - preferences
+ *
+ *  All tests are on user johnsmith (already exists in database)
+ *
+ * */
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,18 +51,9 @@ public class ControllerTests {
     TestRestTemplate restTemplate = new TestRestTemplate();
     HttpHeaders headers = new HttpHeaders();
 
-    /*
-     * Letter is added to assure that tests are executing in alphabetic order
-     * The reason why I should be executed in this order is because some tests depend on others
-     * Ex. You cannot log out if you haven't sign in
-     * a - signup/delete
-     * b - authentication/logout
-     * c - liked restaurants
-     * d - disliked restaurants
-     * e - visited restaurants
-     * f - preferences
+    /**
+     * CT sign up with invalid email
      * */
-
     @Test
     public void a1_testSignUpWrongEmail() throws Exception {
         // sign up and then delete the user
@@ -63,6 +63,10 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"This is not a valid email address!\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+
+    /**
+     * CT sign up with wrong password size
+     * */
     @Test
     public void a2_testSignUpWrongPasswordSize() throws Exception {
         // sign up and then delete the user
@@ -72,6 +76,10 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"Your password must be longer than 6 characters!\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+
+    /**
+     * CT sign up with invalid username
+     * */
     @Test
     public void a3_testSignUpWrongUsername() throws Exception {
         // sign up and then delete the user
@@ -82,6 +90,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT successful sign up
+     * */
     @Test
     public void a4_testSignUpSuccess() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -90,6 +101,10 @@ public class ControllerTests {
         String expected = "{\"response\":true,\"message\":\"User account successfully created.\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+
+    /**
+     * CT sign up with existing username
+     * */
     @Test
     public void a5_testSignUpExistingUser() throws Exception {
         // sign up and then delete the user
@@ -100,6 +115,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT delete user
+     * */
     @Test
     public void a6_testDeleteUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -109,6 +127,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT delete non existing user
+     * */
     @Test
     public void a7_testDeleteNonExistingUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -118,10 +139,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
-    /*
-    * All tests are on user johnsmith (already exists in database)
-    * */
-
+    /**
+     * CT logout fail
+     * */
     @Test
     public void b1_testLogoutFail() throws Exception {
         //Logout without login
@@ -131,6 +151,10 @@ public class ControllerTests {
         String expected ="{\"response\":false,\"message\":\"This user is not logged in\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+
+    /**
+     * CT login with invalid password
+     * */
     @Test
     public void b2_testLoginWithInvalidPassword() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -140,6 +164,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT login with invalid username
+     * */
     @Test
     public void b3_testLoginWithInvalidUsername() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -149,6 +176,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT login successful
+     * */
     @Test
     public void b4_testLoginSuccess() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -158,6 +188,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT logout successful
+     * */
     @Test
     public void b5_testLogoutSuccess() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -167,6 +200,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT list all liked restaurants but list is empty - fail
+     * */
     @Test
     public void c1_testListAllLikedWithNoRestaurants() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -176,6 +212,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT add a liked restaurant to a user - success
+     * */
     @Test
     public void c2_testAddLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -185,6 +224,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT add a disliked restaurant when it is liked -fail
+     * */
     @Test
     public void c3_testAddDislikedWhenLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -194,6 +236,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT list all liked restaurant(1) - success
+     * */
     @Test
     public void c4_testListAllLiked() throws Exception{
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -203,6 +248,9 @@ public class ControllerTests {
         Assert.assertEquals(expected, response.getBody());
     }
 
+    /**
+     * CT remove liked restaurant - success
+     * */
     @Test
     public void c5_testRemoveLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -212,6 +260,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT remove liked restaurant that is not liked - fail
+     * */
     @Test
     public void c6_testRemoveLikedNotInLiked() throws Exception {
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -221,6 +272,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT list all disliked restaurants but the list is empty - fail
+     * */
     @Test
     public void d1_testListAllDislikedWithNoRestaurants() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -229,6 +283,10 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"User does not have disliked restaurants\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+
+    /**
+     * CT add disliked restaurant to a user - success
+     * */
     @Test
     public void d2_testAddDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -238,6 +296,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT add liked restaurant when it is disliked - fail
+     * */
     @Test
     public void d3_testAddLikedWhenDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -247,8 +308,11 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT list all disliked restaurants - success
+     * */
     @Test
-    public void d4_testListAllDisliked() throws Exception{
+    public void d4_testListAllDisliked() {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/disliked"), HttpMethod.GET, entity, String.class);
@@ -256,6 +320,9 @@ public class ControllerTests {
         Assert.assertEquals(expected, response.getBody());
     }
 
+    /**
+     * CT remove disliked restaurant - success
+     * */
     @Test
     public void d5_testRemoveDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -265,6 +332,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT remove disliked restaurant that is not disliked - fail
+     * */
     @Test
     public void d6_testRemoveDislikedNotInDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -274,6 +344,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT clear visited restaurant list that is empty - fail
+     * */
     @Test
     public void e1_testClearEmptyVisited() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -283,6 +356,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT list all visited restaurant list that is empty - fail
+     * */
     @Test
     public void e2_testGetAllVisitedEmpty() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -292,6 +368,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT add visited restaurant - success
+     * */
     @Test
     public void e3_testAddVisited() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -301,8 +380,11 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT list all visited restaurants - success
+     * */
     @Test
-    public void e4_testGetAllVisited() throws Exception {
+    public void e4_testGetAllVisited()  {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/visited"), HttpMethod.GET, entity, String.class);
@@ -310,6 +392,9 @@ public class ControllerTests {
         Assert.assertEquals(expected, response.getBody());
     }
 
+    /**
+     * CT clear all visited restaurants - success
+     * */
     @Test
     public void e5_testClearVisited() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -319,6 +404,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
+    /**
+     * CT add preference - success
+     * */
     @Test
     public void f1_testAddPreference() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -328,7 +416,9 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
-
+    /**
+     * CT get preferences of a user - success
+     * */
     @Test
     public void f2_testGetPreferencesForUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -338,6 +428,9 @@ public class ControllerTests {
         Assert.assertTrue(response.getBody().contains(expected));
     }
 
+    /**
+     * CT edit preference - success
+     * */
     @Test
     public void f3_testEditPreferenceSuccess() throws Exception {
         pid = p.getPreferenceIDs("johnsmith");
@@ -347,6 +440,10 @@ public class ControllerTests {
         String expected = "{\"response\":true,\"message\":\"Preference successfully modified.\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
+
+    /**
+     * CT edit preference - fail
+     * */
     @Test
     public void f4_testEditPreferenceFail() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
@@ -355,8 +452,62 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
+
+    /**
+     * CT get default preference - fail
+     * */
     @Test
-    public void f5_testDeletePreferenceSuccess() throws Exception{
+    public void f5_testGetDefaultPreferenceFail() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/johnsmith/getdefault"), HttpMethod.GET, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"User does not have a default preference\"}";
+        JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+
+    /**
+     * CT set default preference - fail
+     * */
+    @Test
+    public void f6_testSetDefaultPreferenceFail() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/johnsmith/setdefault/1"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"The preference is not related to the user / does not exist\"}";
+        JSONAssert.assertEquals(expected,response.getBody(),false);
+    }
+
+    /**
+     * CT set default preference - success
+     * */
+    @Test
+    public void f7_testSetDefaultPreferenceSuccess() throws Exception {
+        pid = p.getPreferenceIDs("johnsmith");
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/johnsmith/setdefault/"+pid), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true,\"message\":\"Preference successfully set to default\"}";
+        JSONAssert.assertEquals(expected,response.getBody(), false);
+    }
+
+    /**
+     * CT get default preference - success
+     * */
+    @Test
+    public void f8_testGetDefaultPreferenceSuccess() {
+        pid = p.getPreferenceIDs("johnsmith");
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/johnsmith/getdefault"), HttpMethod.GET, entity, String.class);
+        String expected = "[["+pid+",\"french\",\"Montreal\",\"$$\",\"rating\",\"johnsmith\"]]";
+        Assert.assertEquals(expected,response.getBody());
+    }
+
+    /**
+     * CT delete preference - success
+     * */
+    @Test
+    public void f9_testDeletePreferenceSuccess() throws Exception{
         pid = p.getPreferenceIDs("johnsmith");
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
@@ -364,49 +515,17 @@ public class ControllerTests {
         String expected = "{\"response\":true,\"message\":\"Preference successfully deleted.\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
+
+    /**
+     * CT delete preference - fail
+     * */
     @Test
-    public void f6_testDeletePreferenceFail() throws Exception{
+    public void f10_testDeletePreferenceFail() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/preferences/johnsmith/delete/1"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
-    }
-    
-    @Test
-    public void f7_testGetDefaultPreferenceSuccess() throws Exception{
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/users/yeffo/getdefault"), HttpMethod.GET, entity, String.class);
-        String expected = "77";
-        Assert.assertTrue(response.getBody().contains(expected));
-    }
-    
-    @Test
-    public void f8_testGetDefaultPreferenceFail() throws Exception{
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/users/alaye/getdefault"), HttpMethod.GET, entity, String.class);
-        String expected = "77";
-        Assert.assertEquals(response.getBody().contains(expected),false);
-    }
-    
-    @Test
-    public void f9_testSetDefaultPreferenceSuccess() throws Exception {
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/users/yeffo/setdefault/77"), HttpMethod.POST, entity, String.class);
-        String expected = "{\"response\":true,\"message\":\"Preference successfully set to default\"}";
-        Assert.assertTrue(response.getBody().contains(expected));
-    }
-    
-    @Test
-    public void f10_testSetDefaultPreferenceFail() throws Exception {
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/users/yeffo/setdefault/75"), HttpMethod.POST, entity, String.class);
-        String expected = "{\"response\":true,\"message\":\"Preference successfully set to default\"}";
-        Assert.assertEquals(response.getBody().contains(expected),false);
     }
 
     private String createURLWithPort(String uri) {

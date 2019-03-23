@@ -19,7 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
+/**
+ * This class serves to test the AuthenticationService.java
+ * */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FoodmeApplication.class)
 public class AuthenticationServiceTests {
@@ -38,8 +40,11 @@ public class AuthenticationServiceTests {
     private String PASSWORD = "HelloWorld123";
 
 
+    /**
+     * Initial setup
+     * */
     @Before
-    public void setMockOutput() throws InvalidInputException {
+    public void setMockOutput() {
         try {
             AppUser user = new AppUser();
             user.setUsername(USERNAME);
@@ -58,6 +63,9 @@ public class AuthenticationServiceTests {
         }
     }
 
+    /**
+     * UT successful login
+     * */
     @Test
     public void testLoginWithValidPassword() {
         AppUser user = new AppUser();
@@ -103,6 +111,10 @@ public class AuthenticationServiceTests {
         }
 
     }
+
+    /**
+     * UT failed login (Invalid username)
+     * */
     @Test
     public void testLoginWithUnExistingUsername() {
         String error ="";
@@ -130,6 +142,10 @@ public class AuthenticationServiceTests {
 
         assertEquals("User does not exist",error);
     }
+
+    /**
+     * UT failed login (Invalid password)
+     * */
     @Test
     public void testLoginWithWrongPassword() throws InvalidInputException{
         String error ="";
@@ -159,8 +175,11 @@ public class AuthenticationServiceTests {
         assertEquals("Invalid login password!!!",error);
     }
 
+    /**
+     * UT logout (successful/fail)
+     * */
     @Test
-    public void testLogout()throws InvalidInputException {
+    public void testLogout(){
 
         AppUser user = new AppUser();
         try {

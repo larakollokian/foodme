@@ -28,6 +28,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * This class serves to test controller methods related to search (calling the Yelp API)
+ * SearchController.java
+ * */
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SearchControllerTests {
@@ -92,6 +97,9 @@ public class SearchControllerTests {
     
     // ===================== DISTANCE ===================== //
 
+    /**
+     * CT Search sort by distance and location - success
+     * */
     @Test
     public void testSearchSortByDistanceLocation() throws Exception {
         String r = searchController.searchSortByDistance("Montreal", "distance", 0).getBody();
@@ -101,6 +109,9 @@ public class SearchControllerTests {
         assertEquals(r, response);
     }
 
+    /**
+     * CT Search sort by distance and location (long/lat) - success
+     * */
     @Test
     public void testSearchSortByDistanceLongLat() throws Exception {
         String r = searchController.searchByLongLat("-73.623419", "45.474999", "distance", 0).getBody();
@@ -110,6 +121,9 @@ public class SearchControllerTests {
         assertEquals(r, response);
     }
 
+    /**
+     * CT Search sort by distance and invalid location - fail
+     * */
     @Test //(expected = Exception.class)
     public void testSearchSortByDistanceErrorLocation() {
         try {
@@ -119,6 +133,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search sort by distance and invalid sortby - fail
+     * */
     @Test //(expected = Exception.class)
     public void testSearchSortByDistanceErrorSortBy() {
         try {
@@ -128,6 +145,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search sort by distance - success
+     * */
     @Test
     public void testHTTPSearchSortByDistance() throws Exception {
 
@@ -151,7 +171,10 @@ public class SearchControllerTests {
         }
         assertEquals(failed, false);
     }
-    
+
+    /**
+     * CT Search sort by distance - fail
+     * */
     @Test
     public void testHTTPSearchSortByDistanceFailure() throws Exception {
     	this.mockMvc.perform(get("/search/montreal/distance/"))
@@ -161,6 +184,9 @@ public class SearchControllerTests {
 
     // ============== RESTAURANT RECOMMENDATION ============== //
 
+    /**
+     * CT Search Random Restaurant Recommendation - success
+     * */
     @Test
     public void testRandomRestaurantRecommendation() throws Exception {
 
@@ -173,7 +199,10 @@ public class SearchControllerTests {
                 .andReturn().getResponse().getContentAsString();
         assertNotEquals(response1, response2);
     }
-    
+
+    /**
+     * CT Search Random Restaurant Recommendation - fail
+     * */
     @Test
     public void testRandomRestaurantRecommendationFailure() {
 
@@ -186,6 +215,9 @@ public class SearchControllerTests {
 
     // ===================== PRICE RANGE ===================== //
 
+    /**
+     * CT Search by price and location - success
+     * */
     @Test
     public void testSearchByPriceLocation() throws Exception {
         String r = searchController.searchByPriceRange("Montreal", "1").getBody();
@@ -195,6 +227,9 @@ public class SearchControllerTests {
         assertEquals(r, response);
     }
 
+    /**
+     * CT Search by price and location (long/lat) - success
+     * */
     @Test
     public void testSearchByPriceLongLat() throws Exception {
         String r = searchController.searchByPriceRange("-73.623419", "45.474999", "1").getBody();
@@ -204,7 +239,10 @@ public class SearchControllerTests {
         assertEquals(r, response);
     }
 
-    @Test //(expected = Exception.class)
+    /**
+     * CT Search by price and location - fail
+     * */
+    @Test
     public void testSearchByPriceErrorLocation() {
         try {
             searchController.searchByPriceRange("", "1");
@@ -213,7 +251,10 @@ public class SearchControllerTests {
         }
     }
 
-    @Test //(expected = Exception.class)
+    /**
+     * CT Search by invalid price - fail
+     * */
+    @Test
     public void testSearchByPriceErrorPrice() {
         try {
             searchController.searchByPriceRange("Montreal", "");
@@ -222,6 +263,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search by price and invalid location(long) - fail
+     * */
     @Test //(expected = Exception.class)
     public void testSearchByPriceErrorLong() {
         try {
@@ -231,6 +275,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search by price and invalid location(lat) - fail
+     * */
     @Test //(expected = Exception.class)
     public void testSearchByPriceErrorLat() {
         try {
@@ -240,6 +287,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search by invalid price and  location(long/lat) - fail
+     * */
     @Test //(expected = Exception.class)
     public void testSearchByPriceErrorLongLatPrice() {
         try {
@@ -249,6 +299,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search by price http - success
+     * */
     @Test
     public void testSearchByPriceHTTPOk() throws Exception {
 
@@ -263,6 +316,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT Search by price and location(long/lat) http - success
+     * */
     @Test
     public void testSearchByPriceLongLatHTTPOk() throws Exception {
 
@@ -277,6 +333,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT Search by price http - fail
+     * */
     @Test
     public void testSearchByPriceHTTPNotOk() throws Exception {
 
@@ -291,6 +350,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT Search by price and location(long/lat) http - fail
+     * */
     @Test
     public void testSearchByPriceLongLatHTTPNotOk() throws Exception {
 
@@ -307,6 +369,9 @@ public class SearchControllerTests {
 
     // ===================== CUISINE ===================== //
 
+    /**
+     * CT Search by cuisine - success
+     * */
     @Test
     public void testSearchByCuisine() throws Exception {
         String r = searchController.searchByCuisine("Montreal", "afghan").getBody();
@@ -316,6 +381,9 @@ public class SearchControllerTests {
         assertEquals(r, response);
     }
 
+    /**
+     * CT Search by cuisine and location(long/lat) - fail
+     * */
     @Test
     public void testSearchByCuisineLongLat() throws Exception {
         String r = searchController.searchByCuisine("-73.623419", "45.474999", "afghan").getBody();
@@ -325,7 +393,10 @@ public class SearchControllerTests {
         assertEquals(r, response);
     }
 
-    @Test //(expected = Exception.class)
+    /**
+     * CT Search by cuisine and invalid location - fail
+     * */
+    @Test
     public void testSearchByCuisineErrorLocation() {
         try {
             searchController.searchByCuisine("", "1");
@@ -334,7 +405,10 @@ public class SearchControllerTests {
         }
     }
 
-    @Test //(expected = Exception.class)
+    /**
+     * CT Search by cuisine and invalid price - fail
+     * */
+    @Test
     public void testSearchByCuisineErrorPrice() {
         try {
             searchController.searchByCuisine("Montreal", "");
@@ -343,7 +417,10 @@ public class SearchControllerTests {
         }
     }
 
-    @Test //(expected = Exception.class)
+    /**
+     * CT Search by cuisine and invalid location(long) - fail
+     * */
+    @Test
     public void testSearchByCuisineErrorLong() {
         try {
             searchController.searchByCuisine("", "45.474999", "1");
@@ -352,6 +429,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search by cuisine and invalid location(lat) - fail
+     * */
     @Test //(expected = Exception.class)
     public void testSearchByCuisineErrorLat() {
         try {
@@ -361,7 +441,10 @@ public class SearchControllerTests {
         }
     }
 
-    @Test //(expected = Exception.class)
+    /**
+     * CT Search by cuisine and invalid location - fail
+     * */
+    @Test
     public void testSearchByCuisineErrorLongLatPrice() {
         try {
             searchController.searchByCuisine("-73.623419", "45.474999", "");
@@ -370,6 +453,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT Search by cuisine http - success
+     * */
     @Test
     public void testSearchByCuisineHTTPOk() throws Exception {
 
@@ -384,6 +470,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT Search by cuisine and location(long/lat) http - success
+     * */
     @Test
     public void testSearchByCuisineLongLatHTTPOk() throws Exception {
 
@@ -398,6 +487,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT Search by cuisine http - fail
+     * */
     @Test
     public void testSearchByCuisineHTTPNotOk() throws Exception {
 
@@ -412,6 +504,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT Search by cuisine and location(long/lat) http - fail
+     * */
     @Test
     public void testSearchByCuisineLongLatHTTPNotOk() throws Exception {
 
@@ -427,7 +522,10 @@ public class SearchControllerTests {
     }
 
     // ===================== RESTAURANT INFO ===================== //
-    
+
+    /**
+     * CT list restaurant info - success
+     * */
     @Test
     public void testListRestaurantInfoSuccess() throws Exception {
        	
@@ -441,6 +539,9 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
 
+    /**
+     * CT list restaurant info - fail
+     * */
     @Test
     public void testListRestaurantInfoFailure() throws Exception {
         try {
@@ -450,6 +551,9 @@ public class SearchControllerTests {
         }
     }
 
+    /**
+     * CT list restaurant info http - success
+     * */
     @Test
     public void testListRestaurantInfoHTTPSuccess() throws Exception {
         String response1 = this.mockMvc.perform(get("/search/businesses/?id=WavvLdfdP6g8aZTtbBQHTw"))
@@ -462,7 +566,10 @@ public class SearchControllerTests {
 
         assertEquals(response1, response2);
     }
-    
+
+    /**
+     * CT list restaurant http - fail
+     * */
     @Test
     public void testListRestaurantInfoHTTPFailure() throws Exception {
         String response1 = this.mockMvc.perform(get("/search/businesses/"))

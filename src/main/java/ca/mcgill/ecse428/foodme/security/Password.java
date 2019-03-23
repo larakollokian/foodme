@@ -3,18 +3,14 @@ package ca.mcgill.ecse428.foodme.security;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
 import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
-
 import java.security.SecureRandom;
-
 import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.Base64.Decoder;
 import org.apache.commons.text.RandomStringGenerator;
 import static org.apache.commons.text.CharacterPredicates.DIGITS;
 import static org.apache.commons.text.CharacterPredicates.LETTERS;
-
 
 public class Password {
     
@@ -29,18 +25,22 @@ public class Password {
 	 * get salted hash given a password
 	 * @param password
 	 * @return salt hash password
+     * @throws Exception
+     * @throws IllegalArgumentException
 	 */
-
     public static String getSaltedHash(String password) throws Exception {
         byte[] salt = SecureRandom.getInstance("SHA1PRNG").generateSeed(saltLen);
         // store the salt with the password
         return base64Encoder.encodeToString(salt) + "$" + hash(password, salt);
     }
+
     /**
 	 * Hashing password using PBKDF2
 	 * @param password
 	 * @param salt
 	 * @return hashed password
+     * @throws Exception
+     * @throws IllegalArgumentException
 	 */
     private static String hash(String password, byte[] salt) throws Exception {
         if (password == null || password.length() == 0)
@@ -51,10 +51,12 @@ public class Password {
         );
         return base64Encoder.encodeToString(key.getEncoded());
     }
+
     /**
      * checks if password entered by user corresponds to the salt hash 
 	 * @param password
 	 * @param storedHash
+     * @return Boolean (true if valid false otherwise)
      * @throws Exception when the password is not equal to the storedHash
 	 */
     public static boolean check(String password, String storedHash) throws Exception {
@@ -68,6 +70,7 @@ public class Password {
         }
         return true;
     }
+
     /**
      * Generate a random password 
 	 * @param n
