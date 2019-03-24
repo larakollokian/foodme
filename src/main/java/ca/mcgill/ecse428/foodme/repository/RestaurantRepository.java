@@ -295,6 +295,25 @@ public class RestaurantRepository {
         return dislikedRestaurants;
     }
 
+	@Transactional
+	public int restaurantLikes(String id) throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM liked_Restaurants WHERE restaurantid =:id");
+		q.setParameter("id", id);
+		int likes = ((Number) q.getSingleResult()).intValue();
+		return likes;
+
+
+	}
+
+	@Transactional
+	public int restaurantDislikes(String id) throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM disliked_Restaurants WHERE restaurantid =:id");
+		q.setParameter("id", id);
+		int dislikes = ((Number)q.getSingleResult()).intValue();
+		return dislikes;
+
+	}
+
 	/**
 	 * Method that adds a restaurant and a user to the visitedRestaurant list in the database
 	 * @param username
