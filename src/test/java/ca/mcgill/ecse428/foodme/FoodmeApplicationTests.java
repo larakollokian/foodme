@@ -756,14 +756,19 @@ public class FoodmeApplicationTests {
     public void testAllVisited(){}
 
 
-//    @Test
-//    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
-//        ResponseEntity<String> allRestaurant= restaurantRepository.getAllRestaurants("montreal");
-//        //JSONParser parser = new JSONParser();
-//        //JSONObject json = (JSONObject) parser.parse();
-//        assertTrue(!Objects.isNull(allRestaurant));
-//    }
-//
+    @Test
+    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
+       try {
+           when(restaurantRepository.getAllRestaurants().size()).thenReturn(200);
+           //JSONParser parser = new JSONParser();
+           //JSONObject json = (JSONObject) parser.parse();
+           // assertTrue(!Objects.isNull(allRestaurant));
+           assertEquals(restaurantRepository.getAllRestaurants().size(), 200);
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+    }
+
 //    @Test
 //    public void testRestaurantInfo() { //getRestaurant(String id)
 ////
