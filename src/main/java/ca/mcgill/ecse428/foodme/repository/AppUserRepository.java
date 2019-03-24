@@ -34,7 +34,7 @@
         public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
             String passwordHash="";
 
-            if (!email.contains("@") || !email.contains(".")) {
+            if (!email.contains("@") || !email.contains(".com")) {
                 throw new InvalidInputException("This is not a valid email address!");
             }
             if (password.length() <= 6) {
@@ -104,6 +104,19 @@
          * @throws NullObjectException
          * @throws InvalidInputException
          */
+        @Transactional
+        public AppUser resetPassword(String username, String newPassword) throws Exception {
+
+            AppUser u = getAppUser(username);
+
+            if(newPassword.length()<=6){
+                throw new InvalidInputException("Your password should be longer than 6 characters");
+            }
+            u.setPassword(Password.getSaltedHash(newPassword));
+            entityManager.merge(u);
+            return u;
+        }
+
         @Transactional
         public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
 
