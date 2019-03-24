@@ -4,7 +4,8 @@ jdk:
 # would just use default install/script but the ./mvnw script errors on travis
 # obviously this only works for maven builds right now...
 install:
-- mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=207f5a26d2633a63916fd94354f3c3aeb6941ef3 -Dsonar.jacoco.reportPaths=target/jacoco.exec -Dmaven.test.failure.ignore=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+#- mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=207f5a26d2633a63916fd94354f3c3aeb6941ef3 -Dsonar.jacoco.reportPaths=target/jacoco.exec -Dmaven.test.failure.ignore=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 	
 script:
 - mvn test
