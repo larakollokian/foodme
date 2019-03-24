@@ -209,6 +209,7 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
         String expected ="{\"response\":false,\"message\":\"User does not have liked restaurants\"}";
+        System.out.println(response.getBody());
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 

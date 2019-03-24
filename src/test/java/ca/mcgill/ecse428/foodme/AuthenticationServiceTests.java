@@ -147,7 +147,7 @@ public class AuthenticationServiceTests {
      * UT failed login (Invalid password)
      * */
     @Test
-    public void testLoginWithWrongPassword() throws InvalidInputException{
+    public void testLoginWithWrongPassword(){
         String error ="";
         AppUser user = new AppUser();
         try {
@@ -173,6 +173,19 @@ public class AuthenticationServiceTests {
         }
 
         assertEquals("Invalid login password!!!",error);
+
+        password = "";
+        error ="";
+        try{
+            authentication.login(user.getUsername(),password);
+        }
+        //Expected
+        catch(Exception e){
+            error += e.getMessage();
+        }
+
+        assertEquals("Empty passwords are not supported.",error);
+
     }
 
     /**
