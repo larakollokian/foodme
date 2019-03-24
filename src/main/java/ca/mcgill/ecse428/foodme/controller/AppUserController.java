@@ -145,7 +145,6 @@ public class AppUserController {
      */
     @GetMapping("/get/{username}")
     public ResponseEntity getAppUser(@PathVariable("username") String username) {
-        //List<AppUser> user;
         AppUser user = new AppUser();
         try {
             user = userRepository.getAppUser(username);
@@ -154,21 +153,6 @@ public class AppUserController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);//user.get(0));
 
-    }
-
-    /**
-     * Controller method that gets all users in the database
-     * @return ResponseEntity
-     */
-    @GetMapping("/get/all")
-    public ResponseEntity getAllUsers() {
-        List<AppUser> allUsers;
-        try {
-            allUsers = userRepository.getAllUsers();
-        } catch (NullObjectException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(allUsers);
     }
 
     /**
@@ -246,7 +230,6 @@ public class AppUserController {
      */
     @PostMapping("{username}/resetPassword/{n}")
     public ResponseEntity resetPassword(@PathVariable("username") String username, @PathVariable("n") int length) {
-        
         String uUsername = username;
         String randPassword;
         try {
@@ -314,15 +297,13 @@ public class AppUserController {
         props.put("mail.debug", "true");
         props.put("mail.smtp.socketFactory.port", "465");
         props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.socketFactory.fallback", "false"); 
-        
+        props.put("mail.smtp.socketFactory.fallback", "false");
         javax.mail.Session session2 = javax.mail.Session.getDefaultInstance(props, new javax.mail.Authenticator() {  
        
              protected PasswordAuthentication getPasswordAuthentication() {
                  return new PasswordAuthentication(wmail,pw);
               }
          });
-         
          //Compose the message
          try {
              MimeMessage message = new MimeMessage(session2);
@@ -331,7 +312,6 @@ public class AppUserController {
              message.setSubject("Your New Foodme Account Password");
              message.setText("Hi "+firstName+", \n\nLooks like you forgot the password associated with the username "+username+". \n\nWe have generated a new password for you\n\n\nYour new password is: " + generatedPW +
              "\n\nThe FoodMe team");
-             
              //send the message
              Transport.send(message);
          } catch (MessagingException e) {e.printStackTrace();} 

@@ -1,5 +1,6 @@
 package ca.mcgill.ecse428.foodme;
 
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
 import org.junit.*;
 import org.junit.Assert;
@@ -47,6 +48,9 @@ public class ControllerTests {
 
     @Autowired
     private PreferenceRepository p;
+
+    @Autowired
+    private AppUserRepository a;
 
     @LocalServerPort
     private int port;
@@ -247,6 +251,30 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
+    /**
+     * CT get user success
+     * */
+    @Test
+    public void aa7_testGetUser() throws Exception {
+        pid = a.getAppUser("johnsmith").getDefaultPreferenceID();
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/get/johnsmith"), HttpMethod.GET, entity, String.class);
+        String expected ="{\"username\":\"johnsmith\",\"firstName\":\"john\",\"lastName\":\"smith\",\"email\":\"johnmith@email.com\",\"password\":\"EckmbA2Glp0=$2O1TwnFPtStMlX84WE/b\",\"defaultPreferenceID\":"+pid+",\"likedRestaurants\":[],\"dislikedRestaurants\":[],\"visitedRestaurants\":[]}\n";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
+     * CT get user fail
+     * */
+    @Test
+    public void aa8_testGetUserFail() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/get/abc"), HttpMethod.GET, entity, String.class);
+        String expected ="{\"response\":false,\"message\":\"User does not exist\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
     /**
      * CT logout fail
      * */
@@ -684,10 +712,6 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
-
-
-
-
 
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;

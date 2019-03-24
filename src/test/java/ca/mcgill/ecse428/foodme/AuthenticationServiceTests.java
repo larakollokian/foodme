@@ -1,7 +1,6 @@
 package ca.mcgill.ecse428.foodme;
 
 import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.repository.*;
 import ca.mcgill.ecse428.foodme.security.Password;
@@ -23,7 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * This class serves to test the AuthenticationService.java
  * */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FoodmeApplication.class)
+@SpringBootTest
 public class AuthenticationServiceTests {
 
     @Autowired
