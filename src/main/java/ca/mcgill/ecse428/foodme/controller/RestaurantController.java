@@ -45,37 +45,6 @@ public class RestaurantController {
     }
 
     /**
-     * Controller method to get a restaurant's data based on its id
-     * @param id
-     * @return ResponseEntity
-     */
-    @GetMapping("/get/{id}")
-    public ResponseEntity getRestaurant(@PathVariable("id") String id) {
-        List<Restaurant> restaurant = null;
-        try {
-            restaurant = restaurantRepository.getRestaurantQuery(id);
-        } catch (NullObjectException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restaurant.get(0));
-    }
-
-    /**
-     * Controller Method that delete a restaurant
-     * @param restaurantID
-     * @return ResponseEntity
-     */
-    @PostMapping("/deleteRestaurant/{restaurantID}")
-    public ResponseEntity deleteRestaurant(@PathVariable("restaurantID") String restaurantID) {
-        try {
-            restaurantRepository.deleteRestaurant(restaurantID);
-        } catch (InvalidInputException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));
-
-    }
-    /**
      * Controller method that adds a restaurant and a user to the likedRestaurant list in the database
      * @param username
      * @param restaurantID
@@ -136,30 +105,6 @@ public class RestaurantController {
         try{
             disliked = restaurantRepository.listAllDisliked(username);
         }catch(NullObjectException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(disliked);
-    }
-
-    @GetMapping("/{id}/liked")
-    public ResponseEntity restolikes(@PathVariable("id") String Id){
-        int liked;
-        try {
-            liked = restaurantRepository.restaurantLikes(Id);
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(liked);
-    }
-
-    @GetMapping("/{id}/disliked")
-    public ResponseEntity restodislikes(@PathVariable("id") String Id){
-        int disliked;
-        try {
-            disliked = restaurantRepository.restaurantDislikes(Id);
-        }
-        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
