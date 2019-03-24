@@ -1,24 +1,13 @@
 package ca.mcgill.ecse428.foodme.controller;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
@@ -61,6 +50,21 @@ public class RestaurantController {
     }
 
     /**
+     * Controller method to create a restaurant
+     * @param rName
+     * @param restaurantID
+     * @return
+     */
+    @PostMapping("create/{rName}/{restaurantID}")
+    public ResponseEntity createRestaurant(@PathVariable("rName") String rName,@PathVariable("restaurantID") String restaurantID) {
+        try{
+            restaurantRepository.createRestaurant(restaurantID,rName);
+        } catch (InvalidInputException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant was successfully created."));
+    }
+    /**
      * Controller Method that delete a restaurant
      * @param restaurantID
      * @return ResponseEntity
@@ -69,7 +73,7 @@ public class RestaurantController {
     public ResponseEntity deleteRestaurant(@PathVariable("restaurantID") String restaurantID) {
         try {
             restaurantRepository.deleteRestaurant(restaurantID);
-        } catch (InvalidInputException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));
@@ -165,6 +169,18 @@ public class RestaurantController {
         int disliked;
         disliked = restaurantRepository.restaurantDislikes(id);
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
+    }
+
+    @GetMapping("/{id}/rating")
+    public ResponseEntity restorating(@PathVariable("id") String Id){
+        String ratio;
+        try {
+            ratio = restaurantRepository.restaurantRating(Id);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ratio);
     }
 
     /**

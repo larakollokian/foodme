@@ -3,13 +3,10 @@ package ca.mcgill.ecse428.foodme;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import ca.mcgill.ecse428.foodme.controller.AppUserController;
 import ca.mcgill.ecse428.foodme.controller.PreferenceController;
 import ca.mcgill.ecse428.foodme.controller.RestaurantController;
@@ -100,9 +96,24 @@ public class FoodmeApplicationTests {
     /////////////////                     APP USER CONTROLLER                           /////////////////
     /////////////////                                                                   /////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-	@Test
-	public void testCreateAccount()
-	{
+
+    @Test
+    public void testGetAllUsers(){
+        AppUser user;
+        List<AppUser> list = new ArrayList<>();
+        try {
+            user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            list.add(user);
+            when(appUserRepository.getAllUsers()).thenReturn(list);
+            assertEquals(appUserRepository.getAllUsers(), list);
+            Mockito.verify(appUserRepository).getAllUsers();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+	public void testCreateAccount() {
 		AppUser u = new AppUser();
 		u.setUsername(USERNAME);
 		u.setFirstName(FIRSTNAME);
@@ -750,19 +761,19 @@ public class FoodmeApplicationTests {
         }
     }
 
-    public void testClearVisited() {}
+    @Test
+    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
+       try {
+           when(restaurantRepository.getAllRestaurants().size()).thenReturn(200);
+           //JSONParser parser = new JSONParser();
+           //JSONObject json = (JSONObject) parser.parse();
+           // assertTrue(!Objects.isNull(allRestaurant));
+           assertEquals(restaurantRepository.getAllRestaurants().size(), 200);
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+    }
 
-    public void testAllVisited(){}
-
-
-//    @Test
-//    public void testRestaurantList() throws InvalidInputException { //getAllRestaurants(string Location)
-//        ResponseEntity<String> allRestaurant= restaurantRepository.getAllRestaurants("montreal");
-//        //JSONParser parser = new JSONParser();
-//        //JSONObject json = (JSONObject) parser.parse();
-//        assertTrue(!Objects.isNull(allRestaurant));
-//    }
-//
 //    @Test
 //    public void testRestaurantInfo() { //getRestaurant(String id)
 ////
@@ -770,18 +781,6 @@ public class FoodmeApplicationTests {
 ////        assertTrue(restaurant.name.compareToIgnoreCase("Gary Danko"));
 //        assertTrue(!Objects.isNull(restaurant));
 //    }
-
-    @Test
-    public void testRemoveLike() {
-
-	    //       AppUser user;
-//	    user = repository.createAccount("Test", "Test", "Test", "Test@Test.com", "69");
-//  TODO
-//    	Create restaurant
-//      add a like for the restaurant for user
-        // remove like
-        //assert if removed
-    }
 
 
 

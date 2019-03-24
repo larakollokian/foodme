@@ -94,6 +94,7 @@ public class RestaurantRepository {
 	 * @throws InvalidInputException
 	 * @throws IllegalArgumentException
 	 */
+	@Transactional
 	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException,IllegalArgumentException{
 		if(restaurantID.length() == 0 || restaurantName.length() == 0){
 			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
@@ -115,6 +116,7 @@ public class RestaurantRepository {
 	 * @throws InvalidInputException
 	 * @throws IllegalArgumentException
 	 */
+	@Transactional
 	public Restaurant deleteRestaurant(String restaurantID) throws InvalidInputException,IllegalArgumentException {
 		
 		if(restaurantID.length() == 0){
@@ -295,6 +297,11 @@ public class RestaurantRepository {
         return dislikedRestaurants;
     }
 
+	/**
+	 * Method to get number of likes of a restaurant
+	 * @param id
+	 * @return number of likes
+	 */
 	@Transactional
 	public int restaurantLikes(String id) {
 		Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM liked_Restaurants WHERE restaurantid =:id");
@@ -303,12 +310,39 @@ public class RestaurantRepository {
 		return likes;
 	}
 
+	/**
+	 * Method to get number of dislikes of a restaurant
+	 * @param id
+	 * @return The list of all the disliked restaurants
+	 */
 	@Transactional
 	public int restaurantDislikes(String id) {
 		Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM disliked_Restaurants WHERE restaurantid =:id");
 		q.setParameter("id", id);
 		int dislikes = ((Number)q.getSingleResult()).intValue();
 		return dislikes;
+	}
+
+	/**
+	 * Method to get the rating of restaurant
+	 * @return rating
+	 */
+	@Transactional
+	public String restaurantRating(String id)  {
+    	Query q  = entityManager.createNativeQuery(("SELECT * FROM restaurants WHERE restaurantid =:id"));
+    	q.setParameter("id", id);
+    	double likes = restaurantLikes(id);
+    	double dislikes = restaurantDislikes(id);
+    	double total = likes+dislikes;
+    	if (dislikes == 0) {
+    		return "100/100";
+		}
+    	else if (likes == 0 && dislikes == 0) {
+    		return "No User Ratings";
+		}
+    	double ratio = likes/total;
+    	ratio = Math.floor(ratio*100);
+    	return ((int)ratio + "/100");
 	}
 
 	/**
