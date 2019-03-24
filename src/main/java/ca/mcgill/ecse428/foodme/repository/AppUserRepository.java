@@ -150,7 +150,7 @@
          * @throws Exception
          */
         @Transactional
-        public void changeEmail(String username, String oldEmail, String newEmail) throws Exception 
+        public AppUser changeEmail(String username, String oldEmail, String newEmail) throws Exception 
         {
         	AppUser u = getAppUser(username);
         	if (!newEmail.contains("@") || !newEmail.contains(".")) {

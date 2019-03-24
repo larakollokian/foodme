@@ -239,6 +239,24 @@ public class AppUserController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Last Name successfully changed"));
     }
+    
+    /**
+     * Controller method that changes a user's last name
+     * @param username
+     * @param oldEmail
+     * @param newEmail
+     * @return
+     */
+    @PostMapping("/changeEmail/{username}/{oldEmail}/{newEmail}")
+    public ResponseEntity changeEmail(@PathVariable("username") String username,
+            @PathVariable("oldEmail") String oldEmail, @PathVariable("newEmail") String newEmail) {
+        try {
+            userRepository.changeEmail(username, oldEmail, newEmail);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Email successfully changed"));
+    }
 
     /**
      * Controller method that generates a random password given a length n
