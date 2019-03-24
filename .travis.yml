@@ -12,5 +12,5 @@ ignore:
 - src/test/java/ca/mcgill/ecse428/foodme/ModelTests
 - src/test/java/ca/mcgill/ecse428/foodme/SearchControllerTests
 - src/test/java/ca/mcgill/ecse428/foodme/FoodmeApplicationTests
-  java:script:
+script:
 - mvn test
