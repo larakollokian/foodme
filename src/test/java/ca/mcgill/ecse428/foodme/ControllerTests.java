@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -114,31 +115,43 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"User already exists\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
+    
+    /**
+     * CT Reset password of the user with randomly generated password
+     * */
+    @Test
+    public void a6_testResetPassword() throws Exception{
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/tester/resetPassword/16"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":true}";
+        JSONAssert.assertEquals(expected, response.getBody(), JSONCompareMode.LENIENT);
+    }
 
     /**
      * CT delete user
      * */
     @Test
-    public void a6_testDeleteUser() throws Exception{
+    public void a7_testDeleteUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/delete/tester"), HttpMethod.GET, entity, String.class);
         String expected = "{\"response\":true,\"message\":\"User account successfully deleted.\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
-
+    
     /**
      * CT delete non existing user
      * */
     @Test
-    public void a7_testDeleteNonExistingUser() throws Exception{
+    public void a8_testDeleteNonExistingUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/delete/tester"), HttpMethod.GET, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"User does not exist\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
-
+    
     /**
      * CT logout fail
      * */
