@@ -94,6 +94,7 @@ public class RestaurantRepository {
 	 * @throws InvalidInputException
 	 * @throws IllegalArgumentException
 	 */
+	@Transactional
 	public Restaurant createRestaurant(String restaurantID, String restaurantName) throws InvalidInputException,IllegalArgumentException{
 		if(restaurantID.length() == 0 || restaurantName.length() == 0){
 			throw new InvalidInputException("restaurantID and restaurantName must be at least 1 character");
@@ -115,6 +116,7 @@ public class RestaurantRepository {
 	 * @throws InvalidInputException
 	 * @throws IllegalArgumentException
 	 */
+	@Transactional
 	public Restaurant deleteRestaurant(String restaurantID) throws InvalidInputException,IllegalArgumentException {
 		
 		if(restaurantID.length() == 0){
