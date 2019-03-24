@@ -1,8 +1,5 @@
 package ca.mcgill.ecse428.foodme.model;
 
-import ca.mcgill.ecse428.foodme.model.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 @Entity
@@ -23,69 +20,35 @@ public class Preference {
 	@ManyToOne
 	private AppUser appUser;
 
-	public boolean setPID(int aPID) {
-		boolean wasSet = false;
-		this.pID = aPID;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setLocation(String aLocation) {
-		boolean wasSet = false;
-		this.location = aLocation;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setCuisine(String aCuisine) {
-		boolean wasSet = false;
-		this.cuisine = aCuisine;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setPrice(String aPrice)
-	{
-		boolean wasSet = false;
-		this.price = aPrice;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setSortBy(String sortBy) {
-		boolean wasSet = false;
-		this.sortBy = sortBy;
-		wasSet = true;
-		return wasSet;
+	//Setters
+	public void setPID(int aPID) { this.pID = aPID; }
+	public void setLocation(String location) { this.location =location; }
+	public void setCuisine(String cuisine) { this.cuisine = cuisine; }
+	public void setPrice(String price) { this.price = price; }
+	public void setSortBy(String sortBy) { this.sortBy = sortBy; }
+	public void setUser(AppUser aUser) {
+		this.appUser = aUser;
 	}
 
 
+	//Getters
 	public int getPID() {
 		return this.pID;
 	}
-
 	public String getLocation() {
 		return this.location;
 	}
-
 	public String getCuisine() {
 		return this.cuisine;
 	}
-
 	public String getPrice() {
 		return this.price;
 	}
-
 	public String getSortBy() {
 		return this.sortBy;
 	}
-
 	public AppUser getUser() {
 		return this.appUser;
-	}
-
-	public void setUser(AppUser aUser) {
-		this.appUser = aUser;
 	}
 
 	public void deleteUser() {

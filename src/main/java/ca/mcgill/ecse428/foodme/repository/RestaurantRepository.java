@@ -1,6 +1,8 @@
 package ca.mcgill.ecse428.foodme.repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -155,7 +157,7 @@ public class RestaurantRepository {
 	 * @throws InvalidInputException
 	 */
 	@Transactional
-	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws  NullObjectException,IllegalArgumentException,InvalidInputException {
+	public Restaurant addLiked(String username, String restaurantID, String restaurantName) throws  Exception {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
@@ -184,15 +186,49 @@ public class RestaurantRepository {
 	}
 
 	/**
+	 * Method that remove a restaurant and a user of the likedRestaurant list in the database
+	 * @param username
+	 * @param restaurantID
+	 * @return Restaurant
+	 * @throws IllegalArgumentException
+	 * @throws NullObjectException
+	 * @throws InvalidInputException
+	 */
+	@Transactional
+	public Restaurant removeLiked(String username, String restaurantID) throws  Exception {
+		AppUser appUser = getAppUser(username);
+		Restaurant restaurant = new Restaurant();
+
+		try {
+			restaurant = getRestaurant(restaurantID);
+		}
+		catch(NullObjectException e1){
+			throw new NullObjectException("Restaurant doesn't exist");
+		}
+
+		//Check if restaurant is liked by user
+		if(appUser.getlikedRestaurants().contains(restaurant) && restaurant.getAppUser_likes().contains(appUser)){
+			appUser.removelikedRestaurants(restaurant);
+			restaurant.removeLikedAppUsers(appUser);
+			entityManager.merge(appUser);
+			entityManager.merge(restaurant);
+			return restaurant;
+		}
+		else{
+			throw new IllegalArgumentException ("Restaurant is not liked by user!!!");
+		}
+	}
+
+	/**
 	 * Method that lists all the liked restaurants of a user
 	 * @return list of liked restaurants
 	 * @throws NullObjectException
 	 */
-	public List<String> listAllLiked(String username) throws NullObjectException {
-		Query q = entityManager.createNativeQuery("SELECT restaurantid FROM liked_Restaurants WHERE username =:username");
+	public List<Restaurant> listAllLiked(String username) throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM liked_Restaurants WHERE username =:username)");
 		q.setParameter("username", username);
 		@SuppressWarnings("unchecked")
-		List<String>likedRestaurants = q.getResultList();
+		List<Restaurant>likedRestaurants = q.getResultList();
 		if (likedRestaurants.size() == 0){
 			throw new NullObjectException ("User does not have liked restaurants");
 		}
@@ -209,7 +245,7 @@ public class RestaurantRepository {
 	 * @throws NullObjectException
 	 */
 	@Transactional
-	public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws NullObjectException,IllegalArgumentException,InvalidInputException {
+	public Restaurant addDisliked(String username, String restaurantID, String restaurantName) throws Exception {
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
 
@@ -244,7 +280,7 @@ public class RestaurantRepository {
 		
 		restaurant = getRestaurant(restaurantID);
 		
-		if(!appUser.getDislikedRestaurants().contains(restaurant)){
+		if(!appUser.getDislikedRestaurants().contains(restaurant) || !restaurant.getAppUser_dislikes().contains(appUser)){
 			throw new InvalidInputException ("Restaurant is not on disliked list!!!");
 		}
 
@@ -255,38 +291,97 @@ public class RestaurantRepository {
 		return restaurant;
 	}
 
+    /**
+     * Method to list all the disliked restaurants of a user
+     * @return The list of all the disliked restaurants
+     */
+    public List<Restaurant> listAllDisliked(String username)throws NullObjectException {
+        Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM disliked_Restaurants WHERE username =:username)");
+		q.setParameter("username", username);
+        @SuppressWarnings("unchecked")
+        List<Restaurant> dislikedRestaurants = q.getResultList();
+		if (dislikedRestaurants.size() == 0){
+			throw new NullObjectException ("User does not have disliked restaurants");
+		}
+        return dislikedRestaurants;
+    }
+
+	/**
+	 * Method that adds a restaurant and a user to the visitedRestaurant list in the database
+	 * @param username
+	 * @param restaurantID
+	 * @param restaurantName
+	 * @return Restaurant
+	 * @throws IllegalArgumentException
+	 * @throws NullObjectException
+	 */
 	@Transactional
-    public Restaurant removeliked(String username, String restaurantID) throws NullObjectException, InvalidInputException  {
+	public Restaurant addVisited(String username, String restaurantID, String restaurantName) throws Exception {
+
 		AppUser appUser = getAppUser(username);
 		Restaurant restaurant = new Restaurant();
-		
-		restaurant = getRestaurant(restaurantID);
-		
-		if(!appUser.getlikedRestaurants().contains(restaurant)){
-			throw new InvalidInputException ("Restaurant is not on liked list!!!");
+
+		try {
+			restaurant = getRestaurant(restaurantID);
+		}
+		catch(NullObjectException e1){
+			restaurant = createRestaurant(restaurantID,restaurantName);
 		}
 
-		appUser.removelikedRestaurants(restaurant);
-		restaurant.addLikedAppUsers(appUser);
+		//Remove it to put it at top of the list
+		if(appUser.getVisitedRestaurants().contains(restaurant)){
+			//Do nothing already in list
+			return restaurant;
+		}
+
+		appUser.addVisitedRestaurants(restaurant);
+		restaurant.addVisitedAppUsers(appUser);
 		entityManager.merge(appUser);
 		entityManager.merge(restaurant);
 		return restaurant;
 	}
 
-    /**
-     * Method to list all the disliked restaurants of a user
-     * @return The list of all the disliked restaurants
-     */
-    public List<String> listAllDisliked(String username)throws NullObjectException {
-        Query q = entityManager.createNativeQuery("SELECT restaurantid FROM disliked_Restaurants WHERE username =:username");
-		q.setParameter("username", username);
-        @SuppressWarnings("unchecked")
-        List<String> dislikedRestaurants = q.getResultList();
-		if (dislikedRestaurants.size() == 0){
-			throw new NullObjectException ("User does not have liked restaurants");
+	/**
+	 * Method that clears the
+	 * @param username
+	 * @return Restaurant
+	 * @throws IllegalArgumentException
+	 * @throws NullObjectException
+	 */
+	@Transactional
+	public Boolean clearVisited(String username) throws NullObjectException {
+		AppUser appUser = getAppUser(username);
+		if(appUser.getVisitedRestaurants().size()>0){
+			for(Restaurant r : (Set<Restaurant>)appUser.getVisitedRestaurants()){
+				r.removeVisitedAppUsers(appUser);
+				entityManager.merge(r);
+			}
+			appUser.getVisitedRestaurants().clear();
+			entityManager.merge(appUser);
+			return true;
 		}
-        return dislikedRestaurants;
-    }
+		else{
+			throw new NullObjectException ("Visited list is empty");
+		}
+	}
+
+
+	/**
+	 * Method to list all the visited restaurants of a user
+	 * @return The list of all the visited restaurants
+	 */
+	public List<Restaurant> listAllVisited(String username)throws NullObjectException {
+		Query q = entityManager.createNativeQuery("SELECT * FROM restaurants WHERE restaurantid IN (SELECT restaurantid FROM visited_Restaurants WHERE username =:username)");
+		q.setParameter("username", username);
+		@SuppressWarnings("unchecked")
+		List<Restaurant> visitedRestaurants = q.getResultList();
+		if (visitedRestaurants.size() == 0){
+			throw new NullObjectException ("User hasn't visited a restaurant");
+		}
+
+		return visitedRestaurants;
+	}
+
 
 	/**
 	 * Method that checks to see if a restaurant is open at the current time

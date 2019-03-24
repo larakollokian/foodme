@@ -58,6 +58,7 @@ public class SearchController {
         return getMapping(url);
     }
 
+
     /**
      * Method that searches restaurants based on type of cuisine, must select from the list of cuisines available in the yelp API
      * Due to the API's limits we can only return restaurants that currently have a review

@@ -44,8 +44,8 @@
             if (password.length() <= 6) {
                 throw new InvalidInputException("Your password must be longer than 6 characters!");
             }
-            if(username.length() == 0 || firstName.length() == 0 || lastName.length() == 0 ){
-                throw new InvalidInputException("Username, firstName and lastName must be at least 1 character");
+            if(username.length() <= 3){
+                throw new InvalidInputException("Username should be longer than 3 characters");
             }
             if(entityManager.find(AppUser.class,username) != null){
                 throw new IllegalArgumentException("User already exists");

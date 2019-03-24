@@ -6,12 +6,9 @@ import ca.mcgill.ecse428.foodme.model.*;
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.security.*;
 import java.util.HashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
 
 
 @Service
@@ -32,7 +29,7 @@ public class AuthenticationService {
 	 * gets an AppUser by session
 	 * @param sessionGuid
 	 * @return AppUser
-	 * @throws Exception
+	 * @throws NullObjectException when session is invalid or expired
 	 */
 	public AppUser getUserBySession(String sessionGuid) throws NullObjectException {
 		String name = userBySession.get(sessionGuid);
@@ -42,11 +39,12 @@ public class AuthenticationService {
 		AppUser user = findUserByUsername(name);
 		return user;
 	}
+
 	/**
 	 * gets an AppUser in the repository using the username
 	 * @param username
 	 * @return AppUser
-	 * @throws Exception
+	 * @throws NullObjectException when user does not exist
 	 */
 	private AppUser findUserByUsername(String username) throws NullObjectException  {
         AppUser user = null;
@@ -59,11 +57,13 @@ public class AuthenticationService {
 
     }
 	/**
-	 * allows to login: validate username and password
+	 * Allows to login: validate username and password
 	 * @param username
 	 * @param password
 	 * @return sessionGuid
-	 * @throws AuthenticationException
+	 * @throws AuthenticationException when password is invalid
+	 * @throws NullObjectException when user does not exist
+	 * @throws Exception when password checking fails
 	 */
 	public String login(String username, String password) throws Exception{
 		AppUser user = null;
@@ -94,8 +94,9 @@ public class AuthenticationService {
 
     }
 	/**
-	 * allows to logout having the username
+	 * Allows to logout given the username
 	 * @param username
+	 * @throws AuthenticationException when user is not logged in
 	 */
 	public void logout(String username) throws AuthenticationException {
 		if(sessionByUser.get(username)==null){

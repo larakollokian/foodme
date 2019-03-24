@@ -94,11 +94,10 @@ public class AppUserController {
 
         try {
             AppUser user = userRepository.createAccount(username, firstName, lastName, email, password);
+            sendRegistrationConfirmationEmail(email, firstName, username);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
-
-        sendRegistrationConfirmationEmail(email, firstName, username);
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "User account successfully created."));
     }
 
@@ -302,7 +301,8 @@ public class AppUserController {
          } catch (MessagingException e) {e.printStackTrace();} 
     }
 
-    private void sendRegistrationConfirmationEmail(String recipient, String firstName, String username) {
+    private void sendRegistrationConfirmationEmail(String recipient, String firstName, String username)
+            throws Exception {
         String host = "smtp.gmail.com";  
         String wmail = "foodmeapplication@gmail.com";//change accordingly  
         String pw = "FoodMeApp428";//change accordingly
@@ -335,6 +335,26 @@ public class AppUserController {
              
              //send the message
              Transport.send(message);
-         } catch (MessagingException e) {e.printStackTrace();} 
+         } catch (MessagingException e) {
+             throw new Exception(e.getMessage());
+         }
     }
+    
+    // @PostMapping("/add/dislike/resraurant/{username}/{restaurant}")
+    // public ResponseEntity addDislikedRestaurant(@PathVariable("username") String username, @PathVariable("restaurant") String restaurant) {
+    //     try{
+    //     //AppUser u = userRepository.getAppUser(username);
+    //     Restaurant r = restaurantRepository.getRestaurantByName(restaurant);
+    //     //userRepository.getAppUser(username).addDislikedRestaurants(r);
+
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        
+    // }
+
+    //     return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant added successfully to your disliked list."));
+
+    //    }
+
+
 }

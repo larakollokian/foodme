@@ -1,10 +1,8 @@
 package ca.mcgill.ecse428.foodme.model;
 
 import java.util.*;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.*;
-import javax.persistence.Table;
+
 
 @Entity
 @Table(name="AppUsers")
@@ -12,15 +10,13 @@ public class AppUser {
 
 	//User Attributes
 	@Id private String username;
-
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String password;
-
 	private int defaultPreferenceID;
 
-	//User Association
+	//User Associations
 	@ManyToMany
 	@JoinTable(name = "likedRestaurants",
 			joinColumns = @JoinColumn(name = "username"),
@@ -34,83 +30,61 @@ public class AppUser {
 			inverseJoinColumns = @JoinColumn(name = "restaurantID"))
 	private Set<Restaurant> dislikedRestaurants;
 
-	public boolean setUsername(String aUsername) {
-		boolean wasSet = false;
-		this.username = aUsername;
-		wasSet = true;
-		return wasSet;
+	@ManyToMany
+	@JoinTable(
+			name = "visitedRestaurants",
+			joinColumns = @JoinColumn(name = "username"),
+			inverseJoinColumns = @JoinColumn(name = "restaurantID"))
+	private Set<Restaurant> visitedRestaurants;
+
+	//Setters
+	public void setUsername(String username) { this.username = username; }
+	public void setFirstName(String firstName) { this.firstName = firstName; }
+	public void setLastName(String lastName) { this.lastName = lastName; }
+	public void setEmail(String email) { this.email = email; }
+	public void setPassword(String password) { this.password = password; }
+	public void setDefaultPreferenceID(int defaultPreferenceID) { this.defaultPreferenceID = defaultPreferenceID; }
+	public void setlikedRestaurants(Set likedRestaurants) {
+		this.likedRestaurants = likedRestaurants;
+	}
+	public void setDislikedRestaurants(Set dislikedRestaurants) {
+		this.dislikedRestaurants = dislikedRestaurants;
+	}
+	public void setVisitedRestaurants(Set visitedRestaurants) {
+		this.visitedRestaurants = visitedRestaurants;
 	}
 
-	public boolean setFirstName(String aFirstName) {
-		boolean wasSet = false;
-		this.firstName = aFirstName;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setLastName(String aLastName) {
-		boolean wasSet = false;
-		this.lastName = aLastName;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setEmail(String aEmail) {
-		boolean wasSet = false;
-		this.email = aEmail;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setPassword(String aPassword) {
-		boolean wasSet = false;
-		this.password = aPassword;
-		wasSet = true;
-		return wasSet;
-	}
-
-	public boolean setDefaultPreferenceID(int defaultPreferenceID) {
-		boolean wasSet = false;
-		this.defaultPreferenceID = defaultPreferenceID;
-		wasSet = true;
-		return wasSet;
-	}
-
+	//Getters
 	public String getUsername()
 	{
 		return this.username;
 	}
-
 	public String getFirstName()
 	{
 		return this.firstName;
 	}
-
 	public String getLastName()
 	{
 		return this.lastName;
 	}
-
 	public String getEmail()
 	{
 		return this.email;
 	}
-
 	public String getPassword()
 	{
 		return this.password;
 	}
-
 	public int getDefaultPreferenceID() { return this.defaultPreferenceID; }
-
 	public Set getlikedRestaurants() {
 		return likedRestaurants;
 	}
-
-	public void setlikedRestaurants(Set likedRestaurants) {
-		this.likedRestaurants = likedRestaurants;
+	public Set getDislikedRestaurants() {
+		return dislikedRestaurants;
 	}
+	public Set getVisitedRestaurants() { return visitedRestaurants; }
 
+	//Liked list
 	public void addlikedRestaurants(Restaurant likedRestaurants){
 		if(this.likedRestaurants == null){
 			this.likedRestaurants = new HashSet();
@@ -126,14 +100,7 @@ public class AppUser {
 		return false;
 	}
 
-	public Set getDislikedRestaurants() {
-		return dislikedRestaurants;
-	}
-
-	public void setDislikedRestaurants(Set dislikedRestaurants) {
-		this.dislikedRestaurants = dislikedRestaurants;
-	}
-
+	//Disliked list
 	public void addDislikedRestaurants(Restaurant dislikedRestaurants){
 		if(this.dislikedRestaurants == null){
 			this.dislikedRestaurants = new HashSet();
@@ -144,6 +111,22 @@ public class AppUser {
 	public boolean removeDislikedRestaurants(Restaurant dislikedRestaurants) {
 		if(this.dislikedRestaurants.contains(dislikedRestaurants)) {
 			this.dislikedRestaurants.remove(dislikedRestaurants);
+			return true;
+		}
+		return false;
+	}
+
+	//Visited list
+	public void addVisitedRestaurants(Restaurant visitedRestaurants){
+		if(this.visitedRestaurants == null){
+			this.visitedRestaurants = new HashSet();
+		}
+		this.visitedRestaurants.add(visitedRestaurants);
+	}
+
+	public boolean removedVisitedRestaurants(Restaurant visitedRestaurants) {
+		if(this.visitedRestaurants.contains(visitedRestaurants)) {
+			this.visitedRestaurants.remove(visitedRestaurants);
 			return true;
 		}
 		return false;

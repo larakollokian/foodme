@@ -2,31 +2,22 @@ package ca.mcgill.ecse428.foodme.model;
 
 public class Response {
 
+        //Attributes
         private boolean response;
-
         private String message;
-        public Response() {
-        }
 
+        //Constructor
         public Response(boolean response,String message){
             this.response = response;
             this.message = message;
         }
 
-        public boolean getResponse() {
-            return response;
-        }
+        //Getters
+        public boolean getResponse() { return response; }
+        public String getMessage() { return message; }
 
-        public void setResponse(boolean response) {
-            this.response = response;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
+        //Setters
+        public void setResponse(boolean response) { this.response = response; }
+        public void setMessage(String message) { this.message = message; }
 
 }
