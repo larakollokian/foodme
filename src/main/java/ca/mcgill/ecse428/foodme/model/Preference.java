@@ -30,7 +30,6 @@ public class Preference {
 		this.appUser = aUser;
 	}
 
-
 	//Getters
 	public int getPID() {
 		return this.pID;
@@ -51,18 +50,4 @@ public class Preference {
 		return this.appUser;
 	}
 
-	public void deleteUser() {
-		this.appUser = null;
-	}
-
-	public String toString()
-	{
-		return super.toString() + "["+
-				"pID" + ":" + getPID()+ "]" + System.getProperties().getProperty("line.separator") +
-				"  " + "location" + "=" + (getLocation() != null ? !getLocation().equals(this)  ? getLocation().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-				"  " + "cuisine" + "=" + (getCuisine() != null ? !getCuisine().equals(this)  ? getCuisine().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-				"  " + "price" + "=" + (getPrice() != null ? !getPrice().equals(this)  ? getPrice().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-				"  " + "sortBy" + "=" + (getSortBy() != null ? !getSortBy().equals(this)  ? getSortBy().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-				"  " + "user = "+(getUser()!=null?Integer.toHexString(System.identityHashCode(getUser())):"null");
-	}
 }

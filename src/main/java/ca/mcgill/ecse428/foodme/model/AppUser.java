@@ -131,10 +131,4 @@ public class AppUser {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return "AppUser [username=" + username + ", firstName=" + firstName + ", lastName=" + lastName + ", email="
-				+ email + ", password=" + password + ", defaultPreferenceID=" + defaultPreferenceID + "]";
-	}
-
 }
