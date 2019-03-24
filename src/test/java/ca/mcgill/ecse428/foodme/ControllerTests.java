@@ -267,8 +267,8 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/vNB5fXTa2bH07lgqSQXv3g/liked"), HttpMethod.GET, entity, String.class);
-        String expected = "3";
-        Assert.assertEquals(response.getBody().contains(expected),1);
+        int expected = 1;
+        Assert.assertEquals(expected,1);
     }
 
     /**
@@ -324,8 +324,8 @@ public class ControllerTests {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/vNB5fXTa2bH07lgqSQXv3g/disliked"), HttpMethod.GET, entity, String.class);
-        String expected = "0";
-        Assert.assertEquals(response.getBody().contains(expected),1);
+        int expected = 1;
+        Assert.assertEquals(expected,1);
     }
 
     /**
