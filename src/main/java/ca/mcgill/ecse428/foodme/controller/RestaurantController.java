@@ -61,6 +61,21 @@ public class RestaurantController {
     }
 
     /**
+     * Controller method to create a restaurant
+     * @param rName
+     * @param restaurantID
+     * @return
+     */
+    @PostMapping("create/{rName}/{restaurantID}")
+    public ResponseEntity createRestaurant(@PathVariable("rName") String rName,@PathVariable("restaurantID") String restaurantID) {
+        try{
+            restaurantRepository.createRestaurant(restaurantID,rName);
+        } catch (InvalidInputException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant was successfully created."));
+    }
+    /**
      * Controller Method that delete a restaurant
      * @param restaurantID
      * @return ResponseEntity
@@ -69,7 +84,7 @@ public class RestaurantController {
     public ResponseEntity deleteRestaurant(@PathVariable("restaurantID") String restaurantID) {
         try {
             restaurantRepository.deleteRestaurant(restaurantID);
-        } catch (InvalidInputException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant data was successfully deleted."));

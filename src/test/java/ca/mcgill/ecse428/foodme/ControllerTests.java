@@ -28,10 +28,11 @@ import org.springframework.test.context.junit4.SpringRunner;
  * Ex. You cannot log out if you haven't sign in
  * a - signup/delete
  * b - authentication/logout
- * c - liked restaurants
- * d - disliked restaurants
- * e - visited restaurants
- * f - preferences
+ * c - create/delete/get restaurants
+ * d - liked restaurants
+ * e - disliked restaurants
+ * f - visited restaurants
+ * g - preferences
  *
  *  All tests are on user johnsmith (already exists in database)
  *
@@ -214,10 +215,78 @@ public class ControllerTests {
     }
 
     /**
+     * CT to create a new restaurant
+     * @throws Exception
+     */
+    @Test
+    public void c1_createRestaurant() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/create/TestRestaurant/abcdef"), HttpMethod.POST, entity, String.class);
+        String expected ="{\"response\":true,\"message\":\"Restaurant was successfully created.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
+     * CT to get a restaurant by the restaurant ID
+     * @throws Exception
+     */
+    @Test
+    public void c2_getRestaurantById() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/get/abcdef"), HttpMethod.GET, entity, String.class);
+        String expected = "[\"abcdef\",\"TestRestaurant\"]";
+        Assert.assertEquals(expected, response.getBody());
+    }
+
+    /**
+     * CT to get all the restaurants
+     * @throws Exception
+     */
+    @Test
+    public void c3_getAllRestaurant() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/get/all"), HttpMethod.GET, entity, String.class);
+        String expected = "[[\"RIIOjIdlzRyESw1BkmQHtw\",\"Tacos Et Tortas\"],[\"vNB5fXTa2bH07lgqSQXv3g\",\"Rotisserie Portugalia\"],[\"L8MXAFY14EiC_mzFCgmR_g\",\"Domino's Pizza\"],[\"E8RJkjfdcwgtyoPMjQ_Olg\",\"four-barrel-coffee\"],[\"gR9DTbKCvezQlqvD7_FzPw\",\"north-india-restaurant\"],[\"ddee\",\"taco\"],[\"gR9DTbKCvezQlqvD3_FzPw\",\"normandin\"],[\"gR9DTbKCvezQlqvD7_FzP\",\"north-africa-restaurant\"],[\"322\",\"smokeshack\"],[\"teFIIcVgmkx0uWrs_mROzg\",\"Tacomania\"],[\"ey2HUPlc90UulqEvrPyiyw\",\"Guy's Burger Joint\"],[\"Q3A-L3ebXfHGMbZvA7SWAw\",\"Sunny Bowl\"],[\"OaY79nzIvXqz3WzxK1HgSg\",\"Falafel And Kebab\"],[\"YParqyQqRQ350oDlLhaEGw\",\"Hon Sushi\"],[\"ud9ocsQHI7h3zNO7FdOFYQ\",\"Zareen's\"],[\"3MLCZ99s5KcnAIgNpz8gag\",\"In-N-Out Burger\"],[\"lX6DstPH9zxKXgN31VlUdQ\",\"Cucina Venti Restaurant\"],[\"zD3Pm6WgCwViL7Qf693fmg\",\"The Voya Restaurant\"],[\"QEk4Td9-bcQA-5VZl9kmCA\",\"Beta - GWC6\"],[\"g3J-XCEd0--IZUbACAbI2Q\",\"Costco Food Court\"],[\"xY-FrHUYrL8WZ-z3Bvxv3Q\",\"Hanabi Sushi\"],[\"wSWXRx-7kz8Z8ARmxRRktQ\",\"Pho Tran Vu\"],[\"JWiGiOJqhPpMzZM8P5i4yw\",\"Erik's DeliCafé\"],[\"MO_0P8qoflf7mPzyw_5GcA\",\"L&L Hawaiian Barbecue\"],[\"rvM5NOlJffP-_Ew9Q1h2Lw\",\"P.A. & Gargantua\"],[\"Z2NF_xBF-7RqAfu_4EO9ow\",\"Dim Sum Montréal\"],[\"null\",\"Japote\"],[\"9u-nVJmHz_fB6CFW41JI-w\",\"Café 92\"],[\"LsRSCdUHmwMetiHz0eCqhw\",\"Cloud Bistro\"],[\"NL_yEdlxi7ddafyr4bXBFg\",\"Michael's at Shoreline Restaurant\"],[\"Ik76gEiVhgw8i1-d1xhixg\",\"Mom's Tacos\"],[\"xZHlAIoTfvYtfbOMMKK__g\",\"McDonald's\"],[\"ZGfNnmPCZgsN4jr2B2P8bg\",\"Antojitos Estilo de Jaylah's\"],[\"controllertestid\",\"controllertestname\"],[\"abcdef\",\"TestRestaurant\"]]";
+        Assert.assertEquals(expected, response.getBody());
+    }
+
+    /**
+     * CT to delete a restaurant
+     * @throws Exception
+     */
+    @Test
+    public void c4_deleteRestaurantSuccess() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/deleteRestaurant/abcdef"), HttpMethod.POST, entity, String.class);
+        String expected ="{\"response\":true,\"message\":\"Restaurant data was successfully deleted.\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
+     * CT to delete a restaurant that does not exist
+     * @throws Exception
+     */
+    @Test
+    public void c5_deleteRestaurantFail() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/deleteRestaurant/abcdef"), HttpMethod.POST, entity, String.class);
+        String expected ="{\"response\":false,\"message\":\"Restaurant does not exist\"}";
+        System.out.println(response.getBody());
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+
+
+    /**
      * CT list all liked restaurants but list is empty - fail
      * */
     @Test
-    public void c1_testListAllLikedWithNoRestaurants() throws Exception {
+    public void d1_testListAllLikedWithNoRestaurants() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
@@ -229,7 +298,7 @@ public class ControllerTests {
      * CT add a liked restaurant to a user - success
      * */
     @Test
-    public void c2_testAddLiked() throws Exception {
+    public void d2_testAddLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
@@ -241,7 +310,7 @@ public class ControllerTests {
      * CT add a disliked restaurant when it is liked -fail
      * */
     @Test
-    public void c3_testAddDislikedWhenLiked() throws Exception {
+    public void d3_testAddDislikedWhenLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
@@ -253,7 +322,7 @@ public class ControllerTests {
      * CT list all liked restaurant(1) - success
      * */
     @Test
-    public void c4_testListAllLiked() throws Exception{
+    public void d4_testListAllLiked() throws Exception{
 
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
@@ -275,7 +344,7 @@ public class ControllerTests {
      * CT remove liked restaurant - success
      * */
     @Test
-    public void c5_testRemoveLiked() throws Exception {
+    public void d5_testRemoveLiked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
@@ -287,7 +356,7 @@ public class ControllerTests {
      * CT remove liked restaurant that is not liked - fail
      * */
     @Test
-    public void c6_testRemoveLikedNotInLiked() throws Exception {
+    public void d6_testRemoveLikedNotInLiked() throws Exception {
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removeliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
@@ -299,7 +368,7 @@ public class ControllerTests {
      * CT list all disliked restaurants but the list is empty - fail
      * */
     @Test
-    public void d1_testListAllDislikedWithNoRestaurants() throws Exception {
+    public void e1_testListAllDislikedWithNoRestaurants() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/disliked"), HttpMethod.GET, entity, String.class);
@@ -311,7 +380,7 @@ public class ControllerTests {
      * CT add disliked restaurant to a user - success
      * */
     @Test
-    public void d2_testAddDisliked() throws Exception {
+    public void e2_testAddDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
@@ -332,7 +401,7 @@ public class ControllerTests {
      * CT add liked restaurant when it is disliked - fail
      * */
     @Test
-    public void d3_testAddLikedWhenDisliked() throws Exception {
+    public void e3_testAddLikedWhenDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/addliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
@@ -344,7 +413,7 @@ public class ControllerTests {
      * CT list all disliked restaurants - success
      * */
     @Test
-    public void d4_testListAllDisliked() {
+    public void e4_testListAllDisliked() {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/disliked"), HttpMethod.GET, entity, String.class);
@@ -356,7 +425,7 @@ public class ControllerTests {
      * CT remove disliked restaurant - success
      * */
     @Test
-    public void d5_testRemoveDisliked() throws Exception {
+    public void e5_testRemoveDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
@@ -368,7 +437,7 @@ public class ControllerTests {
      * CT remove disliked restaurant that is not disliked - fail
      * */
     @Test
-    public void d6_testRemoveDislikedNotInDisliked() throws Exception {
+    public void e6_testRemoveDislikedNotInDisliked() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/removedisliked/vNB5fXTa2bH07lgqSQXv3g"), HttpMethod.POST, entity, String.class);
@@ -380,7 +449,7 @@ public class ControllerTests {
      * CT clear visited restaurant list that is empty - fail
      * */
     @Test
-    public void e1_testClearEmptyVisited() throws Exception {
+    public void f1_testClearEmptyVisited() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/clearvisited"), HttpMethod.POST, entity, String.class);
@@ -392,7 +461,7 @@ public class ControllerTests {
      * CT list all visited restaurant list that is empty - fail
      * */
     @Test
-    public void e2_testGetAllVisitedEmpty() throws Exception {
+    public void f2_testGetAllVisitedEmpty() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/visited"), HttpMethod.GET, entity, String.class);
@@ -404,7 +473,7 @@ public class ControllerTests {
      * CT add visited restaurant - success
      * */
     @Test
-    public void e3_testAddVisited() throws Exception {
+    public void f3_testAddVisited() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/addvisited/RIIOjIdlzRyESw1BkmQHtw/Tacos Et Tortas"), HttpMethod.POST, entity, String.class);
@@ -416,7 +485,7 @@ public class ControllerTests {
      * CT list all visited restaurants - success
      * */
     @Test
-    public void e4_testGetAllVisited()  {
+    public void f4_testGetAllVisited()  {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/visited"), HttpMethod.GET, entity, String.class);
@@ -428,7 +497,7 @@ public class ControllerTests {
      * CT clear all visited restaurants - success
      * */
     @Test
-    public void e5_testClearVisited() throws Exception {
+    public void f5_testClearVisited() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/clearvisited"), HttpMethod.POST, entity, String.class);
@@ -440,7 +509,7 @@ public class ControllerTests {
      * CT add preference - success
      * */
     @Test
-    public void f1_testAddPreference() throws Exception{
+    public void g1_testAddPreference() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/preferences/johnsmith/add?location=Montreal&cuisine=chinese&price=$&sortBy=rating"), HttpMethod.POST, entity, String.class);
@@ -452,7 +521,7 @@ public class ControllerTests {
      * CT get preferences of a user - success
      * */
     @Test
-    public void f2_testGetPreferencesForUser() throws Exception{
+    public void g2_testGetPreferencesForUser() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/preferences/johnsmith"), HttpMethod.GET, entity, String.class);
@@ -464,7 +533,7 @@ public class ControllerTests {
      * CT edit preference - success
      * */
     @Test
-    public void f3_testEditPreferenceSuccess() throws Exception {
+    public void g3_testEditPreferenceSuccess() throws Exception {
         pid = p.getPreferenceIDs("johnsmith");
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
@@ -477,7 +546,7 @@ public class ControllerTests {
      * CT edit preference - fail
      * */
     @Test
-    public void f4_testEditPreferenceFail() throws Exception{
+    public void g4_testEditPreferenceFail() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/preferences/johnsmith/edit/1?location=Montreal&cuisine=french&price=$$&sortBy=rating"), HttpMethod.POST, entity, String.class);
@@ -489,7 +558,7 @@ public class ControllerTests {
      * CT get default preference - fail
      * */
     @Test
-    public void f5_testGetDefaultPreferenceFail() throws Exception{
+    public void g5_testGetDefaultPreferenceFail() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/johnsmith/getdefault"), HttpMethod.GET, entity, String.class);
@@ -501,7 +570,7 @@ public class ControllerTests {
      * CT set default preference - fail
      * */
     @Test
-    public void f6_testSetDefaultPreferenceFail() throws Exception {
+    public void g6_testSetDefaultPreferenceFail() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/johnsmith/setdefault/1"), HttpMethod.POST, entity, String.class);
@@ -513,7 +582,7 @@ public class ControllerTests {
      * CT set default preference - success
      * */
     @Test
-    public void f7_testSetDefaultPreferenceSuccess() throws Exception {
+    public void g7_testSetDefaultPreferenceSuccess() throws Exception {
         pid = p.getPreferenceIDs("johnsmith");
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
@@ -526,7 +595,7 @@ public class ControllerTests {
      * CT get default preference - success
      * */
     @Test
-    public void f8_testGetDefaultPreferenceSuccess() {
+    public void g8_testGetDefaultPreferenceSuccess() {
         pid = p.getPreferenceIDs("johnsmith");
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
@@ -539,7 +608,7 @@ public class ControllerTests {
      * CT delete preference - success
      * */
     @Test
-    public void f9_testDeletePreferenceSuccess() throws Exception{
+    public void g9_testDeletePreferenceSuccess() throws Exception{
         pid = p.getPreferenceIDs("johnsmith");
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
@@ -552,7 +621,7 @@ public class ControllerTests {
      * CT delete preference - fail
      * */
     @Test
-    public void f10_testDeletePreferenceFail() throws Exception{
+    public void g10_testDeletePreferenceFail() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/preferences/johnsmith/delete/1"), HttpMethod.POST, entity, String.class);
