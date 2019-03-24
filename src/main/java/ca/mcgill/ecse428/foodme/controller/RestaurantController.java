@@ -165,6 +165,18 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
     }
 
+    @GetMapping("/{id}/rating")
+    public ResponseEntity restorating(@PathVariable("id") String Id){
+        String ratio;
+        try {
+            ratio = restaurantRepository.restaurantRating(Id);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ratio);
+    }
+
     /**
      * Controller method that adds a restaurant and a user to the dislikedRestaurant
      * list in the database

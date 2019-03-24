@@ -301,8 +301,6 @@ public class RestaurantRepository {
 		q.setParameter("id", id);
 		int likes = ((Number) q.getSingleResult()).intValue();
 		return likes;
-
-
 	}
 
 	@Transactional
@@ -311,7 +309,24 @@ public class RestaurantRepository {
 		q.setParameter("id", id);
 		int dislikes = ((Number)q.getSingleResult()).intValue();
 		return dislikes;
+	}
 
+	@Transactional
+	public String restaurantRating(String id) throws NullObjectException {
+    	Query q  = entityManager.createNativeQuery(("SELECT * FROM restaurants WHERE restaurantid =:id"));
+    	q.setParameter("id", id);
+    	double likes = restaurantLikes(id);
+    	double dislikes = restaurantDislikes(id);
+    	double total = likes+dislikes;
+    	if (dislikes == 0) {
+    		return "100/100";
+		}
+    	else if (likes == 0 && dislikes == 0) {
+    		return "No User Ratings";
+		}
+    	double ratio = likes/total;
+    	ratio = Math.floor(ratio*100);
+    	return ((int)ratio + "/100");
 	}
 
 	/**
