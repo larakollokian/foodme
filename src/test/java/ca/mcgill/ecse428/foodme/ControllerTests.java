@@ -249,6 +249,15 @@ public class ControllerTests {
         Assert.assertEquals(expected, response.getBody());
     }
 
+    @Test
+    public void g1_testGetLikes() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/vNB5fXTa2bH07lgqSQXv3g/liked"), HttpMethod.GET, entity, String.class);
+        String expected = "3";
+        Assert.assertEquals(response.getBody().contains(expected),1);
+    }
+
     /**
      * CT remove liked restaurant - success
      * */
@@ -295,6 +304,15 @@ public class ControllerTests {
                 createURLWithPort("/restaurants/johnsmith/adddisliked/vNB5fXTa2bH07lgqSQXv3g/Rotisserie Portugalia"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":true,\"message\":\"User successfully disliked Restaurant\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
+    }
+
+    @Test
+    public void g2_testGetDislikes() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/vNB5fXTa2bH07lgqSQXv3g/disliked"), HttpMethod.GET, entity, String.class);
+        String expected = "0";
+        Assert.assertEquals(response.getBody().contains(expected),1);
     }
 
     /**
@@ -529,25 +547,7 @@ public class ControllerTests {
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
-    /* tests need to be adjusted here
-    @Test
-    public void g1_testGetLikes() throws Exception {
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/Z2NF_xBF-7RqAfu_4EO9ow/liked"), HttpMethod.GET, entity, String.class);
-        String expected = "3";
-        Assert.assertEquals(response.getBody().contains(expected),3);
-    }
 
-    @Test
-    public void g2_testGetDislikes() throws Exception {
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/Z2NF_xBF-7RqAfu_4EO9ow/disliked"), HttpMethod.GET, entity, String.class);
-        String expected = "0";
-        Assert.assertEquals(response.getBody().contains(expected),0);
-    }
-    */
 
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;
