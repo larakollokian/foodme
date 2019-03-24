@@ -102,7 +102,7 @@ public class AppUserController {
      * @param username
      * @return ResponseEntity
      */
-    private void sendConfirmationEmail(String recipient, String firstName, String username) throws Exception {
+    private void sendRegistrationConfirmationEmail(String recipient, String firstName, String username) throws Exception {
         String host = "smtp.gmail.com";
         String wmail = "foodmeapplication@gmail.com";//change accordingly
         String pw = "FoodMeApp428";//change accordingly
@@ -149,7 +149,6 @@ public class AppUserController {
         AppUser user = new AppUser();
         try {
             user = userRepository.getAppUser(username);
-            // user = userRepository.getAppUserQuery(username);
         } catch (NullObjectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
@@ -209,15 +208,13 @@ public class AppUserController {
     /**
      * Controller method that changes a user's first name
      * @param username
-     * @param oldFName
      * @param newFName
      * @return ResponseEntity
      */
-    @PostMapping("/changeFirstName/{username}/{oldFName}/{newFName}")
-    public ResponseEntity changeFirstName(@PathVariable("username") String username,
-            @PathVariable("oldFName") String oldFName, @PathVariable("newFName") String newFName) {
+    @PostMapping("/changeFirstName/{username}/{newFName}")
+    public ResponseEntity changeFirstName(@PathVariable("username") String username, @PathVariable("newFName") String newFName) {
         try {
-            userRepository.changeFirstName(username, oldFName, newFName);
+            userRepository.changeFirstName(username, newFName);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
@@ -227,15 +224,13 @@ public class AppUserController {
     /**
      * Controller method that changes a user's last name
      * @param username
-     * @param oldLName
      * @param newLName
      * @return ResponseEntity
      */
-    @PostMapping("/changeFirstName/{username}/{oldLName}/{newLName}")
-    public ResponseEntity changeLastName(@PathVariable("username") String username,
-            @PathVariable("oldLName") String oldLName, @PathVariable("newLName") String newLName) {
+    @PostMapping("/changeLastName/{username}/{newLName}")
+    public ResponseEntity changeLastName(@PathVariable("username") String username, @PathVariable("newLName") String newLName) {
         try {
-            userRepository.changeLastName(username, oldLName, newLName);
+            userRepository.changeLastName(username, newLName);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
@@ -250,26 +245,19 @@ public class AppUserController {
      * @throws Exception
      */
     @PostMapping("{username}/resetPassword/{n}")
-    public ResponseEntity resetPassword(@PathVariable("username") String username, @PathVariable("n") int length)
-            throws Exception {
+    public ResponseEntity resetPassword(@PathVariable("username") String username, @PathVariable("n") int length) {
         
-        AppUser u = userRepository.getAppUser(username); 
         String uUsername = username;
-        String uEmail = u.getEmail();
-        String uFName = u.getFirstName();
-        String uPassword = u.getPassword();
-
-        if(length <= 6){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, "Password should be longer than 6 characters"));
+        String randPassword;
+        try {
+            AppUser u = userRepository.getAppUser(username);
+            randPassword = Password.generateRandomPassword(length);
+            userRepository.resetPassword(uUsername, randPassword);
+            sendResetPasswordConfirmationEmail(u.getEmail(), u.getFirstName(), uUsername, randPassword);
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
         }
-
-        String randPassword = Password.generateRandomPassword(length);
-
-        userRepository.resetPassword(uUsername, randPassword);
-
-
-        sendResetPasswordConfirmationEmail(uEmail,uFName, uUsername, randPassword);
-        return ResponseEntity.status(HttpStatus.OK).body(new Response(true,randPassword));
+        return ResponseEntity.status(HttpStatus.OK).body(new Response(true,"Password successfully reset"));
     }
 
     /**
@@ -304,6 +292,14 @@ public class AppUserController {
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully set to default"));
     }
 
+    /**
+     * Helper method that sends a confirmation email after a password is successfully changed
+     * @param recipient
+     * @param firstName
+     * @param username
+     * @param newPassword
+     * @return ResponseEntity
+     */
     private void sendResetPasswordConfirmationEmail(String recipient, String firstName, String username, String newPassword) {
         String host = "smtp.gmail.com";  
         String wmail = "foodmeapplication@gmail.com";//change accordingly  
@@ -340,61 +336,5 @@ public class AppUserController {
              Transport.send(message);
          } catch (MessagingException e) {e.printStackTrace();} 
     }
-
-    private void sendRegistrationConfirmationEmail(String recipient, String firstName, String username)
-            throws Exception {
-        String host = "smtp.gmail.com";  
-        String wmail = "foodmeapplication@gmail.com";//change accordingly  
-        String pw = "FoodMeApp428";//change accordingly
-        String to = recipient;
-        Properties props = new Properties();
-        props.setProperty("mail.transport.protocol", "smtp");
-        props.setProperty("mail.host", "smtp.gmail.com");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.debug", "true");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.socketFactory.fallback", "false"); 
-        
-        javax.mail.Session session2 = javax.mail.Session.getDefaultInstance(props, new javax.mail.Authenticator() {  
-       
-             protected PasswordAuthentication getPasswordAuthentication() {
-                 return new PasswordAuthentication(wmail,pw);
-              }
-         });
-         
-         //Compose the message
-         try {
-             MimeMessage message = new MimeMessage(session2);
-             message.setFrom(new InternetAddress("FoodMe Application <foodmeapplication@gmail.com>"));
-             message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
-             message.setSubject("Welcome to FoodMe!");
-             message.setText("Hi "+firstName+", \n\nThank you for creating a profile under the username "+username+". \n\nYour account has been successfully activated!\n\n" +
-             "The FoodMe team");
-             
-             //send the message
-             Transport.send(message);
-         } catch (MessagingException e) {
-             throw new Exception(e.getMessage());
-         }
-    }
-    
-    // @PostMapping("/add/dislike/resraurant/{username}/{restaurant}")
-    // public ResponseEntity addDislikedRestaurant(@PathVariable("username") String username, @PathVariable("restaurant") String restaurant) {
-    //     try{
-    //     //AppUser u = userRepository.getAppUser(username);
-    //     Restaurant r = restaurantRepository.getRestaurantByName(restaurant);
-    //     //userRepository.getAppUser(username).addDislikedRestaurants(r);
-
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        
-    // }
-
-    //     return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Restaurant added successfully to your disliked list."));
-
-    //    }
-
 
 }

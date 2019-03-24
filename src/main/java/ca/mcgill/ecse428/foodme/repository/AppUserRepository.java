@@ -96,10 +96,9 @@
         }
 
         /**
-         * Method that allows users to update their first name
+         * Method that allows users to update password
          * @param username
-         * @param oldFName
-         * @param newFName
+         * @param newPassword
          * @return AppUser
          * @throws NullObjectException
          * @throws InvalidInputException
@@ -117,11 +116,19 @@
             return u;
         }
 
+        /**
+         * Method that allows users to update their first name
+         * @param username
+         * @param newFName
+         * @return AppUser
+         * @throws NullObjectException
+         * @throws InvalidInputException
+         */
         @Transactional
-        public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
+        public AppUser changeFirstName(String username, String newFName) throws Exception {
 
             AppUser u = getAppUser(username);
-            if(newFName == u.getFirstName()) {
+            if(newFName.equals(u.getFirstName())) {
                 throw new InvalidInputException("New first name cannot be the same as current name");
             }
             else {
@@ -134,18 +141,17 @@
         /**
          * Method that allows users to update their last name
          * @param username
-         * @param oldLName
          * @param newLName
          * @return AppUser
          * @throws NullObjectException
          * @throws InvalidInputException
          */
         @Transactional
-        public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
+        public AppUser changeLastName(String username, String newLName) throws Exception {
 
             AppUser u = getAppUser(username);
             
-            if(newLName == u.getLastName()) {
+            if(newLName.equals(u.getLastName())) {
                 throw new InvalidInputException("New last name cannot be the same as current name");
                 }
             else {

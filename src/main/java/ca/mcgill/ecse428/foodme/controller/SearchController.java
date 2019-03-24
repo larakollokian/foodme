@@ -264,8 +264,6 @@ public class SearchController {
             @RequestParam("sortby") String sortby) throws Exception {
         // Set up url
         String url = null;
-
-
         url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location
                     + "&radius=" + radius + "&price=" + price + "&categories=" + cuisine 
                     + "&sort_by=" + sortby;
