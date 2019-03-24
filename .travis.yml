@@ -6,11 +6,5 @@ jdk:
 install:
 - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 #- mvn clean install sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login=207f5a26d2633a63916fd94354f3c3aeb6941ef3 -Dsonar.jacoco.reportPaths=target/jacoco.exec -Dmaven.test.failure.ignore=true -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-ignore:
-- ca.mcgill.ecse428.foodme.ControllerTests
-- ca.mcgill.ecse428.foodme.SearchControllerTests
-- ca.mcgill.ecse428.foodme.ModelTests
-- ca.mcgill.ecse428.foodme.AuthenticationServiceTests
-- ca.mcgill.ecse428.foodme.FoodmeApplicationTests
 script:
 - mvn test
