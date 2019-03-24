@@ -207,7 +207,7 @@ public class ControllerTests {
     public void c1_testListAllLikedWithNoRestaurants() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/Mar2/all/liked"), HttpMethod.GET, entity, String.class);
+                createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
         String expected ="{\"response\":false,\"message\":\"User does not have liked restaurants\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
@@ -244,7 +244,7 @@ public class ControllerTests {
 
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/Mar1/all/liked"), HttpMethod.GET, entity, String.class);
+                createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
         String expected = "[[\"vNB5fXTa2bH07lgqSQXv3g\",\"Rotisserie Portugalia\"]]";
         Assert.assertEquals(expected, response.getBody());
     }
