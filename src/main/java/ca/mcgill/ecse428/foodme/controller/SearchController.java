@@ -35,14 +35,19 @@ public class SearchController {
 
     /**
      * Greeting
-     * @return Search connected
+     * @return String Search connected
      */
     @RequestMapping("/")
     public String greeting() {
         return "Search connected!";
     }
 
-    //Template
+    /**
+     * Method to get the url from Yelp API correctly to access the data
+     * @param url the url set by Yelp
+     * @return ResponseEntity<String> a response in type ResponseEntity
+     * @throws Exception
+     */
     public ResponseEntity<String> getMapping(String url) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + APIKey);
@@ -64,8 +69,8 @@ public class SearchController {
 
     /**
      * Controller method that calls the API to return a restaurant based on its id
-     * @param id
-     * @return Restaurant and all its information associated with it
+     * @param id the id of the restaurant
+     * @return Restaurant restaurant and all its information associated with it
      * @throws Exception
      */
     @GetMapping("/businesses/")
@@ -81,9 +86,9 @@ public class SearchController {
     /**
      * Method that searches restaurants based on type of cuisine, must select from the list of cuisines available in the yelp API
      * Due to the API's limits we can only return restaurants that currently have a review
-     * @param cuisine
-     * @param location
-     * @return
+     * @param cuisine type of cuisine
+     * @param location location
+     * @return ResponseEntity<String> a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/cuisine/")
@@ -99,10 +104,10 @@ public class SearchController {
     /**
      * Method that searches restaurants based on type of cuisine, must select from the list of cuisines available in the yelp API
      * Due to the API's limits we can only return restaurants that currently have a review
-     * @param cuisine
-     * @param longitude
-     * @param latitude
-     * @return
+     * @param cuisine type of cuisine
+     * @param longitude longitude
+     * @param latitude latitude
+     * @return ResponseEntity<String> a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/cuisine/longitude/latitude/")
@@ -118,9 +123,8 @@ public class SearchController {
 
     /**
      * Method that searches restaurants using google API
-     *
-     * @param location
-     * @return ResponseEntity
+     * @param location location
+     * @return ResponseEntity a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/google/{location}/")
@@ -144,10 +148,10 @@ public class SearchController {
      * Method that searches restaurant and sort them by best_match, rating, review_count or distance
      * If recommend param is set to 1, it will return random restaurant from the result
      *
-     * @param location
-     * @param sortby:    best_match, rating, review_count or distance
-     * @param recommend: 1-> True, 0-> False
-     * @return ResponseEntity
+     * @param location location
+     * @param sortby    best_match, rating, review_count or distance
+     * @param recommend 1-> True, 0-> False
+     * @return ResponseEntity a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/{location}/{sortby}/{recommend}/")
@@ -207,9 +211,9 @@ public class SearchController {
     /**
      * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
      *
-     * @param location
-     * @param price
-     * @return
+     * @param location location
+     * @param price price range
+     * @return ResponseEntity a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/price/")
@@ -226,10 +230,10 @@ public class SearchController {
     /**
      * Method that searches restaurant based on price range. Must include either location or longitude and latitude.
      *
-     * @param longitude
-     * @param latitude
-     * @param price
-     * @return
+     * @param longitude longitude
+     * @param latitude latitude
+     * @param price price range
+     * @return ResponseEntity a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/price/longitude/latitude/")
@@ -247,12 +251,12 @@ public class SearchController {
     /**
      * Method that searches restaurant and sort them by best_match, rating, review_count or distance
      *
-     * @param location
+     * @param location location
      * @param radius in meters
-     * @param price
-     * @param cuisine
+     * @param price price range
+     * @param cuisine type of cuisine
      * @param sortby:    best_match, rating, review_count or distance
-     * @return ResponseEntity
+     * @return ResponseEntity a response in type ResponseEntity
      * @throws Exception
      */
     @GetMapping("/filter/")
@@ -264,7 +268,6 @@ public class SearchController {
             @RequestParam("sortby") String sortby) throws Exception {
         // Set up url
         String url = null;
-
 
         url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location
                     + "&radius=" + radius + "&price=" + price + "&categories=" + cuisine 

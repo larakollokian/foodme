@@ -33,7 +33,7 @@ public class AppUserController {
 
     /**
      * Greeting
-     * @return AppUser connected
+     * @return String AppUser connected
      */
     @RequestMapping("/")
     public String greeting() {
@@ -42,9 +42,9 @@ public class AppUserController {
 
     /**
      * Controller method that attempts to login
-     * @param username
-     * @param password
-     * @return ResponseEntity
+     * @param username the username
+     * @param password	the password
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/auth/{username}/{password}")
     public ResponseEntity login(@PathVariable("username") String username, @PathVariable("password") String password) {
@@ -58,8 +58,8 @@ public class AppUserController {
     }
 
     /** Controller method that attempts to logout
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/logout/{username}")
     public ResponseEntity logout(@PathVariable("username")String username){
@@ -75,12 +75,12 @@ public class AppUserController {
 
     /**
      * Method that creates a new account for a user. Username must be unique.
-     * @param username
-     * @param firstName
-     * @param lastName
-     * @param email
-     * @param password
-     * @return ResponseEntity
+     * @param username the username
+     * @param firstName the first name
+     * @param lastName the last name
+     * @param email the email
+     * @param password the password
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/create/{username}/{firstName}/{lastName}/{email}/{password}")
     public ResponseEntity createAccount(@PathVariable("username") String username,
@@ -97,10 +97,10 @@ public class AppUserController {
 
     /**
      * Helper method that sends a confirmation email after an account is successfully created
-     * @param recipient
-     * @param firstName
-     * @param username
-     * @return ResponseEntity
+     * @param recipient the recipient 
+     * @param firstName the first name
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     private void sendConfirmationEmail(String recipient, String firstName, String username) throws Exception {
         String host = "smtp.gmail.com";
@@ -140,8 +140,8 @@ public class AppUserController {
 
     /**
      * Controller method that gets a AppUser
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/get/{username}")
     public ResponseEntity getAppUser(@PathVariable("username") String username) {
@@ -157,7 +157,7 @@ public class AppUserController {
 
     /**
      * Controller method that gets all users in the database
-     * @return ResponseEntity
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/get/all")
     public ResponseEntity getAllUsers() {
@@ -172,8 +172,8 @@ public class AppUserController {
 
     /**
      * Controller method that deletes user from the database given a username
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/delete/{username}")
     public ResponseEntity deleteUser(@PathVariable("username") String username) {
@@ -188,10 +188,10 @@ public class AppUserController {
 
     /**
      * Controller method that changes a user's password
-     * @param username
-     * @param oldPass
-     * @param newPass
-     * @return ResponseEntity
+     * @param username the username
+     * @param oldPass the old password
+     * @param newPass the new password the user wants to set
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/changePassword/{username}/{oldPass}/{newPass}")
     public ResponseEntity changePassword(@PathVariable("username") String username,
@@ -206,10 +206,10 @@ public class AppUserController {
 
     /**
      * Controller method that changes a user's first name
-     * @param username
-     * @param oldFName
-     * @param newFName
-     * @return ResponseEntity
+     * @param username the username
+     * @param oldFName the old name used
+     * @param newFName the new name that the user wants to set
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/changeFirstName/{username}/{oldFName}/{newFName}")
     public ResponseEntity changeFirstName(@PathVariable("username") String username,
@@ -224,10 +224,10 @@ public class AppUserController {
 
     /**
      * Controller method that changes a user's last name
-     * @param username
-     * @param oldLName
-     * @param newLName
-     * @return ResponseEntity
+     * @param username the username
+     * @param oldLName the old last name
+     * @param newLName the new last name that the user wants to set
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/changeFirstName/{username}/{oldLName}/{newLName}")
     public ResponseEntity changeLastName(@PathVariable("username") String username,
@@ -242,8 +242,8 @@ public class AppUserController {
 
     /**
      * Controller method that generates a random password given a length n
-     * @param length
-     * @return ResponseEntity
+     * @param length the length of the password to randomly generate
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/password/random/{n}")
     public ResponseEntity getRandomPassword(@PathVariable("n") int length) {
@@ -256,8 +256,8 @@ public class AppUserController {
 
     /**
      * Controller method that gets a default preference
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/{username}/getdefault")
     public ResponseEntity getDefaultPreferences(@PathVariable("username") String username) {
@@ -272,9 +272,9 @@ public class AppUserController {
 
     /**
      * Controller method that sets a default preference
-     * @param pID
-     * @param username
-     * @return ResponseEntity
+     * @param pID the id 
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{username}/setdefault/{pid}")
     public ResponseEntity setDefaultPreferences(@PathVariable("username") String username, @PathVariable("pid") int pID) {
@@ -285,5 +285,4 @@ public class AppUserController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully set to default"));
     }
-
 }

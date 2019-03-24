@@ -19,8 +19,8 @@ public class PreferenceController {
     PreferenceRepository preferenceRepository;
 
     /**
-     * Greeting
-     * @return Preference connected
+     * Greating
+     * @return String Preference connected!
      */
     @RequestMapping("/")
     public String greeting() {
@@ -29,7 +29,7 @@ public class PreferenceController {
 
     /**
      * Controller method that gets all preferences in the database
-     * @return ResponseEntity
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/get/all")
     public ResponseEntity getAllPreferences() {
@@ -42,11 +42,10 @@ public class PreferenceController {
         return ResponseEntity.status(HttpStatus.OK).body(allPs);
     }
 
-
     /**
      * Controller method that gets the list of preferences of a user
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/{username}")
     public ResponseEntity getPreferencesForUser(@PathVariable("username") String username) {
@@ -61,12 +60,12 @@ public class PreferenceController {
 
     /**
      * Controller method that adds a preference
-     * @param username
-     * @param location
-     * @param cuisine
-     * @param price
-     * @param sortBy
-     * @return Preference
+     * @param username the username
+     * @param location the location
+     * @param cuisine the type of cuisine
+     * @param price the price range
+     * @param sortBy the category to which it is sort by
+     * @return Preference the preference set by the user
      */
     @PostMapping("/{user}/add")
     public ResponseEntity addPreference(
@@ -82,13 +81,13 @@ public class PreferenceController {
 
     /**
      * Controller method that edits a preference
-     * @param username
-     * @param pID
-     * @param location
-     * @param cuisine
-     * @param price
-     * @param sortBy
-     * @return Preference
+     * @param username the username
+     * @param pID the id of the preference
+     * @param location the location
+     * @param cuisine the type of cuisine
+     * @param price the price range
+     * @param sortBy the category to which it is sort by
+     * @return Preference the preference set by the user
      */
     @PostMapping("/{user}/edit/{pID}")
     public ResponseEntity editPreference(
@@ -104,9 +103,9 @@ public class PreferenceController {
 
     /**
      * Controller method that deletes a preference
-     * @param pID
-     * @param username
-     * @return ResponseEntity
+     * @param pID the id of the preference
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/delete/{pID}")
     public ResponseEntity deletePreference(
@@ -119,5 +118,4 @@ public class PreferenceController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(new Response(true, "Preference successfully deleted."));
     }
-
 }

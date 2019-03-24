@@ -37,7 +37,7 @@ public class RestaurantController {
 
     /**
      * Greeting
-     * @return Restaurant connected
+     * @return String Restaurant connected
      */
     @RequestMapping("/")
     public String greeting() {
@@ -46,8 +46,8 @@ public class RestaurantController {
 
     /**
      * Controller method to get a restaurant's data based on its id
-     * @param id
-     * @return ResponseEntity
+     * @param id the id of the restaurant to get from the data base
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/get/{id}")
     public ResponseEntity getRestaurant(@PathVariable("id") String id) {
@@ -62,8 +62,8 @@ public class RestaurantController {
 
     /**
      * Controller Method that delete a restaurant
-     * @param restaurantID
-     * @return ResponseEntity
+     * @param restaurantID the id of the restaurant to delete
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/deleteRestaurant/{restaurantID}")
     public ResponseEntity deleteRestaurant(@PathVariable("restaurantID") String restaurantID) {
@@ -77,10 +77,10 @@ public class RestaurantController {
     }
     /**
      * Controller method that adds a restaurant and a user to the likedRestaurant list in the database
-     * @param username
-     * @param restaurantID
-     * @param restaurantName
-     * @return ResponseEntity
+     * @param username the username
+     * @param restaurantID the restaurant id
+     * @param restaurantName the restaurant name
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/addliked/{id}/{restaurant}")
     public ResponseEntity addLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @PathVariable("restaurant") String restaurantName) {
@@ -95,9 +95,9 @@ public class RestaurantController {
 
     /**
      * Controller method that removes a restaurant and a user from the likedRestaurant list in the database
-     * @param username
-     * @param restaurantID
-     * @return ResponseEntity
+     * @param username the username
+     * @param restaurantID the restaurant id
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/removeliked/{id}")
     public ResponseEntity removeLiked(@PathVariable("user") String username, @PathVariable("id") String restaurantID) {
@@ -111,8 +111,8 @@ public class RestaurantController {
 
     /**
      * Controller Method that lists all liked restaurant of a user
-     * @param username
-     * @return ResponseEntitygit 
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity 
      */
     @GetMapping("/{user}/all/liked")
     public ResponseEntity allLiked(@PathVariable("user") String username){
@@ -127,8 +127,8 @@ public class RestaurantController {
 
     /**
      * Controller Method that lists all disliked restaurant of a user
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/{user}/all/disliked")
     public ResponseEntity allDisliked(@PathVariable("user") String username){
@@ -141,6 +141,11 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).body(disliked);
     }
 
+    /**
+     * Controller method that outputs the number of liked restaurants of a user
+     * @param Id id of the restaurant
+     * @return ResponseEntity a response in type ResponseEntity
+     */
     @GetMapping("/{id}/liked")
     public ResponseEntity restolikes(@PathVariable("id") String Id){
         int liked;
@@ -153,6 +158,11 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).body(liked);
     }
 
+    /**
+     * Controller method that ouputs the number of disliked restaurants of a user
+     * @param Id id of the restaurant
+     * @return ResponseEntity a response in type ResponseEntity
+     */
     @GetMapping("/{id}/disliked")
     public ResponseEntity restodislikes(@PathVariable("id") String Id){
         int disliked;
@@ -168,10 +178,10 @@ public class RestaurantController {
     /**
      * Controller method that adds a restaurant and a user to the dislikedRestaurant
      * list in the database
-     * @param username  (of user)
-     * @param restaurantID
-     * @param restaurantName
-     * @return ResponseEntity
+     * @param username the username of the user
+     * @param restaurantID the restaurant id
+     * @param restaurantName the restaurant name
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/adddisliked/{id}/{restaurant}")
     public ResponseEntity addDisliked(@PathVariable("user") String username, @PathVariable("id") String restaurantID,
@@ -186,9 +196,9 @@ public class RestaurantController {
 
     /**
      * Controller method that removes a restaurant and a user from the dislikedRestaurant list in the database
-     * @param username
-     * @param restaurantID
-     * @return ResponseEntity
+     * @param username the username
+     * @param restaurantID restaurant id
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/removedisliked/{restaurantID}")
     public ResponseEntity removeDisliked(@PathVariable("user") String username,
@@ -203,10 +213,9 @@ public class RestaurantController {
                 .body(new Response(true, "User successfully removed disliked Restaurant"));
     }
 
-
     /**
      * Controller method to get all restaurants in the database
-     * @return ResponseEntity
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/get/all")
     public ResponseEntity getAllRestaurants() {
@@ -222,9 +231,9 @@ public class RestaurantController {
     /**
      * Controller method that adds a restaurant and a user to the visitedRestaurant list in the database
      * @param username (of user)
-     * @param restaurantID
-     * @param restaurantName
-     * @return ResponseEntity
+     * @param restaurantID restaurant id
+     * @param restaurantName restaurant name
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/addvisited/{id}/{restaurant}")
     public ResponseEntity addVisited(@PathVariable("user") String username, @PathVariable("id") String restaurantID, @PathVariable("restaurant") String restaurantName) {
@@ -239,7 +248,7 @@ public class RestaurantController {
     /**
      * Controller method that clears the visitedRestaurant list of a user
      * @param username (of user)
-     * @return ResponseEntity
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @PostMapping("/{user}/clearvisited")
     public ResponseEntity clearVisited(@PathVariable("user") String username) {
@@ -253,8 +262,8 @@ public class RestaurantController {
 
     /**
      * Controller Method that lists all visited restaurant of a user
-     * @param username
-     * @return ResponseEntity
+     * @param username the username
+     * @return ResponseEntity a response in type ResponseEntity
      */
     @GetMapping("/{user}/all/visited")
     public ResponseEntity allVisited(@PathVariable("user") String username){
@@ -266,5 +275,4 @@ public class RestaurantController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(visited);
     }
-
 }
