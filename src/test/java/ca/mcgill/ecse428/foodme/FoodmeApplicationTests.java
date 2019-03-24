@@ -39,7 +39,7 @@ import ca.mcgill.ecse428.foodme.security.Password;
  * This class serves to all repository methods that access the database
  * AppUserRepository.java, RestaurantRepository.java and PreferenceRepository.java
  *
- * */
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FoodmeApplicationTests {

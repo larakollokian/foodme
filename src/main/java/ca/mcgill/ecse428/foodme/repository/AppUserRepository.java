@@ -141,6 +141,28 @@
             return u;
             }
         }
+        
+        /**
+         * Methid that allows user to update email address
+         * @param username
+         * @param oldEmail
+         * @param newEmail
+         * @throws Exception
+         */
+        @Transactional
+        public void changeEmail(String username, String oldEmail, String newEmail) throws Exception 
+        {
+        	AppUser u = getAppUser(username);
+        	if (!newEmail.contains("@") || !newEmail.contains(".")) {
+        		throw new InvalidInputException("This is not a valid email address!");
+        	}
+        	else
+        	{
+        		u.setEmail(newEmail);
+        		entityManager.merge(u);
+        		return u;
+        	}
+        }
 
         /**
          * Method that allows to delete a user's account given its username
@@ -270,5 +292,6 @@
                 throw new NullObjectException("User does not have a default preference");
             }
         }
+
     }
 
