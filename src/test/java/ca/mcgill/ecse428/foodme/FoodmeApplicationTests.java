@@ -682,6 +682,24 @@ public class FoodmeApplicationTests {
 
     }
 
+    /**
+     * Test to list all disliked restaurants of a user
+     * @throws InvalidInputException
+     */
+    @Test
+    public void testListAllDisliked () throws InvalidInputException {
+        String restaurant_id = "RIIOjIdlzRyESw1BkmQHtw";
+        String restaurant_name = "Tacos Et Tortas";
+        try {
+            AppUser user =	appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            restaurantRepository.addDisliked(user.getUsername(), restaurant_id, restaurant_name);
+            when(restaurantRepository.listAllDisliked(user.getUsername()).size()).thenReturn(1);
+            assertEquals(1, restaurantRepository.listAllDisliked(user.getUsername()).size());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * Test UT for removing a restaurant from the liked list

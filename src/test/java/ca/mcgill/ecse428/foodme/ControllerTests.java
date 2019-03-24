@@ -17,6 +17,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
+
 /**
  * This class serves to test controllers methods
  * AppUserController.java, RestaurantController.java, PreferenceController.java
@@ -209,7 +211,6 @@ public class ControllerTests {
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
         String expected ="{\"response\":false,\"message\":\"User does not have liked restaurants\"}";
-        System.out.println(response.getBody());
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
 
@@ -242,6 +243,7 @@ public class ControllerTests {
      * */
     @Test
     public void c4_testListAllLiked() throws Exception{
+
     	HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/johnsmith/all/liked"), HttpMethod.GET, entity, String.class);
@@ -528,6 +530,26 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
+
+    /* tests need to be adjusted here
+    @Test
+    public void g1_testGetLikes() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/Z2NF_xBF-7RqAfu_4EO9ow/liked"), HttpMethod.GET, entity, String.class);
+        String expected = "3";
+        Assert.assertEquals(response.getBody().contains(expected),3);
+    }
+
+    @Test
+    public void g2_testGetDislikes() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/Z2NF_xBF-7RqAfu_4EO9ow/disliked"), HttpMethod.GET, entity, String.class);
+        String expected = "0";
+        Assert.assertEquals(response.getBody().contains(expected),0);
+    }
+    */
 
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;

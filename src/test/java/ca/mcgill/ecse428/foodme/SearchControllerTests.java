@@ -1,12 +1,15 @@
 package ca.mcgill.ecse428.foodme;
 
-import ca.mcgill.ecse428.foodme.controller.AppUserController;
-import ca.mcgill.ecse428.foodme.controller.PreferenceController;
-import ca.mcgill.ecse428.foodme.controller.RestaurantController;
-import ca.mcgill.ecse428.foodme.controller.SearchController;
-import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
-import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
-import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +22,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import ca.mcgill.ecse428.foodme.controller.AppUserController;
+import ca.mcgill.ecse428.foodme.controller.PreferenceController;
+import ca.mcgill.ecse428.foodme.controller.RestaurantController;
+import ca.mcgill.ecse428.foodme.controller.SearchController;
+import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
+import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
 
 /**
  * This class serves to test controller methods related to search (calling the Yelp API)
@@ -583,8 +585,19 @@ public class SearchControllerTests {
         assertEquals(response1, response2);
     }
     
+    @Test
+    public void testClosingOneHour() {
+            String response="";
+			String expected = "{\"response\":false,\"message\":\"The restaurant is still open.\"}";
+			try {
+				response = this.mockMvc.perform(get("/search/get/closing/?id=WavvLdfdP6g8aZTtbBQHTw"))
+				        .andExpect(status().isOk())
+				        .andReturn().getResponse().getContentAsString();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			assertEquals(expected,response);
+        }
 }
-
-
-
-
