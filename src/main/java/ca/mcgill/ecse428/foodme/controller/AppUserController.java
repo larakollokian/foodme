@@ -225,7 +225,7 @@ public class AppUserController {
 
         String randPassword = Password.generateRandomPassword(length);
 
-        userRepository.changePassword(uUsername, uPassword, randPassword);
+        userRepository.resetPassword(uUsername, randPassword);
 
 
         sendResetPasswordConfirmationEmail(uEmail,uFName, uUsername, randPassword);
@@ -293,8 +293,8 @@ public class AppUserController {
              message.setFrom(new InternetAddress("FoodMe Application <foodmeapplication@gmail.com>"));
              message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
              message.setSubject("Your New Foodme Account Password");
-             message.setText("Hi "+firstName+", \n\nLooks like you forgot the password associated with the username "+username+". \n\nWe have generated a new password for you\n\n" + generatedPW +
-             "The FoodMe team");
+             message.setText("Hi "+firstName+", \n\nLooks like you forgot the password associated with the username "+username+". \n\nWe have generated a new password for you\n\n\nYour new password is: " + generatedPW +
+             "\n\nThe FoodMe team");
              
              //send the message
              Transport.send(message);

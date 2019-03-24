@@ -101,6 +101,19 @@
         }
 
         @Transactional
+        public AppUser resetPassword(String username, String newPassword) throws Exception {
+
+            AppUser u = getAppUser(username);
+
+            if(newPassword.length()<=6){
+                throw new InvalidInputException("Your password should be longer than 6 characters");
+            }
+            u.setPassword(Password.getSaltedHash(newPassword));
+            entityManager.merge(u);
+            return u;
+        }
+
+        @Transactional
         public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
 
             AppUser u = getAppUser(username);
