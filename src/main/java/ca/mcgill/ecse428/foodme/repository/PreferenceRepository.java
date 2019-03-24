@@ -33,21 +33,6 @@ public class PreferenceRepository {
 	}
 
     /**
-     * Method that gets all preferences in database regardless of user
-     * @return list of Preference
-     */
-    @Transactional
-    public List<Preference> getAllPreferences() throws NullObjectException{
-        Query q = entityManager.createNativeQuery("SELECT * FROM preferences");
-        @SuppressWarnings("unchecked")
-        List<Preference> preferences = q.getResultList();
-        if(preferences.isEmpty()){
-        	throw new NullObjectException("No preferences exists");
-		}
-        return preferences;
-    }
-
-    /**
      * Method that gets all the preferences of a specific user
      * @param username
      * @return list of Preference

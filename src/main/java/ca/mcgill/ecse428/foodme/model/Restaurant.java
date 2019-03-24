@@ -102,14 +102,4 @@ public class Restaurant {
 		}
 		return false;
 	}
-
-	@Override
-	public String toString() {
-		return "Restaurant [restaurantID=" + restaurantID + ", liked="
-				+ ", restaurantName=" + restaurantName + "]";
-	}
-	
-	
-	
-	
 }

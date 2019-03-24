@@ -1,7 +1,6 @@
 package ca.mcgill.ecse428.foodme;
 
 import ca.mcgill.ecse428.foodme.exception.AuthenticationException;
-import ca.mcgill.ecse428.foodme.exception.InvalidInputException;
 import ca.mcgill.ecse428.foodme.exception.NullObjectException;
 import ca.mcgill.ecse428.foodme.repository.*;
 import ca.mcgill.ecse428.foodme.security.Password;
@@ -18,12 +17,13 @@ import org.junit.Before;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import java.util.*;
 
 /**
  * This class serves to test the AuthenticationService.java
  * */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FoodmeApplication.class)
+@SpringBootTest
 public class AuthenticationServiceTests {
 
     @Autowired
@@ -52,8 +52,9 @@ public class AuthenticationServiceTests {
             user.setFirstName(FIRSTNAME);
             user.setPassword(Password.getSaltedHash(PASSWORD));
             user.setEmail(EMAIL);
-
-            Mockito.when(userRepository.getNumberUsers()).thenReturn(1);
+            List<AppUser> list = new ArrayList<AppUser>();
+            list.add(user);
+            Mockito.when(userRepository.getAllUsers()).thenReturn(list);
             Mockito.when(userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD)).thenReturn(user);
             Mockito.when(userRepository.getAppUser(USERNAME)).thenReturn(user);
             Mockito.doThrow(new NullObjectException("User does not exist")).when(userRepository).getAppUser("none");
@@ -71,12 +72,12 @@ public class AuthenticationServiceTests {
         AppUser user = new AppUser();
         try {
              user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            assertEquals(1, userRepository.getAllUsers().size());
         }
         catch(Exception e){
             //Not expected
         }
 
-        assertEquals(1, userRepository.getNumberUsers());
 
         String password = "HelloWorld123";
         try{
@@ -122,11 +123,11 @@ public class AuthenticationServiceTests {
         AppUser user = new AppUser();
         try {
             user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            assertEquals(1, userRepository.getAllUsers().size());
         }
         catch(Exception e){
             //Not expected
         }
-        assertEquals(1, userRepository.getNumberUsers());
 
         try{
             authentication.login("none","none");
@@ -147,16 +148,16 @@ public class AuthenticationServiceTests {
      * UT failed login (Invalid password)
      * */
     @Test
-    public void testLoginWithWrongPassword() throws InvalidInputException{
+    public void testLoginWithWrongPassword(){
         String error ="";
         AppUser user = new AppUser();
         try {
             user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            assertEquals(1, userRepository.getAllUsers().size());
         }
         catch(Exception e){
             //Not expected
         }
-        assertEquals(1, userRepository.getNumberUsers());
 
         String password = "Hello";
 
@@ -173,6 +174,19 @@ public class AuthenticationServiceTests {
         }
 
         assertEquals("Invalid login password!!!",error);
+
+        password = "";
+        error ="";
+        try{
+            authentication.login(user.getUsername(),password);
+        }
+        //Expected
+        catch(Exception e){
+            error += e.getMessage();
+        }
+
+        assertEquals("Empty passwords are not supported.",error);
+
     }
 
     /**
@@ -184,11 +198,11 @@ public class AuthenticationServiceTests {
         AppUser user = new AppUser();
         try {
             user = userRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            assertEquals(1, userRepository.getAllUsers().size());
         }
         catch(Exception e){
             //Not expected
         }
-        assertEquals(1, userRepository.getNumberUsers());
 
         try {
             // First login to get the session

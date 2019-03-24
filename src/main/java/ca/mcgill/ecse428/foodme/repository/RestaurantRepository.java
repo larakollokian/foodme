@@ -297,24 +297,38 @@ public class RestaurantRepository {
         return dislikedRestaurants;
     }
 
+	/**
+	 * Method to get number of likes of a restaurant
+	 * @param id
+	 * @return number of likes
+	 */
 	@Transactional
-	public int restaurantLikes(String id) throws NullObjectException {
+	public int restaurantLikes(String id) {
 		Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM liked_Restaurants WHERE restaurantid =:id");
 		q.setParameter("id", id);
 		int likes = ((Number) q.getSingleResult()).intValue();
 		return likes;
 	}
 
+	/**
+	 * Method to get number of dislikes of a restaurant
+	 * @param id
+	 * @return The list of all the disliked restaurants
+	 */
 	@Transactional
-	public int restaurantDislikes(String id) throws NullObjectException {
+	public int restaurantDislikes(String id) {
 		Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM disliked_Restaurants WHERE restaurantid =:id");
 		q.setParameter("id", id);
 		int dislikes = ((Number)q.getSingleResult()).intValue();
 		return dislikes;
 	}
 
+	/**
+	 * Method to get the rating of restaurant
+	 * @return rating
+	 */
 	@Transactional
-	public String restaurantRating(String id) throws NullObjectException {
+	public String restaurantRating(String id)  {
     	Query q  = entityManager.createNativeQuery(("SELECT * FROM restaurants WHERE restaurantid =:id"));
     	q.setParameter("id", id);
     	double likes = restaurantLikes(id);

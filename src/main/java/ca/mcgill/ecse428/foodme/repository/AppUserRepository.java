@@ -96,10 +96,9 @@
         }
 
         /**
-         * Method that allows users to update their first name
+         * Method that allows users to update password
          * @param username
-         * @param oldFName
-         * @param newFName
+         * @param newPassword
          * @return AppUser
          * @throws NullObjectException
          * @throws InvalidInputException
@@ -117,11 +116,19 @@
             return u;
         }
 
+        /**
+         * Method that allows users to update their first name
+         * @param username
+         * @param newFName
+         * @return AppUser
+         * @throws NullObjectException
+         * @throws InvalidInputException
+         */
         @Transactional
-        public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
+        public AppUser changeFirstName(String username, String newFName) throws Exception {
 
             AppUser u = getAppUser(username);
-            if(newFName == u.getFirstName()) {
+            if(newFName.equals(u.getFirstName())) {
                 throw new InvalidInputException("New first name cannot be the same as current name");
             }
             else {
@@ -134,18 +141,17 @@
         /**
          * Method that allows users to update their last name
          * @param username
-         * @param oldLName
          * @param newLName
          * @return AppUser
          * @throws NullObjectException
          * @throws InvalidInputException
          */
         @Transactional
-        public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
+        public AppUser changeLastName(String username, String newLName) throws Exception {
 
             AppUser u = getAppUser(username);
             
-            if(newLName == u.getLastName()) {
+            if(newLName.equals(u.getLastName())) {
                 throw new InvalidInputException("New last name cannot be the same as current name");
                 }
             else {
@@ -184,23 +190,6 @@
             }
         }
 
-        /**
-         * Method that allows get a user given its username using query
-         * @param username
-         * @return AppUser
-         * @throws  NullObjectException
-         */
-        @Transactional
-        public List<AppUser> getAppUserQuery(String username) throws NullObjectException {
-            Query q = entityManager.createNativeQuery("SELECT * FROM app_users WHERE username=:username");
-            q.setParameter("username", username);
-            @SuppressWarnings("unchecked")
-            List<AppUser> users = q.getResultList();
-            if(users.isEmpty()){
-                throw new NullObjectException("No users exist");
-            }
-            return users;
-        }
 
         /**
          * Method that gets all users in database using native SQL query statement
@@ -215,21 +204,6 @@
                 throw new NullObjectException("No users exist");
             }
             return users;
-        }
-
-        /**
-         *Method that gets the number of users in the datase
-         * @return number of users
-         */
-        @Transactional
-        public int getNumberUsers(){
-            int number = 0;
-             try{
-                 number = getAllUsers().size();
-             }catch(NullObjectException e){
-                 return 0;
-             }
-             return number;
         }
 
         /**

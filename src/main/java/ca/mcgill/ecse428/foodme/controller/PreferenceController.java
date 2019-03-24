@@ -28,22 +28,6 @@ public class PreferenceController {
     }
 
     /**
-     * Controller method that gets all preferences in the database
-     * @return ResponseEntity
-     */
-    @GetMapping("/get/all")
-    public ResponseEntity getAllPreferences() {
-        List<Preference> allPs;
-        try {
-            allPs = preferenceRepository.getAllPreferences();
-        } catch(NullObjectException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(allPs);
-    }
-
-
-    /**
      * Controller method that gets the list of preferences of a user
      * @param username
      * @return ResponseEntity
