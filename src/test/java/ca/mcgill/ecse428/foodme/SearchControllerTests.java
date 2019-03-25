@@ -591,7 +591,7 @@ public class SearchControllerTests {
             String response="";
 			String expected = "{\"response\":false,\"message\":\"The restaurant is still open.\"}";
 			try {
-				response = this.mockMvc.perform(get("/search/get/closing/?id=WavvLdfdP6g8aZTtbBQHTw"))
+				response = this.mockMvc.perform(get("/search/get/closing/?id=5T6kFKFycym_GkhgOiysIw"))
 				        .andExpect(status().isOk())
 				        .andReturn().getResponse().getContentAsString();
 			} catch (UnsupportedEncodingException e) {

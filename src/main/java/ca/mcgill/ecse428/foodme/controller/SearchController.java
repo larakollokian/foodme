@@ -271,7 +271,7 @@ public class SearchController {
         return getMapping(url);
     }
 
-	/**
+/**
 	 * Method that searches a restaurant closing hours and checks if the restaurant will be closing within one hour from now
 	 * @param id id of the restaurant
 	 * @return true when it is closing within one hour
@@ -288,6 +288,7 @@ public class SearchController {
 		String contentAsString = response.getBody();
 
 		String endTime = "";
+		String startTime = "";
 		ZoneId easternZone = ZoneId.of("Canada/Eastern");
 		LocalDate date = LocalDate.now(easternZone);
 		LocalTime time = LocalTime.now(easternZone);
@@ -319,10 +320,16 @@ public class SearchController {
 			for(int j=0; j<days; j++) {
 				JSONObject json3 = open.getJSONObject(j);
 				int day = json3.getInt("day");
+				System.out.println(json3.toString());
 
 				//check if the same DAY in int
 				if(dayOfWeekInInteger==day) {
+					startTime = json3.getString("start");
 					endTime = json3.getString("end");
+					
+					if(startTime.equals(endTime)) {
+						return ResponseEntity.status(HttpStatus.OK).body(new Response(false, "The restaurant is still open."));
+					}
 					String hour = endTime.toString().substring(0, 2);
 					String minute = endTime.toString().substring(2, 4);
 					LocalTime restaurantTime = LocalTime.of(Integer.parseInt(hour), Integer.parseInt(minute));
