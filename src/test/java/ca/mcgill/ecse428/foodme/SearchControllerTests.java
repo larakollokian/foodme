@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -584,7 +585,7 @@ public class SearchControllerTests {
 
         assertEquals(response1, response2);
     }
-    
+    @Ignore
     @Test
     public void testClosingOneHour() {
             String response="";

@@ -276,6 +276,21 @@ public class AppUserController {
     }
 
     /**
+     * Controller method to get all users in the database
+     * @return ResponseEntity
+     */
+    @GetMapping("/get/all")
+    public ResponseEntity getAllUsers() {
+        List<AppUser> users = null;
+        try {
+            users = userRepository.getAllUsers();
+        } catch (NullObjectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new Response(false, e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(users);
+    }
+
+    /**
      * Helper method that sends a confirmation email after a password is successfully changed
      * @param recipient
      * @param firstName
