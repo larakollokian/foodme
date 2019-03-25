@@ -47,7 +47,7 @@ public class FoodmeApplicationTests {
 	private static final String USERNAME = "test";
 	private static final String FIRSTNAME = "John";
 	private static final String LASTNAME="Doe";
-	private static String EMAIL="johnDoe@hotmail.ca";
+	private static String EMAIL = "johnDoe@hotmail.ca";
 	private String PASSWORD = "HelloWorld123";
 
     private MockMvc mockMvc;
@@ -783,8 +783,6 @@ public class FoodmeApplicationTests {
         // remove like
         //assert if removed
     }
-
-
 
 }
 
