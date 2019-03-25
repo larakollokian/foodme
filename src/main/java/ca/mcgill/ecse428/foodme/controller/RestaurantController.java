@@ -227,6 +227,11 @@ public class RestaurantController {
         return ResponseEntity.status(HttpStatus.OK).body(visited);
     }
 
+    /**
+     * Controller Method that deletes existing restaurant
+     * @param restaurantName
+     * @return
+     */
     @PostMapping("/deleteRestaurant/{restaurantName}")
     public ResponseEntity deleteRestaurant(//@PathVariable("id") String id
     @PathVariable("restaurantName") String restaurantName) {

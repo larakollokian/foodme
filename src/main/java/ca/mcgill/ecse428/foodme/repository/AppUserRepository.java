@@ -38,9 +38,10 @@
         public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
             String passwordHash="";
 
-            if (!email.contains("@") || !email.contains(".com")) {
+            if (!email.contains("@") || !email.contains(".")) {
                 throw new InvalidInputException("This is not a valid email address!");
             }
+
             if (password.length() <= 6) {
                 throw new InvalidInputException("Your password must be longer than 6 characters!");
             }
@@ -100,6 +101,15 @@
             return u;
         }
 
+        /**
+         * Method that is used when reseting password, method takes in username and the pregenerated password
+         * from the random password method and sets the random password as the new password.
+         *  
+         * @param username
+         * @param newPassword
+         * @return
+         * @throws Exception
+         */
         @Transactional
         public AppUser resetPassword(String username, String newPassword) throws Exception {
 
