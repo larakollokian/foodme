@@ -30,8 +30,5 @@ The user preference feature allows users to filter their search results by speci
 
 On Foodme, users can add restaraunts to their personal liked/disliked list, Foodme takes this into account when showing users restaurant recommendations, restaurants that have been disliked by a user will not be recommended to them, while restaurants that are liked will be recommened more frequently.
 
-## How to use
-
-
 
 By: The Foodme Team
