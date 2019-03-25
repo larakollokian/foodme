@@ -200,6 +200,167 @@ public class FoodmeApplicationTests {
     }
 
     @Test
+    public void testChangeFirstNameSuccess()
+    {
+	    //If no exception caught, change first name is successful
+        String newFirstName = "Jonathan";
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            AppUser newName = appUserRepository.createAccount(USERNAME, newFirstName, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changeFirstName(user.getUsername(), newFirstName)).thenReturn(newName);
+            assertEquals(appUserRepository.changeFirstName(user.getUsername(), newFirstName),newName);
+            Mockito.verify(appUserRepository).changeFirstName(user.getUsername(), newFirstName);
+        }
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeFirstNameFailure1()
+    {
+        String newFirstName = "John";
+        Exception x = new InvalidInputException("New first name cannot be the same as current name");
+        
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changeFirstName(user.getUsername(), newFirstName))
+            .thenThrow(new InvalidInputException("New first name cannot be the same as current name"));
+            assertEquals(appUserRepository.changeFirstName(user.getUsername(), newFirstName), x);
+            Mockito.verify(appUserRepository).changeFirstName(user.getUsername(), newFirstName);
+        }
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeFirstNameFailure2()
+    {
+        String newFirstName = "J0hn";
+        Exception x = new InvalidInputException("First name should contain only alphabetic characters");
+        
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changeFirstName(user.getUsername(), newFirstName))
+            .thenThrow(new InvalidInputException("First name should contain only alphabetic characters"));
+            assertEquals(appUserRepository.changeFirstName(user.getUsername(), newFirstName), x);
+            Mockito.verify(appUserRepository).changeFirstName(user.getUsername(), newFirstName);
+        }
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeLastNameSuccess()
+    {
+	    //If no exception caught, change last name is successful
+        String newLastName = "Dont";
+
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            AppUser newName = appUserRepository.createAccount(USERNAME, FIRSTNAME, newLastName, EMAIL, PASSWORD);
+            when(appUserRepository.changeLastName(user.getUsername(), newLastName)).thenReturn(newName);
+            assertEquals(appUserRepository.changeLastName(user.getUsername(), newLastName),newName);
+            Mockito.verify(appUserRepository).changeLastName(user.getUsername(), newLastName);
+        }
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeLastNameFailure1()
+    {
+        String newLastName = "Doe";
+        Exception x = new InvalidInputException("New last name cannot be the same as current name");
+        
+        
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changeLastName(user.getUsername(), newLastName))
+            .thenThrow(new InvalidInputException("New last name cannot be the same as current name"));
+            assertEquals(appUserRepository.changeLastName(user.getUsername(), newLastName), x);
+            Mockito.verify(appUserRepository).changeLastName(user.getUsername(), newLastName);
+        }
+        catch(Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeLastNameFailure2()
+    {
+        String newLastName = "D03";
+        Exception x = new InvalidInputException("Last name should contain only alphabetic characters");
+        
+        
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changeLastName(user.getUsername(), newLastName))
+            .thenThrow(new InvalidInputException("Last name should contain only alphabetic characters"));
+            assertEquals(appUserRepository.changeLastName(user.getUsername(), newLastName), x);
+            Mockito.verify(appUserRepository).changeLastName(user.getUsername(), newLastName);
+        }
+        catch(Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeEmailSuccess()
+    {
+	    //If no exception caught, change email is successful
+        String newEmail = "jonathan.dont@gmail.com";
+        
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            AppUser newUser = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, newEmail, PASSWORD);
+            when(appUserRepository.changeEmail(user.getUsername(), newEmail)).thenReturn(newUser);
+            assertEquals(appUserRepository.changeEmail(user.getUsername(), newEmail),newUser);
+            Mockito.verify(appUserRepository).changeEmail(user.getUsername(), newEmail);
+        }
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    @Test
+    public void testChangeEmailFailure()
+    {
+        String newEmail = "jonathan.com";
+        Exception x = new InvalidInputException("This is not a valid email address!");
+        
+        try 
+        {
+            AppUser user = appUserRepository.createAccount(USERNAME, FIRSTNAME, LASTNAME, EMAIL, PASSWORD);
+            when(appUserRepository.changeEmail(user.getUsername(), newEmail))
+            .thenThrow(new InvalidInputException("This is not a valid email address!"));
+            assertEquals(appUserRepository.changeEmail(user.getUsername(), newEmail),x);
+            Mockito.verify(appUserRepository).changeEmail(user.getUsername(), newEmail);
+        }
+        catch (Exception e) 
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void testGenerateRandomPassword() {
         int lenOfPassword = 16;
 
