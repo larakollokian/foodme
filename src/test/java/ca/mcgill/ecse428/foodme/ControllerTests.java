@@ -19,8 +19,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
-
 /**
  * This class serves to test controllers methods
  * AppUserController.java, RestaurantController.java, PreferenceController.java
