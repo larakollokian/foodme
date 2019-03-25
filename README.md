@@ -32,3 +32,6 @@ On Foodme, users can add restaraunts to their personal liked/disliked list, Food
 
 ## How to use
 
+
+
+By: The Foodme Team
