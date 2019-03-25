@@ -585,9 +585,12 @@ public class SearchControllerTests {
 
         assertEquals(response1, response2);
     }
-    @Ignore
+
+    /**
+     * CT test closing in one hour - fail
+     * */
     @Test
-    public void testClosingOneHour() {
+    public void testClosingOneHourFail() {
             String response="";
 			String expected = "{\"response\":false,\"message\":\"The restaurant is still open.\"}";
 			try {

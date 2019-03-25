@@ -142,7 +142,7 @@ public class ControllerTests {
      * CT change first name - fail
      * */
     @Test
-    public void a7_testChangeFirstNameFail() throws Exception {
+    public void a7_testChangeFirstNameFailSame() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeFirstName/tester/johnn"), HttpMethod.POST, entity, String.class);
@@ -154,7 +154,7 @@ public class ControllerTests {
      * CT change first name - fail
      * */
     @Test
-    public void a7_testChangeFirstNameFail1() throws Exception {
+    public void a7_testChangeFirstNameFailWrongCharacters() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeFirstName/tester/321j213"), HttpMethod.POST, entity, String.class);
@@ -179,7 +179,7 @@ public class ControllerTests {
      * CT change last name - fail
      * */
     @Test
-    public void a9_testChangeLastNameFail() throws Exception {
+    public void a9_testChangeLastNameFailSame() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeLastName/tester/smithh"), HttpMethod.POST, entity, String.class);
@@ -191,7 +191,7 @@ public class ControllerTests {
      * CT change last name - fail
      * */
     @Test
-    public void a9_testChangeLastNameFail1() throws Exception {
+    public void a9_testChangeLastNameFailWrongCharacters() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeLastName/tester/s432sd"), HttpMethod.POST, entity, String.class);
