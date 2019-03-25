@@ -1,0 +1,7 @@
+ca.mcgill.ecse428.foodme
+ca.mcgill.ecse428.foodme.controller
+ca.mcgill.ecse428.foodme.exception
+ca.mcgill.ecse428.foodme.model
+ca.mcgill.ecse428.foodme.repository
+ca.mcgill.ecse428.foodme.security
+ca.mcgill.ecse428.foodme.service

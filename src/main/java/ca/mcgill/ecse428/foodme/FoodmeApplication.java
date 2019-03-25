@@ -18,7 +18,6 @@ public class FoodmeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FoodmeApplication.class, args);
-
         System.out.println("Press 'Enter' to terminate");
         new Scanner(System.in).nextLine();
         System.out.println("terminating application...");

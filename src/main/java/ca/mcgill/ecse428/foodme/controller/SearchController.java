@@ -264,8 +264,6 @@ public class SearchController {
             @RequestParam("sortby") String sortby) throws Exception {
         // Set up url
         String url = null;
-
-
         url = "https://api.yelp.com/v3/businesses/search?term=restaurants&location=" + location
                     + "&radius=" + radius + "&price=" + price + "&categories=" + cuisine 
                     + "&sort_by=" + sortby;
@@ -300,22 +298,14 @@ public class SearchController {
 
 		//convert to the day
 		switch(dayOfWeek) {
-		case MONDAY: dayOfWeekInInteger = 0;
-		break;
-		case TUESDAY: dayOfWeekInInteger = 1;
-		break;
-		case WEDNESDAY: dayOfWeekInInteger = 2;
-		break;
-		case THURSDAY: dayOfWeekInInteger = 3;
-		break;
-		case FRIDAY: dayOfWeekInInteger = 4;
-		break;
-		case SATURDAY: dayOfWeekInInteger = 5;
-		break;
-		case SUNDAY: dayOfWeekInInteger = 6;
-		break;
-		default: dayOfWeekInInteger = 0;
-		break;
+		case MONDAY: dayOfWeekInInteger = 0; break;
+		case TUESDAY: dayOfWeekInInteger = 1;break;
+		case WEDNESDAY: dayOfWeekInInteger = 2;break;
+		case THURSDAY: dayOfWeekInInteger = 3;break;
+		case FRIDAY: dayOfWeekInInteger = 4;break;
+		case SATURDAY: dayOfWeekInInteger = 5;break;
+		case SUNDAY: dayOfWeekInInteger = 6;break;
+		default: dayOfWeekInInteger = 0;break;
 		}
 
 		JSONObject json = new JSONObject(contentAsString);

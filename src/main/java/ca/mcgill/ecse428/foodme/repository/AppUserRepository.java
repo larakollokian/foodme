@@ -31,9 +31,9 @@ public class AppUserRepository {
 	 * @throws IllegalStateException
 	 */
 	@Transactional
-	public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception {
+	public AppUser createAccount (String username, String firstName, String lastName, String email, String password) throws Exception 
+	{
 		String passwordHash="";
-
 		if (!email.contains("@") || !email.contains(".")) {
 			throw new InvalidInputException("This is not a valid email address!");
 		}
@@ -67,7 +67,6 @@ public class AppUserRepository {
 		u.setDefaultPreferenceID(0);
 		u.setPassword(passwordHash);
 		entityManager.persist(u);
-
 		return u;
 	}
 
@@ -113,7 +112,7 @@ public class AppUserRepository {
 	 * @throws InvalidInputException
 	 */
 	@Transactional
-	public AppUser changeFirstName(String username,String oldFName, String newFName) throws Exception {
+	public AppUser changeFirstName(String username, String newFName) throws Exception {
 
 		AppUser u = getAppUser(username);
 		if(newFName == u.getFirstName()) {
@@ -140,10 +139,9 @@ public class AppUserRepository {
 	 * @throws InvalidInputException
 	 */
 	@Transactional
-	public AppUser changeLastName(String username,String oldLName, String newLName) throws Exception {
+	public AppUser changeLastName(String username, String newLName) throws Exception {
 
 		AppUser u = getAppUser(username);
-
 		if(newLName == u.getLastName()) {
 			throw new InvalidInputException("New last name cannot be the same as current name");
 		}
@@ -159,6 +157,27 @@ public class AppUserRepository {
 	}
 
 	/**
+	 * Method that allows users to update password
+	 * @param username
+	 * @param newPassword
+	 * @return AppUser
+	 * @throws NullObjectException
+	 * @throws InvalidInputException
+	 */
+	@Transactional
+	public AppUser resetPassword(String username, String newPassword) throws Exception {
+
+		AppUser u = getAppUser(username);
+
+		if(newPassword.length()<=6){
+			throw new InvalidInputException("Your password should be longer than 6 characters");
+		}
+		u.setPassword(Password.getSaltedHash(newPassword));
+		entityManager.merge(u);
+		return u;
+	}
+
+	/**
 	 * Methid that allows user to update email address
 	 * @param username
 	 * @param oldEmail
@@ -166,7 +185,7 @@ public class AppUserRepository {
 	 * @throws Exception
 	 */
 	@Transactional
-	public AppUser changeEmail(String username, String oldEmail, String newEmail) throws Exception 
+	public AppUser changeEmail(String username, String newEmail) throws Exception 
 	{
 		AppUser u = getAppUser(username);
 		if (!newEmail.contains("@") || !newEmail.contains(".")) {
@@ -192,6 +211,7 @@ public class AppUserRepository {
 		return u;
 	}
 
+
 	/**
 	 * Method that allows get a user given its username
 	 * @param username
@@ -207,24 +227,6 @@ public class AppUserRepository {
 			AppUser appUser = entityManager.find(AppUser.class, username);
 			return appUser;
 		}
-	}
-
-	/**
-	 * Method that allows get a user given its username using query
-	 * @param username
-	 * @return AppUser
-	 * @throws  NullObjectException
-	 */
-	@Transactional
-	public List<AppUser> getAppUserQuery(String username) throws NullObjectException {
-		Query q = entityManager.createNativeQuery("SELECT * FROM app_users WHERE username=:username");
-		q.setParameter("username", username);
-		@SuppressWarnings("unchecked")
-		List<AppUser> users = q.getResultList();
-		if(users.isEmpty()){
-			throw new NullObjectException("No users exist");
-		}
-		return users;
 	}
 
 	/**

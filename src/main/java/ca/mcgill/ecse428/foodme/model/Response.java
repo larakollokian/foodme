@@ -6,7 +6,9 @@ public class Response {
         private boolean response;
         private String message;
 
-        //Constructor
+        //Constructors
+        public Response(){
+        }
         public Response(boolean response,String message){
             this.response = response;
             this.message = message;
