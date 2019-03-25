@@ -5,11 +5,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -584,9 +582,12 @@ public class SearchControllerTests {
 
         assertEquals(response1, response2);
     }
-    
+
+    /**
+     * CT test closing in one hour - fail
+     * */
     @Test
-    public void testClosingOneHour() {
+    public void testClosingOneHourFail() {
             String response="";
 			String expected = "{\"response\":false,\"message\":\"The restaurant is still open.\"}";
 			try {

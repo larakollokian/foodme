@@ -105,7 +105,6 @@ public class AppUserRepository {
 	/**
 	 * Method that allows users to update their first name
 	 * @param username
-	 * @param oldFName
 	 * @param newFName
 	 * @return AppUser
 	 * @throws NullObjectException
@@ -115,7 +114,7 @@ public class AppUserRepository {
 	public AppUser changeFirstName(String username, String newFName) throws Exception {
 
 		AppUser u = getAppUser(username);
-		if(newFName == u.getFirstName()) {
+		if(newFName.equals(u.getFirstName())) {
 			throw new InvalidInputException("New first name cannot be the same as current name");
 		}
 		if(!checkIfAllLetters(newFName))
@@ -132,7 +131,6 @@ public class AppUserRepository {
 	/**
 	 * Method that allows users to update their last name
 	 * @param username
-	 * @param oldLName
 	 * @param newLName
 	 * @return AppUser
 	 * @throws NullObjectException
@@ -142,7 +140,7 @@ public class AppUserRepository {
 	public AppUser changeLastName(String username, String newLName) throws Exception {
 
 		AppUser u = getAppUser(username);
-		if(newLName == u.getLastName()) {
+		if(newLName.equals(u.getLastName())) {
 			throw new InvalidInputException("New last name cannot be the same as current name");
 		}
 		if(!checkIfAllLetters(newLName))
@@ -180,7 +178,6 @@ public class AppUserRepository {
 	/**
 	 * Methid that allows user to update email address
 	 * @param username
-	 * @param oldEmail
 	 * @param newEmail
 	 * @throws Exception
 	 */

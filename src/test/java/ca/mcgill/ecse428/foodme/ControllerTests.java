@@ -2,6 +2,7 @@ package ca.mcgill.ecse428.foodme;
 
 import ca.mcgill.ecse428.foodme.repository.AppUserRepository;
 import ca.mcgill.ecse428.foodme.repository.PreferenceRepository;
+import ca.mcgill.ecse428.foodme.repository.RestaurantRepository;
 import org.junit.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,8 +19,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
-
 /**
  * This class serves to test controllers methods
  * AppUserController.java, RestaurantController.java, PreferenceController.java
@@ -35,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * e - disliked restaurants
  * f - visited restaurants
  * g - preferences
+ * h - get all users/restaurants
  *
  *  All tests are on user johnsmith (already exists in database)
  *
@@ -52,6 +52,9 @@ public class ControllerTests {
 
     @Autowired
     private AppUserRepository a;
+
+    @Autowired
+    private RestaurantRepository r;
 
     @LocalServerPort
     private int port;
@@ -137,11 +140,23 @@ public class ControllerTests {
      * CT change first name - fail
      * */
     @Test
-    public void a7_testChangeFirstNameFail() throws Exception {
+    public void a7_testChangeFirstNameFailSame() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeFirstName/tester/johnn"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"New first name cannot be the same as current name\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
+     * CT change first name - fail
+     * */
+    @Test
+    public void a7_testChangeFirstNameFailWrongCharacters() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/changeFirstName/tester/321j213"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"First name should contain only alphabetic characters\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
@@ -162,12 +177,23 @@ public class ControllerTests {
      * CT change last name - fail
      * */
     @Test
-    public void a9_testChangeLastNameFail() throws Exception {
-        // sign up and then delete the user
+    public void a9_testChangeLastNameFailSame() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeLastName/tester/smithh"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"New last name cannot be the same as current name\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
+     * CT change last name - fail
+     * */
+    @Test
+    public void a9_testChangeLastNameFailWrongCharacters() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/changeLastName/tester/s432sd"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Last name should contain only alphabetic characters\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
@@ -352,10 +378,9 @@ public class ControllerTests {
 
     /**
      * CT to get a restaurant by the restaurant ID
-     * @throws Exception
      */
     @Test
-    public void c2_getRestaurantById() throws Exception {
+    public void c2_getRestaurantById()  {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/get/abcdef"), HttpMethod.GET, entity, String.class);
@@ -364,24 +389,11 @@ public class ControllerTests {
     }
 
     /**
-     * CT to get all the restaurants
-     * @throws Exception
-     */
-    @Test
-    public void c3_getAllRestaurant() throws Exception {
-        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/restaurants/get/all"), HttpMethod.GET, entity, String.class);
-        String expected = "[[\"RIIOjIdlzRyESw1BkmQHtw\",\"Tacos Et Tortas\"],[\"vNB5fXTa2bH07lgqSQXv3g\",\"Rotisserie Portugalia\"],[\"L8MXAFY14EiC_mzFCgmR_g\",\"Domino's Pizza\"],[\"E8RJkjfdcwgtyoPMjQ_Olg\",\"four-barrel-coffee\"],[\"gR9DTbKCvezQlqvD7_FzPw\",\"north-india-restaurant\"],[\"ddee\",\"taco\"],[\"gR9DTbKCvezQlqvD3_FzPw\",\"normandin\"],[\"gR9DTbKCvezQlqvD7_FzP\",\"north-africa-restaurant\"],[\"322\",\"smokeshack\"],[\"teFIIcVgmkx0uWrs_mROzg\",\"Tacomania\"],[\"ey2HUPlc90UulqEvrPyiyw\",\"Guy's Burger Joint\"],[\"Q3A-L3ebXfHGMbZvA7SWAw\",\"Sunny Bowl\"],[\"OaY79nzIvXqz3WzxK1HgSg\",\"Falafel And Kebab\"],[\"YParqyQqRQ350oDlLhaEGw\",\"Hon Sushi\"],[\"ud9ocsQHI7h3zNO7FdOFYQ\",\"Zareen's\"],[\"3MLCZ99s5KcnAIgNpz8gag\",\"In-N-Out Burger\"],[\"lX6DstPH9zxKXgN31VlUdQ\",\"Cucina Venti Restaurant\"],[\"zD3Pm6WgCwViL7Qf693fmg\",\"The Voya Restaurant\"],[\"QEk4Td9-bcQA-5VZl9kmCA\",\"Beta - GWC6\"],[\"g3J-XCEd0--IZUbACAbI2Q\",\"Costco Food Court\"],[\"xY-FrHUYrL8WZ-z3Bvxv3Q\",\"Hanabi Sushi\"],[\"wSWXRx-7kz8Z8ARmxRRktQ\",\"Pho Tran Vu\"],[\"JWiGiOJqhPpMzZM8P5i4yw\",\"Erik's DeliCafé\"],[\"MO_0P8qoflf7mPzyw_5GcA\",\"L&L Hawaiian Barbecue\"],[\"rvM5NOlJffP-_Ew9Q1h2Lw\",\"P.A. & Gargantua\"],[\"Z2NF_xBF-7RqAfu_4EO9ow\",\"Dim Sum Montréal\"],[\"null\",\"Japote\"],[\"9u-nVJmHz_fB6CFW41JI-w\",\"Café 92\"],[\"LsRSCdUHmwMetiHz0eCqhw\",\"Cloud Bistro\"],[\"NL_yEdlxi7ddafyr4bXBFg\",\"Michael's at Shoreline Restaurant\"],[\"Ik76gEiVhgw8i1-d1xhixg\",\"Mom's Tacos\"],[\"xZHlAIoTfvYtfbOMMKK__g\",\"McDonald's\"],[\"ZGfNnmPCZgsN4jr2B2P8bg\",\"Antojitos Estilo de Jaylah's\"],[\"controllertestid\",\"controllertestname\"],[\"abcdef\",\"TestRestaurant\"]]";
-        Assert.assertEquals(expected, response.getBody());
-    }
-
-    /**
      * CT to delete a restaurant
      * @throws Exception
      */
     @Test
-    public void c4_deleteRestaurantSuccess() throws Exception {
+    public void c3_deleteRestaurantSuccess() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/deleteRestaurant/abcdef"), HttpMethod.POST, entity, String.class);
@@ -394,7 +406,7 @@ public class ControllerTests {
      * @throws Exception
      */
     @Test
-    public void c5_deleteRestaurantFail() throws Exception {
+    public void c4_deleteRestaurantFail() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/restaurants/deleteRestaurant/abcdef"), HttpMethod.POST, entity, String.class);
@@ -780,6 +792,45 @@ public class ControllerTests {
         String expected = "{\"response\":false,\"message\":\"Preference is not related to user\"}";
         JSONAssert.assertEquals(expected, response.getBody(),false);
     }
+
+    /**
+     * CT get all users
+     * */
+    @Test
+    public void h1_testGetAllUsers() throws Exception{
+        int pid = a.getAppUser("johnsmith").getDefaultPreferenceID();
+        int pid1 = a.getAppUser("raylabs").getDefaultPreferenceID();
+        int pid2 = a.getAppUser("yeffo").getDefaultPreferenceID();
+        int pid3 = a.getAppUser("alaye").getDefaultPreferenceID();
+
+
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/get/all"), HttpMethod.GET, entity, String.class);
+
+        String expected1 = "[\"johnsmith\","+pid+",\"johnmith@email.com\",\"john\",\"smith\",\"EckmbA2Glp0=$2O1TwnFPtStMlX84WE/b\"]";
+        String expected2 = "[\"raylabs\","+pid1+",\"raylabs@mcgill.ca\",\"raylabs\",\"newLName\",\"8PNDbeyJTs0=$K25T2l0I6B+ODCgu1ENf\"]";
+        String expected3 = "[\"yeffo\","+pid2+",\"yeffo@email.com\",\"yeffo\",\"yeffo\",\"zDiQDb/qvDg=$31t0ipzzR+8ozU5nNViR\"]";
+        String expected4 = "[\"alaye\","+pid3+",\"anthony.l@hotmail.com\",\"ant\",\"lay\",\"4VY7kkO53xw=$mouAINhPbVZeqnJTEF9r\"]";
+
+        Assert.assertTrue(response.getBody().contains(expected1));
+        Assert.assertTrue(response.getBody().contains(expected2));
+        Assert.assertTrue(response.getBody().contains(expected3));
+        Assert.assertTrue(response.getBody().contains(expected4));
+    }
+
+    /**
+     * CT to get all the restaurants
+     */
+    @Test
+    public void h2_testGetAllRestaurants() {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/restaurants/get/all"), HttpMethod.GET, entity, String.class);
+        String expected = "[\"RIIOjIdlzRyESw1BkmQHtw\",\"Tacos Et Tortas\"],[\"vNB5fXTa2bH07lgqSQXv3g\",\"Rotisserie Portugalia\"],[\"L8MXAFY14EiC_mzFCgmR_g\",\"Domino's Pizza\"]";
+        Assert.assertTrue(response.getBody().contains(expected));
+    }
+
 
     private String createURLWithPort(String uri) {
         return "http://localhost:" + port + uri;

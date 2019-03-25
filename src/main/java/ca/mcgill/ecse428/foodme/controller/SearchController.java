@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
 import ca.mcgill.ecse428.foodme.model.Response;
-
-import java.util.Random;
 
 @RestController
 @RequestMapping("/search")
