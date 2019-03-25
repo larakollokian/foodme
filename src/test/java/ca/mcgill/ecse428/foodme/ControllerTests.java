@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -152,6 +151,18 @@ public class ControllerTests {
     }
 
     /**
+     * CT change first name - fail
+     * */
+    @Test
+    public void a7_testChangeFirstNameFail1() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/changeFirstName/tester/321j213"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"First name should contain only alphabetic characters\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
      * CT change last name - success
      * */
     @Test
@@ -169,11 +180,22 @@ public class ControllerTests {
      * */
     @Test
     public void a9_testChangeLastNameFail() throws Exception {
-        // sign up and then delete the user
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/users/changeLastName/tester/smithh"), HttpMethod.POST, entity, String.class);
         String expected = "{\"response\":false,\"message\":\"New last name cannot be the same as current name\"}";
+        JSONAssert.assertEquals(expected, response.getBody(), false);
+    }
+
+    /**
+     * CT change last name - fail
+     * */
+    @Test
+    public void a9_testChangeLastNameFail1() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/users/changeLastName/tester/s432sd"), HttpMethod.POST, entity, String.class);
+        String expected = "{\"response\":false,\"message\":\"Last name should contain only alphabetic characters\"}";
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
