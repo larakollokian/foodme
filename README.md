@@ -27,4 +27,3 @@ Liked/Disliked Restaurants:
 On Foodme, users can add restaraunts to their personal, liked/disliked list, Foodme takes this into account when showing users restaurant recommendations, restaurants that have been disliked by a user will not be recommended to them, while restaurants that are liked will be recommened more frequently.
 
 
-[API of our FoodMe Project](docs/allclasses-frame.html)
