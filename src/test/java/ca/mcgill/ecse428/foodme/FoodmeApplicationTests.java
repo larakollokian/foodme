@@ -34,7 +34,7 @@ import ca.mcgill.ecse428.foodme.security.Password;
  * This class serves to all repository methods that access the database
  * AppUserRepository.java, RestaurantRepository.java and PreferenceRepository.java
  *
- * */
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FoodmeApplicationTests {
@@ -42,7 +42,7 @@ public class FoodmeApplicationTests {
 	private static final String USERNAME = "test";
 	private static final String FIRSTNAME = "John";
 	private static final String LASTNAME="Doe";
-	private static String EMAIL="johnDoe@hotmail.ca";
+	private static String EMAIL = "johnDoe@hotmail.ca";
 	private String PASSWORD = "HelloWorld123";
 
     private MockMvc mockMvc;
@@ -781,8 +781,6 @@ public class FoodmeApplicationTests {
 ////        assertTrue(restaurant.name.compareToIgnoreCase("Gary Danko"));
 //        assertTrue(!Objects.isNull(restaurant));
 //    }
-
-
 
 }
 
