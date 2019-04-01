@@ -9,3 +9,7 @@ By creating an account users have access to additional features such as if they 
 
 
 [add google doc test] (https://docs.google.com/document/d/1k68nE1JissS-cKd3ogIabY2UrFCUAL5q4O904sxv8uw/edit#heading=h.abhn8m7uogl)
+
+
+
+A detailed [Report](Final Report.pdf) has been added for more information on how we managed to complete the project and the Agile values that we followed throughout the project.
